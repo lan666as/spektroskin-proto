@@ -201,7 +201,7 @@ export interface paths {
         /**
          * Run Ai
          * @description Add the AI outputs to a capture processed before they existed. Idempotent; never changes
-         *     stored measurements. Allowed for the capturing clinician and dermatologists of the group.
+         *     stored measurements.
          */
         post: operations["run_ai_api_captures__capture_id__ai_post"];
         delete?: never;
@@ -466,6 +466,27 @@ export interface components {
              */
             learning_queue: components["schemas"]["LearningCase"][];
         };
+        /** AbcdScore */
+        AbcdScore: {
+            /** Asymmetry Axes */
+            asymmetry_axes: number;
+            /** Abrupt Border Segments */
+            abrupt_border_segments: number;
+            /** Colours */
+            colours: string[];
+            /** Structures */
+            structures: string[];
+            /**
+             * Tds
+             * @description Total dermoscopy score, 1.3A + 0.1B + 0.5C + 0.5D (Stolz)
+             */
+            tds: number;
+            /**
+             * Category
+             * @enum {string}
+             */
+            category: "benign" | "suspicious" | "highly_suspicious";
+        };
         /**
          * AcralOpinion
          * @description Research-mode acral pattern read (pigment along furrows or ridges) from a model trained on
@@ -575,6 +596,22 @@ export interface components {
              */
             client_secret?: string | null;
         };
+        /** BraaffScore */
+        BraaffScore: {
+            /** Items */
+            items: {
+                [key: string]: number;
+            };
+            /** Not Assessed */
+            not_assessed: string[];
+            /** Score */
+            score: number;
+            /**
+             * Suspicious
+             * @description Score of 1 or more (Lallas et al. 2015)
+             */
+            suspicious: boolean;
+        };
         /** CaptureOut */
         CaptureOut: {
             /**
@@ -636,6 +673,7 @@ export interface components {
             change_since_first?: components["schemas"]["ChangeSinceFirst"] | null;
             triage_model?: components["schemas"]["TriageOpinion"] | null;
             acral_model?: components["schemas"]["AcralOpinion"] | null;
+            checklists?: components["schemas"]["Checklists"] | null;
             morphology?: components["schemas"]["Morphology"] | null;
             /** Registration Shift Px */
             registration_shift_px?: {
@@ -706,7 +744,7 @@ export interface components {
              * @description Named criteria worth the dermatologist's attention; not a score
              * @default []
              */
-            attention_flags: ("ridge_pattern" | "growing" | "border_change" | "looks_different" | "ai_unsure")[];
+            attention_flags: ("ridge_pattern" | "checklist_suspicious" | "growing" | "border_change" | "looks_different" | "ai_unsure")[];
             /** Captures */
             captures: components["schemas"]["CaptureOut"][];
             /** Lesion History */
@@ -762,7 +800,7 @@ export interface components {
              * @description Named criteria worth the dermatologist's attention; not a score
              * @default []
              */
-            attention_flags: ("ridge_pattern" | "growing" | "border_change" | "looks_different" | "ai_unsure")[];
+            attention_flags: ("ridge_pattern" | "checklist_suspicious" | "growing" | "border_change" | "looks_different" | "ai_unsure")[];
         };
         /**
          * ChangeSinceFirst
@@ -785,6 +823,18 @@ export interface components {
             overlap_fraction: number;
             /** Registration Shift Px */
             registration_shift_px: number[];
+        };
+        /**
+         * Checklists
+         * @description Published melanoma checklists scored automatically; decision support, not a diagnosis.
+         */
+        Checklists: {
+            /** Applicable */
+            applicable: boolean;
+            /** Reason */
+            reason?: string | null;
+            abcd?: components["schemas"]["AbcdScore"] | null;
+            braaff?: components["schemas"]["BraaffScore"] | null;
         };
         /** ChromophoreContrast */
         ChromophoreContrast: {

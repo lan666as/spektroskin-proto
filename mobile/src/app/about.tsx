@@ -44,7 +44,7 @@ export default function About() {
       <View style={{ gap: spacing.xs }}>
         <Image source={require('@/assets/images/icon.png')} style={{ width: 64, height: 64, borderRadius: 14 }} />
         <Title>SpektroSkin</Title>
-        <Text style={styles.lead}>A second look shouldn't require a second hospital.</Text>
+        <Text style={styles.lead}>A second look shouldn't require a second visit.</Text>
         <Muted>
           A research-stage concept for smaller Indonesian hospitals: a clinician captures a suspicious
           lesion with a multispectral module, and a dermatologist gives a remote second look. The

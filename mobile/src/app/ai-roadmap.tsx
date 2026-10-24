@@ -54,6 +54,14 @@ const TIERS: { tier: string; title: string; status: Status; what: string; gate: 
     gate: 'Report sensitivity and specificity with confidence intervals per Fitzpatrick type before any display.',
   },
   {
+    tier: 'Tier 3',
+    title: 'Diagnosis support: published melanoma checklists',
+    status: 'researchActive',
+    what:
+      'Running now: the ABCD rule of dermoscopy (Stolz; total dermoscopy score with the published 4.75 and 5.45 thresholds) and, on palms and soles, the BRAAFF checklist for acral melanoma (Lallas; score of 1 or more). Each item is read automatically from the pigment and blood maps, for pigmented lesions only.',
+    gate: 'Item detection is not validated: next, compare automated items with dermatologists scoring the same real captures.',
+  },
+  {
     tier: 'Tier 3b',
     title: 'Triage support: suspicion for biopsy',
     status: 'research',
@@ -101,8 +109,10 @@ export default function AiRoadmap() {
       <Card style={{ borderColor: colors.danger }}>
         <Heading>Never shown, at any tier</Heading>
         <Text style={styles.body}>
-          A diagnosis, a malignancy probability, a risk score, or a performance number that was not
-          measured. The dermatologist recommends; the treating clinician decides.
+          A diagnosis, a malignancy probability, or a performance number that was not measured. The
+          only scores shown are published melanoma checklists (ABCD TDS, BRAAFF) with their
+          published thresholds, scored automatically and labelled as decision support. The
+          dermatologist recommends; the treating clinician decides.
         </Text>
       </Card>
     </Screen>

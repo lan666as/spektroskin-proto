@@ -8,7 +8,7 @@ Where they disagree, **this file wins**. Re-read both after any context summary.
 
 Taken from the team's Drive (proposal, rewritten deck, pitch strategy, GENOHACK guide):
 
-- **Product framing:** "A second look shouldn't require a second hospital." SpektroSkin is a
+- **Product framing:** "A second look shouldn't require a second visit." SpektroSkin is a
   research-stage, smartphone-linked multispectral dermoscope concept for **smaller Indonesian
   hospitals (BPS class C/D, tier-2/3 cities)**: facilities that see suspicious lesions and can
   arrange biopsy or referral but lack dermoscopy or dermatologists.
@@ -29,6 +29,12 @@ Taken from the team's Drive (proposal, rewritten deck, pitch strategy, GENOHACK 
   (`docs/evidence/triage_model_card.md`), shown to clinician and dermatologist as "research mode ·
   not a diagnosis · simulated training data". Benign-vs-malignant stays off: the phantoms carry no
   such labels, so any such number would be fabricated.
+  *Amendment (25 Oct 2026, 06:20 WIB, builder: "I want some kind of cancer probability model, or
+  AI-assisted diagnosis"):* published melanoma checklists are scored automatically and shown with
+  their published thresholds: the ABCD rule of dermoscopy (TDS; Stolz/Nachbar 1994) and BRAAFF for
+  acral lesions (Lallas 2015), for pigmented lesions only, labelled "automated · decision support ·
+  not a diagnosis". This overrides the earlier no-risk-score rule for these published scores only.
+  A malignancy probability stays off: it would need labelled data we do not have.
 - **Pitch:** 6 min pitch+demo, 4 min Q&A (track round, Sun 10:00–12:00); the Grand Final allows 7 min.
   The deck gives the demo **~60 s** (slide 6). Judges score prototype strength, "assumptions
   tested during the hackathon", and "real outputs wherever possible"; there is a Best Prototype prize.

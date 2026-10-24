@@ -21,6 +21,7 @@ import {
 import { CaseTimeline, Footnote, HistoryStrip, Recommendation, SpectralViews, VisitCompare } from '@/ui/clinical';
 import { areaChange, AutomatedAnalysis, formatSize, measuredFindings, MorphologyCard } from '@/ui/analysis';
 import { AcralPattern, RunAiBanner, TriageSupport } from '@/ui/triage';
+import { ChecklistCard } from '@/ui/checklists';
 import { OutcomeCard } from '@/ui/outcome';
 import { SimilarCases } from '@/ui/similar';
 import { SpectralSignature } from '@/ui/measurement';
@@ -242,6 +243,7 @@ export default function ReviewCase() {
             ) : null}
             {latest && !hideAI ? <TriageSupport capture={latest} read={c.review?.pattern_read} /> : null}
             {latest && !hideAI ? <AcralPattern capture={latest} site={c.lesion.body_site} /> : null}
+            {latest && !hideAI ? <ChecklistCard capture={latest} site={c.lesion.body_site} /> : null}
             {!hideAI ? <SimilarCases caseId={c.id} /> : null}
             <CaseTimeline c={c} />
             {c.review ? (

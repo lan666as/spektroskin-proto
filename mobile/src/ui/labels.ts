@@ -104,6 +104,11 @@ export const FLAG_LABELS: Record<AttentionFlag, { label: string; why: string; to
     why: 'Acral pattern model (research mode): pigment along the ridges, a guideline reason for prompt review.',
     tone: 'danger',
   },
+  checklist_suspicious: {
+    label: 'Checklist threshold met',
+    why: 'An automated melanoma checklist (ABCD TDS or, on acral sites, BRAAFF) reaches its published threshold.',
+    tone: 'danger',
+  },
   growing: {
     label: 'Growing',
     why: 'Area grew 20% or more since the first visit (evolution).',

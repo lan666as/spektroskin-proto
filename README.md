@@ -1,6 +1,6 @@
 # SpektroSkin — GENOHACK 2026 prototype
 
-> A second look shouldn't require a second hospital.
+> A second look shouldn't require a second visit.
 
 SpektroSkin is a research-stage concept for a smartphone-linked multispectral dermoscope for smaller
 Indonesian hospitals (BPS class C/D). This repository is the **working end-to-end prototype built
@@ -14,7 +14,7 @@ records) → dermatologist review portal → recommendation back to the clinicia
 **Build log:** [BUILD_LOG.md](BUILD_LOG.md) ·
 **Evidence:** [docs/evidence/validation_report.md](docs/evidence/validation_report.md)
 
-**What this is not:** no diagnosis, no cancer probability, no risk score. Automated outputs are
+**What this is not:** no diagnosis and no cancer probability. The only scores are published melanoma checklists (ABCD TDS, BRAAFF) scored automatically with their published thresholds, as decision support. Automated outputs are
 image quality checks, deterministic image processing, and two small learned models trained on
 simulated data only: an image-quality classifier shown as an advisory second opinion
 ([model card](docs/evidence/quality_model_card.md)) and a research-mode lesion-pattern triage
@@ -47,6 +47,7 @@ dermatologist recommends; the treating clinician decides.
 | Image quality `quality_v2` | Second opinion beside the QC rules: good, blurry, glare or noisy | 0.96 vs 0.88 for the rules | [card](docs/evidence/quality_model_card.md) |
 | Lesion-pattern triage `triage_v1` | Pigment-dominant / vascular / mixed. It abstains when unsure or when a capture is outside the training range, and explains its top reasons | 0.98 overall; 0.96 on Fitzpatrick V; calibration error 0.03; RGB-only ablation 0.95 | [card](docs/evidence/triage_model_card.md) |
 | Acral pattern `acral_v1` | Palms, soles, nails: pigment along the furrows or the ridges. A ridge pattern prompts review | 0.99; abstains on faint patterns | [card](docs/evidence/acral_model_card.md) |
+| Melanoma checklists (published rules) | ABCD rule of dermoscopy (TDS, thresholds 4.75 / 5.45) and BRAAFF for acral lesions (≥ 1), scored automatically on pigmented lesions | Not validated: the items are read automatically from simulated images | `backend/app/processing/checklists.py` |
 
 Around the models:
 - **AI evidence view:** where the pigment and blood evidence sits in the lesion.

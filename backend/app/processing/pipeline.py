@@ -3,6 +3,7 @@ from dataclasses import replace
 from app.processing import render
 from app.processing.acral_model import predict as acral_opinion
 from app.processing.calibration import calibrate
+from app.processing.checklists import score as checklist_score
 from app.processing.qc import run_qc
 from app.processing.quality_model import predict as quality_opinion
 from app.processing.registration import register
@@ -19,6 +20,7 @@ def run(frame_set: FrameSet, device_profile: DeviceProfile) -> ProcessingResult:
     models (research mode) suggest patterns for the dermatologist."""
     result = measure(frame_set, device_profile)
     measured = result.mask is not None
+    acral = acral_opinion(result.reflectance, result.melanin, result.mask) if measured else None
     return replace(
         result,
         quality_model=quality_opinion(frame_set, device_profile),
@@ -27,7 +29,10 @@ def run(frame_set: FrameSet, device_profile: DeviceProfile) -> ProcessingResult:
         )
         if measured
         else None,
-        acral_model=acral_opinion(result.reflectance, result.melanin, result.mask)
+        acral_model=acral,
+        checklists=checklist_score(
+            result.melanin, result.hemoglobin, result.mask, (acral or {}).get("pattern")
+        )
         if measured
         else None,
     )

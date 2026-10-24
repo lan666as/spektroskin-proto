@@ -50,6 +50,13 @@ def attention_flags(case: Case) -> list[str]:
         before, now = _border(first), _border(latest)
         if before is not None and now is not None and now - before >= BORDER_FLAG:
             flags.append("border_change")
+    checklists = result.get("checklists") or {}
+    braaff = checklists.get("braaff") or {}
+    abcd = checklists.get("abcd") or {}
+    if abcd.get("category", "benign") != "benign" or (
+        case.lesion.body_site in ACRAL_SITES and braaff.get("suspicious")
+    ):
+        flags.append("checklist_suspicious")
     if case.lesion.id in looks_different(case.lesion.patient.lesions):
         flags.append("looks_different")
     triage = result.get("triage_model")

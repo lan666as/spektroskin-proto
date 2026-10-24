@@ -58,6 +58,7 @@ def capture_out(capture: Capture, viewer: User) -> CaptureOut:
         quality_model=capture.result.get("quality_model"),
         triage_model=capture.result.get("triage_model"),
         acral_model=capture.result.get("acral_model"),
+        checklists=capture.result.get("checklists"),
         morphology=capture.result.get("morphology"),
         change_since_first=capture.result.get("change_since_first"),
         registration_shift_px=capture.result.get("registration_shift_px"),

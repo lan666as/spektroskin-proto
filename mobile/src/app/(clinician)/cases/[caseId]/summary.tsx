@@ -20,6 +20,7 @@ import {
 } from '@/ui/labels';
 import { HISTO_LABELS, OUTCOME_LABELS } from '@/ui/outcome';
 import { patternSummary } from '@/ui/triage';
+import { checklistSummary } from '@/ui/checklists';
 import { usePrintStyles } from '@/ui/printStyles';
 import { SimulatedBadge } from '@/ui/SimulatedBadge';
 import { colors, spacing } from '@/ui/theme';
@@ -130,6 +131,9 @@ export default function ReferralSummary() {
                       : 'Uncertain'
                   }
                 />
+              ) : null}
+              {checklistSummary(reviewed.checklists, c.lesion.body_site) ? (
+                <Line label="Melanoma checklists" value={checklistSummary(reviewed.checklists, c.lesion.body_site)!.replace('Checklists: ', '')} />
               ) : null}
               {c.review.pattern_read ? <Line label="Dermatologist's pattern read" value={c.review.pattern_read} /> : null}
               <Muted>Not a diagnosis. Models trained and tested on simulated data only.</Muted>

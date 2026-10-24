@@ -558,3 +558,29 @@ Timestamped record of what was built during GENOHACK (Sat 24 – Sun 25 Oct 2026
     mistake, the Dependabot advisories);
   - what changed, with screenshot folders;
   - phone checks, the updated demo script, deck and Q&A lines on the AI, and known limits.
+
+## 2026-10-25 06:20 WIB — Builder requests: PT-0011 cleanup, motto, melanoma checklists
+
+- **PT-0011 cleanup (builder-approved):** `scripts/remove_seed_leak.py`.
+  - It removes exactly the 4 seeded lesions and their captures, rows and stored files, only if
+    each lesion still belongs to PT-0011, has no case, and holds only the listed capture.
+  - It ran through the deploy path, not raw ssh: a dry run on live-38 listed exactly the 4; the
+    apply ran on live-39; it is a no-op on later deploys.
+  - The builder's own PT-0011 lesions were untouched.
+  - Storage gained `delete_prefix`.
+- **Motto** now "A second look shouldn't require a second visit." (login, About, README, PLAN).
+- **AI-assisted diagnosis support:** `app/processing/checklists.py` scores published melanoma
+  checklists automatically:
+  - the ABCD rule of dermoscopy (TDS = 1.3A + 0.1B + 0.5C + 0.5D; benign < 4.75, suspicious to 5.45,
+    highly suspicious above);
+  - BRAAFF for acral lesions (Lallas 2015; ≥ 1 suggests acral melanoma);
+  - pigmented lesions only (vascular lesions are "not applicable");
+  - BRAAFF is dropped on non-acral sites.
+- **In the app:** a "Melanoma checklists" card (results, reviewer) with each item, the published
+  thresholds, citations and a "consider review and biopsy" line when a threshold is met; a line in
+  the AI assist strip; a queue flag "Checklist threshold met"; the referral summary line; an AI
+  roadmap tier.
+- No probability is shown. PLAN §0 amendment records the override of the no-risk-score rule for
+  these published scores. Tests: formula, applicability, BRAAFF on the ridge phantom; e2e asserts
+  the cards. Item thresholds were set on simulated phantoms; item detection is not clinically
+  validated, and the card says so.

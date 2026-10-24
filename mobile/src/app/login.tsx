@@ -35,7 +35,7 @@ export default function Login() {
       <View style={styles.brand}>
         <Image source={require('@/assets/images/icon.png')} style={{ width: 64, height: 64, borderRadius: 14 }} />
         <Title>SpektroSkin</Title>
-        <Text style={styles.tagline}>A second look shouldn't require a second hospital.</Text>
+        <Text style={styles.tagline}>A second look shouldn't require a second visit.</Text>
         <SimulatedBadge label="Research prototype · optical module simulated" />
       </View>
       <Card>

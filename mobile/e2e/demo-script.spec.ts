@@ -110,6 +110,8 @@ test('PLAN §6 demo script: 60 s core + extended', async ({ browser, request }) 
   await expect(byId(clinician, 'triage-support')).toContainText('not a diagnosis');
   await expect(byId(clinician, 'triage-drivers')).toContainText('melanin excess');
   await expect(byId(clinician, 'acral-pattern-result')).toContainText('furrows');
+  await expect(byId(clinician, 'abcd')).toContainText('TDS');
+  await expect(byId(clinician, 'checklists')).not.toContainText('%');
   await expect(byId(clinician, 'morph-border')).toContainText('since Day 01');
   await expect(byId(clinician, 'morph-evolution')).toContainText('mm² new');
   await expect(byId(clinician, 'morphology')).not.toContainText(/score\s*[:=]?\s*\d/i);

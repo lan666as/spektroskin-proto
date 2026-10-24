@@ -58,8 +58,11 @@ def ingest(
 
     summary = result.summary()
     if lesion.body_site not in ACRAL_SITES:
-        # The acral pattern read only means something on palms, soles and nails.
+        # The acral pattern read and the BRAAFF checklist only mean something on palms, soles
+        # and nails.
         summary["acral_model"] = None
+        if (summary.get("checklists") or {}).get("braaff"):
+            summary["checklists"]["braaff"] = None
     if change is not None:
         summary["views"] = sorted(views)
         summary["change_since_first"] = change[1]
@@ -116,12 +119,13 @@ def _change_since_first(session, storage: Storage, lesion: Lesion, captured_at, 
     return mask_spacer(image), {**stats, "first_capture_id": str(first.id)}
 
 
-NEWER_OUTPUTS = ("quality_model", "triage_model", "acral_model", "morphology")
+NEWER_OUTPUTS = ("quality_model", "triage_model", "acral_model", "morphology", "checklists")
 AREA_TOLERANCE_MM2 = 0.01
 
 
 def lacks_newer_outputs(capture: Capture) -> bool:
-    return capture.status == "processed" and "triage_model" not in (capture.result or {})
+    result = capture.result or {}
+    return capture.status == "processed" and any(k not in result for k in NEWER_OUTPUTS)
 
 
 def add_newer_outputs(storage: Storage, capture: Capture, *, apply: bool) -> str:
@@ -146,6 +150,8 @@ def add_newer_outputs(storage: Storage, capture: Capture, *, apply: bool) -> str
         return "would_update"
     if capture.lesion.body_site not in ACRAL_SITES:
         summary["acral_model"] = None
+        if (summary.get("checklists") or {}).get("braaff"):
+            summary["checklists"]["braaff"] = None
     new_views = sorted(set(result.views) - set(capture.result.get("views", [])))
     for name in new_views:
         storage.put(view_key(capture.id, name), encode_png_rgb(result.views[name]))

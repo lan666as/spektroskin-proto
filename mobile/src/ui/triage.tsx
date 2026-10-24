@@ -5,6 +5,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { api, type BodySite, type Capture } from '@/api/client';
 
 import { Button, Card, ErrorBanner, Heading, Muted, Row } from './components';
+import { checklistSummary } from './checklists';
 import { isAcral } from './labels';
 import { SimulatedBadge } from './SimulatedBadge';
 import { colors, radius, spacing } from './theme';
@@ -173,6 +174,11 @@ export function AiGlance({ capture, site }: { capture: Capture; site?: BodySite 
           {acral.pattern === 'ridge' ? 'ridges ⚠ prompt review' : acral.pattern === 'furrow' ? 'furrows' : '… (uncertain)'}
         </Text>
       ) : null}
+      {checklistSummary(capture.checklists, site) ? (
+        <Text style={styles.glanceLine} testID="ai-glance-checklists">
+          {checklistSummary(capture.checklists, site)}
+        </Text>
+      ) : null}
       {change ? (
         <Text style={styles.glanceLine}>
           Since Day 01: {change.new_area_mm2.toFixed(1)} mm² new area
@@ -190,7 +196,7 @@ export function RunAiBanner({ capture }: { capture: Capture }) {
     mutationFn: () => api.runAi(capture.id),
     onSuccess: () => queryClient.invalidateQueries(),
   });
-  if (capture.status !== 'processed' || capture.triage_model) return null;
+  if (capture.status !== 'processed' || capture.checklists) return null;
   return (
     <Card testID="run-ai">
       <Muted>This capture was processed before the AI models existed.</Muted>

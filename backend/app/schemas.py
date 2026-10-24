@@ -35,7 +35,14 @@ ReviewAction = Literal["observe", "biopsy", "refer"]
 OutcomeAction = Literal["observed", "biopsied", "excised", "referred", "declined"]
 Histopathology = Literal["pending", "benign", "malignant", "indeterminate"]
 PatternRead = Literal["pigmented", "vascular", "mixed", "unsure"]
-AttentionFlag = Literal["ridge_pattern", "growing", "border_change", "looks_different", "ai_unsure"]
+AttentionFlag = Literal[
+    "ridge_pattern",
+    "checklist_suspicious",
+    "growing",
+    "border_change",
+    "looks_different",
+    "ai_unsure",
+]
 ViewName = Literal["standard", "pigment", "vascular", "evidence", "change"]
 
 PatientCode = Annotated[str, StringConstraints(pattern=r"^PT-\d{4}$")]
@@ -219,6 +226,31 @@ class AcralOpinion(BaseModel):
     trained_on: str
 
 
+class AbcdScore(BaseModel):
+    asymmetry_axes: int
+    abrupt_border_segments: int
+    colours: list[str]
+    structures: list[str]
+    tds: float = Field(description="Total dermoscopy score, 1.3A + 0.1B + 0.5C + 0.5D (Stolz)")
+    category: Literal["benign", "suspicious", "highly_suspicious"]
+
+
+class BraaffScore(BaseModel):
+    items: dict[str, int]
+    not_assessed: list[str]
+    score: int
+    suspicious: bool = Field(description="Score of 1 or more (Lallas et al. 2015)")
+
+
+class Checklists(BaseModel):
+    """Published melanoma checklists scored automatically; decision support, not a diagnosis."""
+
+    applicable: bool
+    reason: str | None = None
+    abcd: AbcdScore | None = None
+    braaff: BraaffScore | None = None
+
+
 class CaptureOut(BaseModel):
     id: uuid.UUID
     lesion_id: uuid.UUID
@@ -238,6 +270,7 @@ class CaptureOut(BaseModel):
     change_since_first: ChangeSinceFirst | None = None
     triage_model: TriageOpinion | None = None
     acral_model: AcralOpinion | None = None
+    checklists: Checklists | None = None
     morphology: Morphology | None = None
     registration_shift_px: dict[str, list[float]] | None = None
     gain_correction: dict[str, float] | None = None

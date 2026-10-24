@@ -83,4 +83,6 @@ test('clinician: login → patient → lesion → capture → results with histo
   await captureWith(page, 'acral_ridge_dark');
   await expect(byId(page, 'acral-pattern-result')).toContainText('ridges');
   await expect(byId(page, 'acral-guideline')).toContainText('prompt dermatologist review');
+  await expect(byId(page, 'braaff')).toContainText('Meets the criterion for suspected acral melanoma');
+  await expect(byId(page, 'checklist-action')).toContainText('consider dermatologist review');
 });

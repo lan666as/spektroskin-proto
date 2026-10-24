@@ -179,9 +179,9 @@ export function AutomatedAnalysis({
       ))}
       <StepRow
         step={{
-          title: 'Benign or malignant assessment',
+          title: 'Malignancy probability',
           result: 'Not active',
-          how: 'Needs real, consented, histopathology-labelled captures and ethics approval. Never estimated from simulated data.',
+          how: 'A probability needs real, consented, histopathology-labelled captures and ethics approval; it is never estimated from simulated data. The published checklists above are shown instead.',
           active: false,
           testID: 'triage-not-active',
         }}
