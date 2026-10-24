@@ -297,3 +297,14 @@ Timestamped record of what was built during GENOHACK (Sat 24 – Sun 25 Oct 2026
   cases. Never a score; the queue order stays first come, first served.
 - Queue: flag pills and an "All / With attention flags" filter; case page lists each flag with why
   it was raised. Tests for the flag rules; demo e2e asserts "Growing" on the demo lesion.
+
+## 2026-10-25 01:59 WIB — Iteration loop, batch 10: AI evidence map, honesty text corrected
+
+- New "AI evidence" view per capture (`render.evidence_view`): amber = melanin above the surrounding
+  skin, red = blood above it (blended by share), pink = brightest blood spots, on a grey standard
+  view with the outline. It shows where the evidence the triage model reads sits. Added to the image
+  whitelist and to the view checks in tests, smoke and e2e.
+- Corrected statements that had become false: the app footnote and the About page said "no AI";
+  they now say what the AI is (research-mode suggestions from models trained on simulated data) and
+  still rule out diagnosis, cancer probability and risk scores. About's real-vs-simulated table lists
+  the models (real code) and their accuracy numbers (simulated data).

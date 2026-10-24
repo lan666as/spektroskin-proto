@@ -99,7 +99,7 @@ test('PLAN §6 demo script: 60 s core + extended', async ({ browser, request }) 
   await expect(byId(clinician, 'qc-second-opinion')).toContainText('agrees with the rules');
   await shot(clinician, '05-results');
   // 3: switch the three views; outline and area.
-  for (const view of ['pigment', 'vascular', 'standard']) {
+  for (const view of ['pigment', 'vascular', 'evidence', 'standard']) {
     await byId(clinician, `view-${view}`).click();
     await expect(byId(clinician, `view-image-${view}`)).toBeVisible();
   }

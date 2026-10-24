@@ -48,7 +48,7 @@ test('clinician: login → patient → lesion → capture → results with histo
   await captureWith(page, 'acral_dark_d30');
   await expect(byId(page, 'qc-passed')).toBeVisible();
 
-  for (const view of ['pigment', 'vascular', 'standard']) {
+  for (const view of ['pigment', 'vascular', 'evidence', 'standard']) {
     await byId(page, `view-${view}`).click();
     await expect(byId(page, `view-image-${view}`)).toBeVisible();
   }

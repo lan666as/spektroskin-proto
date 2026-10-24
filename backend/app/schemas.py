@@ -36,7 +36,7 @@ OutcomeAction = Literal["observed", "biopsied", "excised", "referred", "declined
 Histopathology = Literal["pending", "benign", "malignant", "indeterminate"]
 PatternRead = Literal["pigmented", "vascular", "mixed", "unsure"]
 AttentionFlag = Literal["ridge_pattern", "growing", "border_change", "ai_unsure"]
-ViewName = Literal["standard", "pigment", "vascular"]
+ViewName = Literal["standard", "pigment", "vascular", "evidence"]
 
 PatientCode = Annotated[str, StringConstraints(pattern=r"^PT-\d{4}$")]
 Text2000 = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=2000)]

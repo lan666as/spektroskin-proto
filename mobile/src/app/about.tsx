@@ -12,6 +12,8 @@ const REAL_VS_SIMULATED: [string, string, boolean][] = [
   ['Calibration, registration, spectral maps, outline, area', 'Real code', true],
   ['Clinician app (Android and web) and review portal', 'Real', true],
   ['Records, audit log, consent flag', 'Real (demo login only)', true],
+  ['AI models (quality, lesion pattern, acral pattern)', 'Real models, trained on simulated data', true],
+  ['AI accuracy numbers', 'Measured on held-out simulated data, not patients', false],
 ];
 
 const PIPELINE = [
@@ -57,7 +59,11 @@ export default function About() {
             </View>
           </View>
         ))}
-        <Muted>No diagnosis, cancer probability, risk score or AI anywhere. No real patient images.</Muted>
+        <Muted>
+          No diagnosis, cancer probability or risk score anywhere. The AI suggests patterns in
+          research mode and abstains when unsure; the dermatologist reads, the clinician decides. No
+          real patient images.
+        </Muted>
       </Card>
 
       <Card>

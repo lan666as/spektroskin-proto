@@ -14,7 +14,7 @@ Taken from the team's Drive (proposal, rewritten deck, pitch strategy, GENOHACK 
   arrange biopsy or referral but lack dermoscopy or dermatologists.
 - **Users:** a general physician or dermatology staff member captures the image (clinician app). A remote
   dermatologist gives the "second look" (reviewer portal) and *recommends* observe, biopsy or refer.
-  **The treating clinician decides.** No AI, no risk score, no autonomous triage.
+  **The treating clinician decides.** No AI, no risk score, no autonomous triage (AI amended below).
   *Amendment (25 Oct 2026, 00:15 WIB, builder's overnight brief):* automated assistance that really
   exists (image-quality check, lesion outline and measurements, change tracking across visits) is
   shown and labelled as automated assistance with its limits. One small model may be trained on the

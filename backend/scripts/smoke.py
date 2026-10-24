@@ -181,7 +181,10 @@ def run(base: str) -> None:
         f"POST /captures (clean phantom processed): {status} {capture}",
     )
     expect(capture["simulated"] is True, "capture is flagged simulated")
-    expect(set(capture["views"]) == {"standard", "pigment", "vascular"}, "three views returned")
+    expect(
+        set(capture["views"]) == {"standard", "pigment", "vascular", "evidence"},
+        "four views returned",
+    )
     status, again = upload(c, lesion["id"], "acral_dark_d30", capture_id)
     expect(
         status == 200 and again["id"] == capture_id, f"POST /captures retry idempotent: {status}"

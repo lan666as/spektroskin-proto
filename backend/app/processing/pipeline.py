@@ -57,6 +57,9 @@ def measure(frame_set: FrameSet, device_profile: DeviceProfile) -> ProcessingRes
         "standard": render.with_outline(standard, mask),
         "pigment": render.with_outline(render.mask_spacer(render.pigment_view(melanin)), mask),
         "vascular": render.with_outline(render.mask_spacer(render.vascular_view(hemoglobin)), mask),
+        "evidence": render.with_outline(
+            render.mask_spacer(render.evidence_view(standard, melanin, hemoglobin, mask)), mask
+        ),
     }
     return ProcessingResult(
         qc=qc,

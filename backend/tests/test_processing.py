@@ -34,7 +34,7 @@ def test_clean_phantom_passes_qc_and_recovers_ground_truth(phantom_id: str) -> N
     assert m["hemoglobin_rmse"] <= 0.03
     assert m["mask_dice"] >= 0.93
     assert abs(m["area_error_pct"]) <= 10.0
-    assert set(result.views) == {"standard", "pigment", "vascular"}
+    assert set(result.views) == {"standard", "pigment", "vascular", "evidence"}
 
 
 @pytest.mark.parametrize("phantom_id", CLEAN)

@@ -1790,7 +1790,7 @@ export interface operations {
             header?: never;
             path: {
                 capture_id: string;
-                name: "standard" | "pigment" | "vascular";
+                name: "standard" | "pigment" | "vascular" | "evidence";
             };
             cookie?: never;
         };
