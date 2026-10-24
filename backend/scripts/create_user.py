@@ -1,4 +1,5 @@
-"""Create a user if it does not exist (idempotent). The password is read from stdin so it never
+"""Create a user if it does not exist (idempotent); with --update-password, also reset the
+password of an existing user. The password is read from stdin so it never
 appears in argv, shell history or logs.
 
     security find-generic-password -s spektroskin-demo-clinician -w | \\
@@ -11,11 +12,11 @@ import sys
 
 from sqlalchemy import select
 
-from app.auth import hash_password
+from app.auth import hash_password, verify_password
 from app.db import get_sessionmaker
 from app.models import ROLES, User
 
-MIN_PASSWORD_LENGTH = 12
+MIN_PASSWORD_LENGTH = 8
 
 
 def main() -> int:
@@ -28,6 +29,11 @@ def main() -> int:
         "--test-user",
         action="store_true",
         help="automated smoke/e2e account (kept out of demo views)",
+    )
+    parser.add_argument(
+        "--update-password",
+        action="store_true",
+        help="reset the password if the user exists (the caller's secret store is the source)",
     )
     args = parser.parse_args()
 
@@ -42,6 +48,11 @@ def main() -> int:
             if existing.role != args.role:
                 print(f"user {args.username} exists with role {existing.role}", file=sys.stderr)
                 return 1
+            if args.update_password and not verify_password(password, existing.password_hash):
+                existing.password_hash = hash_password(password)
+                session.commit()
+                print(f"user {args.username} exists; password updated")
+                return 0
             print(f"user {args.username} exists; unchanged")
             return 0
         session.add(

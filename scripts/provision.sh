@@ -29,8 +29,9 @@ create() {
     --username "$username" --role "$role" --display-name "$display" --password-stdin "$@"
 }
 
-create clinician clinician "dr. Demo Clinician" demo-clinician
-create dermatologist dermatologist "dr. Demo Dermatologist, Sp.D.V.E." demo-dermatologist
+# Demo passwords follow the Keychain (simple on purpose for the live demo; synthetic data only).
+create clinician clinician "dr. Demo Clinician" demo-clinician --update-password
+create dermatologist dermatologist "dr. Demo Dermatologist, Sp.D.V.E." demo-dermatologist --update-password
 create smoke-clinician clinician "Smoke Test Clinician" smoke-clinician --test-user
 create smoke-dermatologist dermatologist "Smoke Test Dermatologist" smoke-dermatologist --test-user
 api_exec -m scripts.seed
