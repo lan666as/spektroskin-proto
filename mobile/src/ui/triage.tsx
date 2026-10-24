@@ -36,7 +36,7 @@ export function TriageSupport({ capture, read }: { capture: Capture; read?: stri
     <Card testID="triage-support" style={{ borderColor: colors.accent }}>
       <Row style={{ justifyContent: 'space-between', flexWrap: 'wrap' }}>
         <Heading>Triage support</Heading>
-        <Row style={{ gap: spacing.xs }}>
+        <Row style={{ gap: spacing.xs, flexWrap: 'wrap' }}>
           <View style={styles.research}>
             <Text style={styles.researchText}>Research mode · not a diagnosis</Text>
           </View>
@@ -118,7 +118,7 @@ export function AcralPattern({ capture, site }: { capture: Capture; site: BodySi
     <Card testID="acral-pattern" style={{ borderColor: ridge ? colors.danger : colors.accent }}>
       <Row style={{ justifyContent: 'space-between', flexWrap: 'wrap' }}>
         <Heading>Acral pattern</Heading>
-        <Row style={{ gap: spacing.xs }}>
+        <Row style={{ gap: spacing.xs, flexWrap: 'wrap' }}>
           <View style={styles.research}>
             <Text style={styles.researchText}>Research mode · not a diagnosis</Text>
           </View>

@@ -319,3 +319,13 @@ Timestamped record of what was built during GENOHACK (Sat 24 – Sun 25 Oct 2026
   and are not retrieved (no production backfill).
 - Tests: DB test for ranking and same-lesion exclusion; smoke covers the endpoint; demo e2e asserts
   the card.
+
+## 2026-10-25 02:19 WIB — Iteration loop, batch 12: audit 2 fixes
+
+- Audit 2 (docs/screenshots/20261025-0212-audit-2, critique in ITERATION_BACKLOG.md).
+- The acral pattern model no longer runs without pigment to read (melanin excess < 0.3); this fixes
+  a false "follows the furrows" on vascular acral lesions. Test added; model card notes it.
+- AI card badges wrap at phone width; the measurements card moved below the submit button.
+- `scripts/reprocess_captures.py` (dry run by default) adds the newer outputs to captures from
+  before batch 2. Verified on the local dev database (195 updated, 0 skipped, idempotent). Not run
+  on production: it is a backfill and needs the builder's go-ahead.

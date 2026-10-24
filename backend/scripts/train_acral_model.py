@@ -18,7 +18,14 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import confusion_matrix
 from sklearn.preprocessing import StandardScaler
 
-from app.processing.acral_model import ABSTAIN_BELOW, CLASSES, MODEL_PATH, features, probabilities
+from app.processing.acral_model import (
+    ABSTAIN_BELOW,
+    CLASSES,
+    MIN_PIGMENT_EXCESS,
+    MODEL_PATH,
+    features,
+    probabilities,
+)
 from app.processing.pipeline import measure
 from simulator.device import capture, factory_profile
 from simulator.phantoms import TONE_FITZPATRICK, PhantomSpec, ground_truth
@@ -169,6 +176,8 @@ Confusion (rows = true, columns = predicted: furrow, ridge): {h["confusion"]}
 - Simulated ridges and pigment from a simplified optical model; real dermatoglyphics, sweat pores,
   hyperkeratosis and pressure change the picture. Must be retrained and validated on real,
   consented acral captures before any clinical use.
+- Not run when the lesion carries little extra pigment (melanin excess below
+  {MIN_PIGMENT_EXCESS}): there is no pigment pattern to read, e.g. on vascular lesions.
 - Two patterns only; fibrillar, lattice-like and irregular patterns are not modelled.
 - Not a medical device.
 """

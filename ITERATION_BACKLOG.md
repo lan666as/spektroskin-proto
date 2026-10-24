@@ -48,3 +48,34 @@ Score = judge impact (1–5) × 2 − risk (1–5) − effort (S=1, M=2, L=3). D
 | 8 | Visual refresh: light-gray canvas with white cards, initials avatars, compact device card | 3 | 2 | M | 2 | todo |
 | 9 | Referral summary: add measurements, automated-analysis notes and the outcome | 3 | 1 | S | 4 | todo |
 | 10 | Reviewer case card: change since Day 01 and diameter next to area | 3 | 1 | S | 4 | done (batch 1) |
+
+## Audit 2 — 02:12 WIB, live site, after batches 2–11
+
+Screenshots: `docs/screenshots/20261025-0212-audit-2/` (demo script against live, 390 px and 1440 px).
+
+What changed since audit 1: three working models (image quality, lesion-pattern triage, acral
+pattern) with model cards and held-out metrics, the RGB-vs-spectral ablation, explanations ("why
+this suggestion", AI evidence view), dermoscopy-style measurements, the care lifecycle (outcome,
+histopathology, to-do list), shadow-mode validation with blind reads, an AI & validation page,
+attention flags in the queue, similar-case retrieval, and per-capture simulation.
+
+Findings and fixes:
+
+- **Wrong output (fixed, batch 12):** the acral card read "pigment follows the furrows" on a
+  vascular lesion with no pigment. The model now only runs when the lesion has extra pigment.
+- **Layout (fixed, batch 12):** the badges on the AI cards were clipped at 390 px; the results page
+  pushed the submit button below four cards. The badges now wrap, and the measurements card sits
+  below the submit button.
+- **Seeded demo data has no AI outputs (needs the builder):** production captures from before
+  batch 2 (the seeded PT-0003 / PT-0005 / PT-0007 history) lack triage, acral, morphology and the
+  evidence view. `backend/scripts/reprocess_captures.py` adds them from the stored raw frames.
+  - It is a dry run by default.
+  - With `--apply` it only adds missing keys and never changes stored measurements.
+  - It was verified on the local dev database: 195 captures updated, 0 skipped, and a second run
+    found nothing left to do.
+  - Running it on production is a data backfill, so it is left for the builder to decide.
+- **Test-account queue is long:** many smoke cases are visible. This only affects the smoke
+  account; demo accounts never see test data.
+
+Re-ranked next items: referral summary with AI and outcome (9), visual refresh (8), demo-script
+update in PLAN §6 for the AI moments.

@@ -22,6 +22,9 @@ from app.processing.spectral import shading
 MODEL_PATH = Path(__file__).resolve().parent / "models" / "acral_v1.json"
 CLASSES = ("furrow", "ridge")
 ABSTAIN_BELOW = 0.75
+# Below this melanin excess over the surrounding skin there is no pigment pattern to read
+# (vascular lesions sit near 0, the faintest trained pigmented lesions near 0.5).
+MIN_PIGMENT_EXCESS = 0.3
 
 
 def _band_pass(x: np.ndarray) -> np.ndarray:
@@ -70,7 +73,7 @@ def predict(
     reflectance: dict[str, np.ndarray], melanin: np.ndarray, mask: np.ndarray
 ) -> dict | None:
     x = features(reflectance, melanin, mask)
-    if x is None:
+    if x is None or x[4] < MIN_PIGMENT_EXCESS:
         return None
     w = _weights()
     p = probabilities(x, w)

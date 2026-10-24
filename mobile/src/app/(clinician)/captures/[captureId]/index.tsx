@@ -49,9 +49,9 @@ export default function Results() {
               <SpectralViews capture={c} />
               <TriageSupport capture={c} />
               {lesion.data ? <AcralPattern capture={c} site={lesion.data.body_site} /> : null}
-              <MorphologyCard capture={c} visits={lesion.data?.captures ?? []} />
               {lesion.data ? <VisitCompare captures={lesion.data.captures} selectedId={c.id} /> : null}
               <Button label="Submit for dermatologist review" onPress={submit} testID="submit-for-review" />
+              <MorphologyCard capture={c} visits={lesion.data?.captures ?? []} />
               <AutomatedAnalysis capture={c} visits={lesion.data?.captures ?? []} site={lesion.data?.body_site} />
               {lesion.data ? (
                 <HistoryStrip

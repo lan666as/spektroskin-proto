@@ -1,6 +1,6 @@
 # Model card: acral pattern model `acral_v1` (research mode)
 
-Trained 2026-10-24 18:27 UTC on top of commit `9896864` with
+Trained 2026-10-24 19:14 UTC on top of commit `8ab5fc8` with
 `uv run python -m scripts.train_acral_model` (deterministic).
 
 ## What it does
@@ -40,5 +40,7 @@ Confusion (rows = true, columns = predicted: furrow, ridge): [[117, 1], [1, 111]
 - Simulated ridges and pigment from a simplified optical model; real dermatoglyphics, sweat pores,
   hyperkeratosis and pressure change the picture. Must be retrained and validated on real,
   consented acral captures before any clinical use.
+- Not run when the lesion carries little extra pigment (melanin excess below
+  0.3): there is no pigment pattern to read, e.g. on vascular lesions.
 - Two patterns only; fibrillar, lattice-like and irregular patterns are not modelled.
 - Not a medical device.
