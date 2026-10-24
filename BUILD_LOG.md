@@ -84,6 +84,14 @@ Timestamped record of what was built during GENOHACK (Sat 24 – Sun 25 Oct 2026
   clinician submits → dermatologist sees it in the queue and recommends Biopsy / 14 days →
   clinician page shows the recommendation via polling. Full gate: pytest 32, smoke 32/32, e2e 4/4.
 
+### 2026-10-24 21:56 WIB — M6: deployed, tagged v-core
+- `scripts/deploy.sh` (refuses unless clean `main` + green gate; pushes; VPS `git pull --ff-only`;
+  ships the gate-tested web export; `docker compose -f docker-compose.yml up -d --build --wait`;
+  provisions users from Keychain over ssh; seeds; verifies publicly).
+- Verified against https://spektroskin.zidan.dev (commit 9c6872d): health 200, smoke 32/32,
+  Playwright e2e 4/4 (clinician flow at 390 px, two-context review loop). Demo clinician sees seeded
+  PT-0003 / PT-0005 / PT-0007; PT-0007 sole has Day 01 (18.4 mm²) and Day 14 (22.6 mm²) visits.
+
 ## Decisions made alone
 - M1: Expo routes live in `mobile/src/app/` (SDK 58 template convention) instead of `mobile/app/`.
 - M1: web export uses `web.output: "single"` (SPA) so Caddy can serve deep links via `try_files`.
