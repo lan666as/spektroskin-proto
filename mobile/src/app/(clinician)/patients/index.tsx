@@ -3,7 +3,7 @@ import { Stack, useRouter } from 'expo-router';
 
 import { api } from '@/api/client';
 import { Button, Empty, ErrorBanner, ListItem, Loading, Screen } from '@/ui/components';
-import { patientLabel } from '@/ui/labels';
+import { demographics } from '@/ui/labels';
 
 export default function Patients() {
   const router = useRouter();
@@ -20,7 +20,7 @@ export default function Patients() {
         <ListItem
           key={p.id}
           title={p.code}
-          subtitle={patientLabel(p)}
+          subtitle={demographics(p)}
           onPress={() => router.push({ pathname: '/patients/[patientId]', params: { patientId: p.id } })}
           testID={`patient-${p.code}`}
         />

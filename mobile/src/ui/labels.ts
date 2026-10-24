@@ -45,8 +45,12 @@ export function siteLabel(lesion: Pick<Lesion, 'body_site' | 'laterality'>): str
   return `${side} ${site.toLowerCase()}`;
 }
 
+export function demographics(p: Pick<Patient, 'age' | 'sex' | 'fitzpatrick'>): string {
+  return `${p.age} ${p.sex === 'female' ? 'F' : 'M'} · Fitzpatrick ${p.fitzpatrick}`;
+}
+
 export function patientLabel(p: Pick<Patient, 'code' | 'age' | 'sex' | 'fitzpatrick'>): string {
-  return `${p.code} · ${p.age} ${p.sex === 'female' ? 'F' : 'M'} · Fitzpatrick ${p.fitzpatrick}`;
+  return `${p.code} · ${demographics(p)}`;
 }
 
 export function formatDateTime(iso: string): string {
