@@ -93,3 +93,19 @@ def test_generator_bundles_frames_but_never_ground_truth(tmp_path) -> None:
     assert bundled == expected
     index = (mobile / "src" / "device" / "phantoms.generated.ts").read_text()
     assert "acral_dark_d30" in index and "npz" not in index
+
+
+def test_spectral_signature_shows_band_contrast() -> None:
+    pigmented, _, _ = _run("pigmented_dark")
+    sig = pigmented.signature
+    contrast = [s - le for le, s in zip(sig["lesion"], sig["skin"], strict=True)]
+    assert all(c > 0 for c in contrast)  # pigment darkens every band
+    assert contrast[0] / sig["skin"][0] > contrast[3] / sig["skin"][3]  # blue >> NIR (melanin)
+    assert sig["melanin"]["lesion"] > sig["melanin"]["skin"]
+
+    vascular, _, _ = _run("vascular_medium")
+    vsig = vascular.signature
+    green_drop = 1 - vsig["lesion"][1] / vsig["skin"][1]
+    red_drop = 1 - vsig["lesion"][2] / vsig["skin"][2]
+    assert green_drop > red_drop  # hemoglobin absorbs green far more than red
+    assert vsig["hemoglobin"]["lesion"] > vsig["hemoglobin"]["skin"]

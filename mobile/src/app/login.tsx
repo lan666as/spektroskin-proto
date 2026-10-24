@@ -78,6 +78,7 @@ export default function Login() {
         />
         <Muted>Demo auth for the prototype: two demo roles, clinician and dermatologist.</Muted>
       </Card>
+      <Button label="About this prototype" variant="secondary" onPress={() => router.push('/about')} testID="open-about" />
     </Screen>
   );
 }

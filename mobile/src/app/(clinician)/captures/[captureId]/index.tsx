@@ -4,6 +4,7 @@ import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { api } from '@/api/client';
 import { Button, Card, ErrorBanner, Heading, KeyValue, Loading, Muted, Screen } from '@/ui/components';
 import { Footnote, HistoryStrip, QCCard, SpectralViews, ValidationPanel, VisitCompare } from '@/ui/clinical';
+import { QualityDetails, SpectralSignature } from '@/ui/measurement';
 import { formatArea, formatDateTime, patientLabel, siteLabel, visitDay } from '@/ui/labels';
 
 export default function Results() {
@@ -59,6 +60,8 @@ export default function Results() {
                   }
                 />
               ) : null}
+              <SpectralSignature capture={c} />
+              <QualityDetails capture={c} />
               <ValidationPanel capture={c} />
             </>
           ) : (

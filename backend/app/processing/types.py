@@ -39,6 +39,7 @@ class ProcessingResult:
     hemoglobin: np.ndarray | None = None
     mask: np.ndarray | None = None
     area_mm2: float | None = None
+    signature: dict[str, Any] | None = None
     shifts_px: dict[str, tuple[float, float]] = field(default_factory=dict)
     gain_correction: dict[str, float] = field(default_factory=dict)
 
@@ -57,4 +58,5 @@ class ProcessingResult:
             },
             "gain_correction": {b: round(g, 4) for b, g in self.gain_correction.items()},
             "views": sorted(self.views),
+            "signature": self.signature,
         }

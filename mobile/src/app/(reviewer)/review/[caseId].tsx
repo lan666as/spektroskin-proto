@@ -18,7 +18,8 @@ import {
   Row,
   Screen,
 } from '@/ui/components';
-import { Footnote, HistoryStrip, Recommendation, SpectralViews, VisitCompare } from '@/ui/clinical';
+import { CaseTimeline, Footnote, HistoryStrip, Recommendation, SpectralViews, VisitCompare } from '@/ui/clinical';
+import { SpectralSignature } from '@/ui/measurement';
 import { formatArea, formatDateTime, siteLabel, STATUS_LABELS, statusTone } from '@/ui/labels';
 import { colors, radius, spacing } from '@/ui/theme';
 
@@ -151,10 +152,12 @@ export default function ReviewCase() {
               onSelect={(v) => setSelectedId(v.id)}
             />
             <VisitCompare captures={c.lesion_history} selectedId={reviewed?.id} />
+            {latest ? <SpectralSignature capture={latest} /> : null}
             <Footnote />
           </View>
           <View style={{ flex: twoColumns ? 2 : undefined, width: twoColumns ? undefined : '100%', gap: spacing.lg }}>
             <CaseInfo c={c} />
+            <CaseTimeline c={c} />
             {c.review ? (
               <>
                 {justSent ? (

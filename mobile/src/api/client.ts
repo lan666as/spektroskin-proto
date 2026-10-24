@@ -4,6 +4,7 @@ import { absoluteUrl } from './config';
 export type Schemas = components['schemas'];
 export type User = Schemas['UserOut'];
 export type Patient = Schemas['PatientOut'];
+export type PatientListItem = Schemas['PatientListItem'];
 export type PatientDetail = Schemas['PatientDetail'];
 export type Lesion = Schemas['LesionOut'];
 export type LesionDetail = Schemas['LesionDetail'];
@@ -112,7 +113,7 @@ export const api = {
     );
   },
   me: () => get<User>('/auth/me'),
-  patients: () => get<Patient[]>('/patients'),
+  patients: () => get<PatientListItem[]>('/patients'),
   patient: (id: string) => get<PatientDetail>(`/patients/${id}`),
   createPatient: (body: PatientCreate) => post<Patient>('/patients', body),
   createLesion: (body: LesionCreate) => post<Lesion>('/lesions', body),

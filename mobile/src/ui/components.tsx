@@ -1,7 +1,8 @@
-import type { ReactNode } from 'react';
+import { type ReactNode, useState } from 'react';
 import {
   ActivityIndicator,
   Pressable,
+  RefreshControl,
   ScrollView,
   StyleSheet,
   Text,
@@ -17,13 +18,28 @@ export function Screen({
   children,
   wide = false,
   testID,
+  onRefresh,
 }: {
   children: ReactNode;
   wide?: boolean;
   testID?: string;
+  /** Enables pull-to-refresh. */
+  onRefresh?: () => Promise<unknown>;
 }) {
+  const [refreshing, setRefreshing] = useState(false);
+  const refresh = onRefresh
+    ? async () => {
+        setRefreshing(true);
+        try {
+          await onRefresh();
+        } finally {
+          setRefreshing(false);
+        }
+      }
+    : undefined;
   return (
     <ScrollView
+      refreshControl={refresh ? <RefreshControl refreshing={refreshing} onRefresh={refresh} /> : undefined}
       style={styles.screen}
       contentContainerStyle={[styles.screenContent, { maxWidth: wide ? 1200 : 640 }]}
       keyboardShouldPersistTaps="handled"

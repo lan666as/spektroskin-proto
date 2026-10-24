@@ -5,7 +5,7 @@ import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 
 import { api } from '@/api/client';
 import { Button, Card, ErrorBanner, Heading, Loading, Muted, Pill, Row, Screen } from '@/ui/components';
-import { Footnote, HistoryStrip, Recommendation, SpectralViews, VisitCompare } from '@/ui/clinical';
+import { CaseTimeline, Footnote, HistoryStrip, Recommendation, SpectralViews, VisitCompare } from '@/ui/clinical';
 import { formatDateTime, patientLabel, siteLabel, STATUS_LABELS, statusTone } from '@/ui/labels';
 import { colors, radius, spacing } from '@/ui/theme';
 
@@ -73,6 +73,7 @@ export default function ClinicianCase() {
             <Muted style={{ fontSize: 15 }}>{c.question}</Muted>
             <Muted>Submitted {formatDateTime(c.created_at)}</Muted>
           </Card>
+          <CaseTimeline c={c} />
           {latest ? <SpectralViews key={latest.id} capture={latest} /> : null}
           <HistoryStrip captures={c.lesion_history} currentId={latest?.id} onSelect={(v) => setSelectedId(v.id)} />
           <VisitCompare captures={c.lesion_history} selectedId={reviewed?.id} />

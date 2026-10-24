@@ -8,27 +8,39 @@ from sqlalchemy.orm import Session, selectinload
 
 from app import audit
 from app.api.serialize import lesion_out
-from app.auth import Clinician, CurrentUser, same_group
+from app.auth import Clinician, CurrentUser, same_group, sign_image_url
 from app.db import get_session
 from app.models import Lesion, Patient
-from app.schemas import PatientCreate, PatientDetail, PatientOut
+from app.schemas import PatientCreate, PatientDetail, PatientListItem, PatientOut
 
 router = APIRouter(prefix="/patients", tags=["patients"])
 SessionDep = Annotated[Session, Depends(get_session)]
 
 
-@router.get("", response_model=list[PatientOut])
-def list_patients(user: CurrentUser, session: SessionDep) -> list[Patient]:
-    """Clinicians see the patients they registered; dermatologists see their user group's."""
-    query = select(Patient).order_by(Patient.code)
+@router.get("", response_model=list[PatientListItem])
+def list_patients(user: CurrentUser, session: SessionDep) -> list[PatientListItem]:
+    """Clinicians see the patients they registered; dermatologists see their user group's.
+    Most recently seen first."""
+    query = select(Patient).options(selectinload(Patient.lesions).selectinload(Lesion.captures))
     if user.role == "clinician":
         query = query.where(Patient.created_by == user.id)
     else:
         query = query.where(Patient.created_by.in_(same_group(user)))
-    patients = list(session.scalars(query))
+    items = [_list_item(p, user) for p in session.scalars(query)]
     audit.record(session, user, "list", "patient", "*")
     session.commit()
-    return patients
+    return sorted(items, key=lambda i: i.last_visit_at or i.created_at, reverse=True)
+
+
+def _list_item(patient: Patient, viewer) -> PatientListItem:
+    visits = [c for lesion in patient.lesions for c in lesion.captures if c.status == "processed"]
+    latest = max(visits, key=lambda c: c.captured_at, default=None)
+    return PatientListItem(
+        **PatientOut.model_validate(patient).model_dump(),
+        lesion_count=len(patient.lesions),
+        last_visit_at=latest.captured_at if latest else None,
+        latest_thumbnail_url=sign_image_url(latest.id, "standard", viewer.id) if latest else None,
+    )
 
 
 @router.post("", response_model=PatientOut, status_code=status.HTTP_201_CREATED)

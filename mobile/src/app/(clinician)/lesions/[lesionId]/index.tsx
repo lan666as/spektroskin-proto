@@ -23,7 +23,7 @@ export default function LesionScreen() {
   const newCapture = () => router.push({ pathname: '/lesions/[lesionId]/capture', params: { lesionId } });
 
   return (
-    <Screen testID="lesion-screen">
+    <Screen testID="lesion-screen" onRefresh={() => Promise.all([lesion.refetch(), syncNow()])}>
       <Stack.Screen options={{ title: l ? siteLabel(l) : 'Lesion' }} />
       <ErrorBanner error={lesion.error} />
       {lesion.isPending ? <Loading /> : null}

@@ -65,6 +65,7 @@ export interface paths {
         /**
          * List Patients
          * @description Clinicians see the patients they registered; dermatologists see their user group's.
+         *     Most recently seen first.
          */
         get: operations["list_patients_api_patients_get"];
         put?: never;
@@ -410,6 +411,15 @@ export interface components {
             views: {
                 [key: string]: string;
             };
+            spectral_signature?: components["schemas"]["SpectralSignature"] | null;
+            /** Registration Shift Px */
+            registration_shift_px?: {
+                [key: string]: number[];
+            } | null;
+            /** Gain Correction */
+            gain_correction?: {
+                [key: string]: number;
+            } | null;
         };
         /** CaseCreate */
         CaseCreate: {
@@ -497,6 +507,13 @@ export interface components {
             thumbnail_url: string | null;
             /** Review Action */
             review_action: ("observe" | "biopsy" | "refer") | null;
+        };
+        /** ChromophoreContrast */
+        ChromophoreContrast: {
+            /** Lesion */
+            lesion: number;
+            /** Skin */
+            skin: number;
         };
         /** HTTPValidationError */
         HTTPValidationError: {
@@ -649,6 +666,47 @@ export interface components {
             /** Lesions */
             lesions: components["schemas"]["LesionOut"][];
         };
+        /** PatientListItem */
+        PatientListItem: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Code */
+            code: string;
+            /** Age */
+            age: number;
+            /**
+             * Sex
+             * @enum {string}
+             */
+            sex: "female" | "male";
+            /**
+             * Fitzpatrick
+             * @enum {string}
+             */
+            fitzpatrick: "I" | "II" | "III" | "IV" | "V" | "VI";
+            /** Research Consent */
+            research_consent: boolean;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Lesion Count
+             * @default 0
+             */
+            lesion_count: number;
+            /** Last Visit At */
+            last_visit_at?: string | null;
+            /**
+             * Latest Thumbnail Url
+             * @description Signed standard view of the patient's most recent visit
+             */
+            latest_thumbnail_url?: string | null;
+        };
         /** PatientOut */
         PatientOut: {
             /**
@@ -732,6 +790,23 @@ export interface components {
              * Format: date-time
              */
             created_at: string;
+        };
+        /** SpectralSignature */
+        SpectralSignature: {
+            /** Bands Nm */
+            bands_nm: number[];
+            /**
+             * Lesion
+             * @description Mean calibrated reflectance per band in the lesion
+             */
+            lesion: number[];
+            /**
+             * Skin
+             * @description Mean reflectance per band in surrounding skin
+             */
+            skin: number[];
+            melanin: components["schemas"]["ChromophoreContrast"];
+            hemoglobin: components["schemas"]["ChromophoreContrast"];
         };
         /** Token */
         Token: {
@@ -899,7 +974,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["PatientOut"][];
+                    "application/json": components["schemas"]["PatientListItem"][];
                 };
             };
         };

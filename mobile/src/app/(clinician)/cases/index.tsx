@@ -3,7 +3,7 @@ import { Stack, useRouter } from 'expo-router';
 
 import { api } from '@/api/client';
 import { Empty, ErrorBanner, ListItem, Loading, Pill, Screen } from '@/ui/components';
-import { ACTION_LABELS, STATUS_LABELS, siteLabel, statusTone } from '@/ui/labels';
+import { ACTION_LABELS, duration, STATUS_LABELS, siteLabel, statusTone } from '@/ui/labels';
 
 const POLL_MS = 3_000;
 
@@ -12,7 +12,7 @@ export default function MyCases() {
   const cases = useQuery({ queryKey: ['cases', 'mine'], queryFn: () => api.cases(), refetchInterval: POLL_MS });
 
   return (
-    <Screen testID="my-cases-screen">
+    <Screen testID="my-cases-screen" onRefresh={() => cases.refetch()}>
       <Stack.Screen options={{ title: 'My cases' }} />
       <ErrorBanner error={cases.error} />
       {cases.isPending ? <Loading /> : null}
@@ -23,7 +23,7 @@ export default function MyCases() {
           title={`${c.patient.code} · ${siteLabel(c.lesion)}`}
           subtitle={
             c.review_action
-              ? `Recommendation: ${ACTION_LABELS[c.review_action]}`
+              ? `Recommendation: ${ACTION_LABELS[c.review_action]} · answered in ${duration(c.created_at, c.answered_at)}`
               : c.question.length > 80
                 ? `${c.question.slice(0, 80)}…`
                 : c.question

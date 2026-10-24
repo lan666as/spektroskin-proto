@@ -6,7 +6,7 @@ import { api, type Capture, type Schemas } from '@/api/client';
 import { absoluteUrl } from '@/api/config';
 
 import { Button, Card, Chips, ErrorBanner, Heading, KeyValue, Loading, Muted, Pill, Row } from './components';
-import { ACTION_LABELS, formatArea, formatDate, formatDateTime, visitDay } from './labels';
+import { ACTION_LABELS, duration, formatArea, formatDate, formatDateTime, visitDay } from './labels';
 import { ImageViewer } from './ImageViewer';
 import { SimulatedBadge } from './SimulatedBadge';
 import { colors, radius, spacing } from './theme';
@@ -261,6 +261,43 @@ export function ValidationPanel({ capture }: { capture: Capture }) {
   );
 }
 
+/** Submitted → opened by dermatologist → answered, with the response time. */
+export function CaseTimeline({
+  c,
+}: {
+  c: Pick<Schemas['CaseSummary'], 'status' | 'created_at' | 'answered_at' | 'requested_by'>;
+}) {
+  const opened = c.status !== 'submitted';
+  const steps = [
+    { label: 'Submitted', detail: `${c.requested_by} · ${formatDateTime(c.created_at)}`, done: true },
+    { label: 'Opened by dermatologist', detail: opened ? 'Viewed' : 'Not yet opened', done: opened },
+    {
+      label: 'Recommendation sent',
+      detail: c.answered_at
+        ? `${formatDateTime(c.answered_at)} · response time ${duration(c.created_at, c.answered_at)}`
+        : `Waiting ${duration(c.created_at)}`,
+      done: !!c.answered_at,
+    },
+  ];
+  return (
+    <Card testID="case-timeline">
+      <Heading>Timeline</Heading>
+      {steps.map((step, i) => (
+        <View key={step.label} style={styles.timelineRow}>
+          <View style={styles.timelineRail}>
+            <View style={[styles.timelineDot, step.done && styles.timelineDotDone]} />
+            {i < steps.length - 1 ? <View style={styles.timelineLine} /> : null}
+          </View>
+          <View style={{ flex: 1, paddingBottom: spacing.md }}>
+            <Text style={[styles.timelineLabel, !step.done && { color: colors.textMuted }]}>{step.label}</Text>
+            <Muted>{step.detail}</Muted>
+          </View>
+        </View>
+      ))}
+    </Card>
+  );
+}
+
 export function Footnote() {
   return <Muted style={{ fontStyle: 'italic' }}>{SIMULATION_FOOTNOTE}</Muted>;
 }
@@ -288,6 +325,12 @@ const styles = StyleSheet.create({
   },
   zoomHintText: { color: '#F8FAFC', fontSize: 12, fontWeight: '600' },
   caption: { fontSize: 16, fontWeight: '700', color: colors.text },
+  timelineRow: { flexDirection: 'row', gap: spacing.md },
+  timelineRail: { alignItems: 'center', width: 16 },
+  timelineDot: { width: 14, height: 14, borderRadius: 7, borderWidth: 2, borderColor: colors.border, backgroundColor: colors.background },
+  timelineDotDone: { backgroundColor: colors.accent, borderColor: colors.accent },
+  timelineLine: { flex: 1, width: 2, backgroundColor: colors.border, marginTop: 2 },
+  timelineLabel: { fontSize: 15, fontWeight: '600', color: colors.text },
   compareRow: { flexDirection: 'row', gap: spacing.sm },
   compareCell: { flex: 1, gap: 2 },
   compareImage: { width: '100%', aspectRatio: 1, borderRadius: radius.md, backgroundColor: colors.surface },

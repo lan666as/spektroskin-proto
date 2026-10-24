@@ -6,7 +6,7 @@ import { Image, StyleSheet, View } from 'react-native';
 import { api, type CaseSummary } from '@/api/client';
 import { absoluteUrl } from '@/api/config';
 import { Empty, ErrorBanner, Heading, ListItem, Loading, Muted, Pill, Row, Screen } from '@/ui/components';
-import { ACTION_LABELS, formatDateTime, siteLabel, STATUS_LABELS, statusTone } from '@/ui/labels';
+import { ACTION_LABELS, duration, formatDateTime, siteLabel, STATUS_LABELS, statusTone } from '@/ui/labels';
 import { radius } from '@/ui/theme';
 
 const POLL_MS = 2_000;
@@ -17,9 +17,11 @@ function CaseRow({ item, onOpen, fresh }: { item: CaseSummary; onOpen: () => voi
     <View style={fresh ? styles.fresh : undefined}>
     <ListItem
       title={`${item.patient.code} · ${siteLabel(item.lesion)} · Fitzpatrick ${item.patient.fitzpatrick}`}
-      subtitle={`${item.requested_by} · ${formatDateTime(item.created_at)}${
-        item.review_action ? ` · ${ACTION_LABELS[item.review_action]}` : ''
-      }`}
+      subtitle={`${item.requested_by} · ${
+        item.answered_at
+          ? `answered in ${duration(item.created_at, item.answered_at)}`
+          : `waiting ${duration(item.created_at)}`
+      }${item.review_action ? ` · ${ACTION_LABELS[item.review_action]}` : ''} · ${formatDateTime(item.created_at)}`}
       right={
         <Row>
           {fresh ? <Pill label="New" tone="danger" /> : null}
@@ -65,7 +67,7 @@ export default function Queue() {
   const openCase = (id: string) => router.push({ pathname: '/review/[caseId]', params: { caseId: id } });
 
   return (
-    <Screen wide testID="queue-screen">
+    <Screen wide testID="queue-screen" onRefresh={() => Promise.all([open.refetch(), answered.refetch()])}>
       <Stack.Screen options={{ title: 'Review queue' }} />
       <Muted>Cases sent by clinicians for a second look. Updates automatically.</Muted>
       <ErrorBanner error={open.error} />

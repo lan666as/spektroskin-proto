@@ -45,6 +45,9 @@ def capture_out(capture: Capture, viewer: User) -> CaptureOut:
         views={
             name: sign_image_url(capture.id, name, viewer.id) for name in capture.result["views"]
         },
+        spectral_signature=capture.result.get("signature"),
+        registration_shift_px=capture.result.get("registration_shift_px"),
+        gain_correction=capture.result.get("gain_correction"),
     )
 
 

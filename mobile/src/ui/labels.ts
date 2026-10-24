@@ -77,3 +77,15 @@ export function visitDay(capturedAt: string, firstCapturedAt: string): number {
 export function formatArea(mm2: number | null | undefined): string {
   return mm2 == null ? '—' : `${mm2.toFixed(1)} mm²`;
 }
+
+/** "just now", "4 min", "2 h 5 min", "3 days" between two instants (default: now). */
+export function duration(fromIso: string, toIso?: string | null): string {
+  const ms = (toIso ? Date.parse(toIso) : Date.now()) - Date.parse(fromIso);
+  const minutes = Math.max(0, Math.floor(ms / 60_000));
+  if (minutes < 1) return 'just now';
+  if (minutes < 60) return `${minutes} min`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return minutes % 60 ? `${hours} h ${minutes % 60} min` : `${hours} h`;
+  const days = Math.floor(hours / 24);
+  return `${days} day${days === 1 ? '' : 's'}`;
+}

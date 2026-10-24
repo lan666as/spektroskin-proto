@@ -5,7 +5,7 @@ export default function ClinicianLayout() {
     <RoleStack
       role="clinician"
       links={[
-        { label: 'Patients', href: '/patients', testID: 'nav-patients' },
+        { label: 'Home', href: '/patients', testID: 'nav-patients' },
         { label: 'My cases', href: '/cases', testID: 'nav-cases' },
       ]}
     />

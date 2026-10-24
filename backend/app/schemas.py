@@ -94,6 +94,14 @@ class LesionOut(ORM):
     )
 
 
+class PatientListItem(PatientOut):
+    lesion_count: int = 0
+    last_visit_at: datetime | None = None
+    latest_thumbnail_url: str | None = Field(
+        default=None, description="Signed standard view of the patient's most recent visit"
+    )
+
+
 class PatientDetail(PatientOut):
     lesions: list[LesionOut]
 
@@ -103,6 +111,19 @@ class QCOut(BaseModel):
     metrics: dict[str, float]
     checks: dict[str, bool]
     guidance: list[str]
+
+
+class ChromophoreContrast(BaseModel):
+    lesion: float
+    skin: float
+
+
+class SpectralSignature(BaseModel):
+    bands_nm: list[int]
+    lesion: list[float] = Field(description="Mean calibrated reflectance per band in the lesion")
+    skin: list[float] = Field(description="Mean reflectance per band in surrounding skin")
+    melanin: ChromophoreContrast
+    hemoglobin: ChromophoreContrast
 
 
 class CaptureOut(BaseModel):
@@ -117,6 +138,9 @@ class CaptureOut(BaseModel):
     qc: QCOut
     area_mm2: float | None
     views: dict[str, str] = Field(description="View name → short-lived signed image URL")
+    spectral_signature: SpectralSignature | None = None
+    registration_shift_px: dict[str, list[float]] | None = None
+    gain_correction: dict[str, float] | None = None
 
 
 class LesionDetail(LesionOut):
