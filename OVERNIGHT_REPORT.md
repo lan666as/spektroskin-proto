@@ -71,3 +71,15 @@ Plan:
 - `GET /api/audit?limit=&before=&entity_type=` (dermatologist only, newest first, cursor by time):
   actor, action, entity, time. Reviewer portal: "Audit log" page.
 - Smoke: consent round-trip; audit visible to dermatologist, 403 for clinician.
+
+Result (22:09 WIB): **done**, commit `cecb336`.
+- Alembic 0003 adds `patients.research_consent` (NOT NULL, server default false). Additive: the
+  deployed API keeps working; existing patients read "No". Its downgrade drops recorded answers
+  (declared one-way for data; restore from backup).
+- New patient form requires an explicit Yes/No; shown on the patient screen and the reviewer case.
+- `GET /api/audit` (dermatologist only; newest first; `before` cursor; optional `entity_type`) and
+  an "Audit log" page in the reviewer portal with "Load older".
+- Verified: smoke (consent round-trip, audit 200 for dermatologist / 403 for clinician, cursor
+  paging), Playwright 4/4 (consent chosen in both flows, consent visible to the reviewer, the
+  review event visible in the audit log). Gate green.
+- Morning merge note: deploy applies migration 0003 automatically on API start.
