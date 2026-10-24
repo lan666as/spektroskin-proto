@@ -344,6 +344,12 @@ class ModelSummary(BaseModel):
         default=None, description="Held-out accuracy per feature set (triage: rgb_only, spectral)"
     )
     model_card: str
+    by_tone: dict[str, float] = Field(
+        default={}, description="Held-out accuracy per simulated skin tone (Fitzpatrick)"
+    )
+    ablation_by_tone: dict[str, dict[str, float]] | None = Field(
+        default=None, description="Triage only: held-out accuracy per tone for each feature set"
+    )
 
 
 class ShadowAgreement(BaseModel):

@@ -853,6 +853,23 @@ export interface components {
             } | null;
             /** Model Card */
             model_card: string;
+            /**
+             * By Tone
+             * @description Held-out accuracy per simulated skin tone (Fitzpatrick)
+             * @default {}
+             */
+            by_tone: {
+                [key: string]: number;
+            };
+            /**
+             * Ablation By Tone
+             * @description Triage only: held-out accuracy per tone for each feature set
+             */
+            ablation_by_tone?: {
+                [key: string]: {
+                    [key: string]: number;
+                };
+            } | null;
         };
         /** Morphology */
         Morphology: {

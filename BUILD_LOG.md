@@ -339,3 +339,10 @@ Timestamped record of what was built during GENOHACK (Sat 24 – Sun 25 Oct 2026
   99.5th percentile of training norms (> 7.20) get no suggestion ("outside the training range");
   0.9 % of held-out simulated lesions were withheld. Same weights (deterministic retrain); the
   model card documents the guard. Test: a 5× pigment shift is withheld.
+
+## 2026-10-25 02:37 WIB — Iteration loop, batch 14: per-skin-tone results on the AI page
+
+- `/api/ai/summary` model entries carry held-out accuracy per simulated tone, and per tone for both
+  ablation arms of the triage model. The AI page shows a tone strip per model with the lowest tone
+  outlined, and states the finding plainly: both pattern models are least accurate on Fitzpatrick V
+  (triage 0.96, acral 0.97); the quality model is lowest on light skin (0.92).

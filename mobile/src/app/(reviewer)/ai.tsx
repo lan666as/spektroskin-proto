@@ -53,6 +53,22 @@ function ModelCard({ m }: { m: Schemas['ModelSummary'] }) {
           </View>
         ) : null}
       </Row>
+      {Object.keys(m.by_tone ?? {}).length ? (
+        <View style={{ gap: 4 }} testID={`fairness-${m.version}`}>
+          <Text style={styles.sub}>By skin tone (held-out, simulated)</Text>
+          <Row style={{ flexWrap: 'wrap', gap: spacing.md }}>
+            {Object.entries(m.by_tone).map(([tone, acc]) => {
+              const lowest = acc === Math.min(...Object.values(m.by_tone));
+              return (
+                <View key={tone} style={[styles.tone, lowest ? styles.toneLow : null]}>
+                  <Text style={styles.toneValue}>{pct(acc)}</Text>
+                  <Muted>Fitzpatrick {tone}</Muted>
+                </View>
+              );
+            })}
+          </Row>
+        </View>
+      ) : null}
       {m.ablation ? (
         <View style={{ gap: 4 }} testID="ablation">
           <Text style={styles.sub}>Optics kill test: same model, with and without the extra bands</Text>
@@ -92,6 +108,11 @@ export default function AiOverview() {
         Three small models assist; none diagnoses. Dermatologist reads and biopsy results are how
         each model is checked before it may do more.
       </Muted>
+      <Text style={styles.gap} testID="fairness-note">
+        Both pattern models (triage and acral) are least accurate on the darkest simulated skin tone
+        (Fitzpatrick V). That gap is the first thing local Indonesian data has to close, and results
+        are always reported per tone.
+      </Text>
       <ErrorBanner error={query.error} />
       {query.isPending ? <Loading /> : null}
       {s ? (
@@ -170,5 +191,9 @@ const styles = StyleSheet.create({
   track: { flex: 1, height: 12, borderRadius: 6, backgroundColor: colors.surface, overflow: 'hidden' },
   fill: { height: 12, borderRadius: 6, backgroundColor: colors.accent },
   barValue: { width: 48, textAlign: 'right', fontSize: 14, fontWeight: '700', color: colors.text },
+  tone: { borderWidth: 1, borderColor: colors.border, borderRadius: radius.md, padding: spacing.sm, minWidth: 120 },
+  toneLow: { borderColor: colors.danger },
+  toneValue: { fontSize: 18, fontWeight: '800', color: colors.text },
+  gap: { fontSize: 14, fontWeight: '600', color: colors.danger },
   link: { color: colors.accent, fontWeight: '600', paddingVertical: spacing.xs },
 });

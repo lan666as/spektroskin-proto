@@ -28,6 +28,10 @@ SCOPE = (
 PATTERNS = ("pigmented", "vascular", "mixed")
 
 
+def _tone_accuracy(held_out: dict) -> dict[str, float]:
+    return {tone: group["accuracy"] for tone, group in held_out["by_tone"].items()}
+
+
 def _models() -> list[ModelSummary]:
     quality = json.loads(quality_model.MODEL_PATH.read_text())
     triage = json.loads(triage_model.MODEL_PATH.read_text())
@@ -42,6 +46,7 @@ def _models() -> list[ModelSummary]:
             trained_at=quality["trained_at"],
             held_out=HeldOut(**{k: quality["metrics"]["held_out"][k] for k in ("accuracy", "n")}),
             model_card="docs/evidence/quality_model_card.md",
+            by_tone=quality["metrics"]["held_out_by_tone"],
         ),
         ModelSummary(
             name="Lesion pattern triage",
@@ -60,6 +65,10 @@ def _models() -> list[ModelSummary]:
                 "spectral": t["spectral"]["held_out"]["accuracy"],
             },
             model_card="docs/evidence/triage_model_card.md",
+            by_tone=_tone_accuracy(t["spectral"]["held_out"]),
+            ablation_by_tone={
+                arm: _tone_accuracy(t[arm]["held_out"]) for arm in ("rgb_only", "spectral")
+            },
         ),
         ModelSummary(
             name="Acral pattern",
@@ -74,6 +83,7 @@ def _models() -> list[ModelSummary]:
                 }
             ),
             model_card="docs/evidence/acral_model_card.md",
+            by_tone=_tone_accuracy(acral["metrics"]["held_out"]),
         ),
     ]
 

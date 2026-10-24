@@ -166,6 +166,7 @@ test('PLAN §6 demo script: 60 s core + extended', async ({ browser, request }) 
   await byId(reviewer, 'nav-ai').click();
   await expect(byId(reviewer, 'shadow-agreement')).toContainText('%');
   await expect(byId(reviewer, 'ablation')).toContainText('RGB bands only');
+  await expect(byId(reviewer, 'fairness-triage_v1')).toContainText('Fitzpatrick dark (V)');
   await expect(byId(reviewer, 'validation-eligible')).toBeVisible();
   await shot(reviewer, '10c-ai-overview');
 
