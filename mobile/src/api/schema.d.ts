@@ -224,6 +224,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/cases/{case_id}/outcome": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Record Outcome
+         * @description The requesting clinician records what was done and, after tissue sampling, the
+         *     histopathology result. Idempotent: a repeat replaces the previous entry.
+         */
+        put: operations["record_outcome_api_cases__case_id__outcome_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/images/{capture_id}/{name}": {
         parameters: {
             query?: never;
@@ -479,11 +500,21 @@ export interface components {
             thumbnail_url: string | null;
             /** Review Action */
             review_action: ("observe" | "biopsy" | "refer") | null;
+            /**
+             * Follow Up Due
+             * @description Answer date + the dermatologist's follow-up interval
+             */
+            follow_up_due?: string | null;
+            /** Outcome Action */
+            outcome_action?: ("observed" | "biopsied" | "excised" | "referred" | "declined") | null;
+            /** Histopathology */
+            histopathology?: ("pending" | "benign" | "malignant" | "indeterminate") | null;
             /** Captures */
             captures: components["schemas"]["CaptureOut"][];
             /** Lesion History */
             lesion_history: components["schemas"]["CaptureOut"][];
             review: components["schemas"]["ReviewOut"] | null;
+            outcome?: components["schemas"]["OutcomeOut"] | null;
         };
         /** CaseSummary */
         CaseSummary: {
@@ -519,6 +550,15 @@ export interface components {
             thumbnail_url: string | null;
             /** Review Action */
             review_action: ("observe" | "biopsy" | "refer") | null;
+            /**
+             * Follow Up Due
+             * @description Answer date + the dermatologist's follow-up interval
+             */
+            follow_up_due?: string | null;
+            /** Outcome Action */
+            outcome_action?: ("observed" | "biopsied" | "excised" | "referred" | "declined") | null;
+            /** Histopathology */
+            histopathology?: ("pending" | "benign" | "malignant" | "indeterminate") | null;
         };
         /** ChromophoreContrast */
         ChromophoreContrast: {
@@ -623,6 +663,52 @@ export interface components {
              * @description Signed standard view of the latest processed visit
              */
             latest_thumbnail_url?: string | null;
+        };
+        /** OutcomeIn */
+        OutcomeIn: {
+            /**
+             * Action Taken
+             * @enum {string}
+             */
+            action_taken: "observed" | "biopsied" | "excised" | "referred" | "declined";
+            /** Procedure Date */
+            procedure_date?: string | null;
+            /**
+             * Histopathology
+             * @description Only when tissue was taken (biopsied or excised)
+             */
+            histopathology?: ("pending" | "benign" | "malignant" | "indeterminate") | null;
+            /** Histopathology Notes */
+            histopathology_notes?: string | null;
+        };
+        /** OutcomeOut */
+        OutcomeOut: {
+            /**
+             * Action Taken
+             * @enum {string}
+             */
+            action_taken: "observed" | "biopsied" | "excised" | "referred" | "declined";
+            /** Procedure Date */
+            procedure_date?: string | null;
+            /**
+             * Histopathology
+             * @description Only when tissue was taken (biopsied or excised)
+             */
+            histopathology?: ("pending" | "benign" | "malignant" | "indeterminate") | null;
+            /** Histopathology Notes */
+            histopathology_notes?: string | null;
+            /** Recorded By Name */
+            recorded_by_name: string;
+            /**
+             * Recorded At
+             * Format: date-time
+             */
+            recorded_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
         };
         /** PatientCreate */
         PatientCreate: {
@@ -1350,6 +1436,41 @@ export interface operations {
         responses: {
             /** @description Successful Response */
             201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CaseDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    record_outcome_api_cases__case_id__outcome_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                case_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OutcomeIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
                 headers: {
                     [name: string]: unknown;
                 };

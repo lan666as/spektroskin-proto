@@ -140,6 +140,19 @@ test('PLAN §6 demo script: 60 s core + extended', async ({ browser, request }) 
   await shot(clinician, '10-answer-received');
   const coreSeconds = (Date.now() - started) / 1000;
 
+  // Extended: close the loop. Biopsy taken, histopathology pending, then the result arrives.
+  await byId(clinician, 'outcome-action-biopsied').click();
+  await byId(clinician, 'save-outcome').click();
+  await expect(byId(clinician, 'outcome-histopathology')).toContainText('Result pending');
+  await byId(clinician, 'edit-outcome').click();
+  await byId(clinician, 'histo-benign').click();
+  await byId(clinician, 'outcome-notes').fill('Compound naevus, margins clear');
+  await byId(clinician, 'save-outcome').click();
+  await expect(byId(clinician, 'outcome-histopathology')).toContainText('Benign');
+  await shot(clinician, '10b-outcome-recorded');
+  await reviewer.reload();
+  await expect(byId(reviewer, 'outcome-histopathology')).toContainText('Benign');
+
   // Extended: glare capture fails QC with retake guidance; validation panel on a retake.
   await byId(clinician, 'nav-patients').click();
   await byId(clinician, `patient-${code}`).click();

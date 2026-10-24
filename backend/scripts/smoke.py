@@ -278,6 +278,23 @@ def run(base: str) -> None:
         status == 200 and answered["review"]["action"] == "biopsy",
         f"clinician sees the recommendation: {status}",
     )
+    expect(answered["follow_up_due"] is not None, "answered case carries the follow-up due date")
+    outcome = {
+        "action_taken": "biopsied",
+        "procedure_date": answered["answered_at"][:10],
+        "histopathology": "pending",
+    }
+    status, closed = c.request("PUT", f"/api/cases/{case['id']}/outcome", body=outcome)
+    expect(
+        status == 200 and closed["outcome"]["action_taken"] == "biopsied",
+        f"PUT /cases/{{id}}/outcome: {status}",
+    )
+    status, _ = c.request(
+        "PUT",
+        f"/api/cases/{case['id']}/outcome",
+        body={"action_taken": "observed", "histopathology": "benign"},
+    )
+    expect(status == 422, f"histopathology without tissue is 422: {status}")
     print(f"smoke passed against {base} (smoke user {clinician['username']})")
 
 

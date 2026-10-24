@@ -6,6 +6,7 @@ import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { api } from '@/api/client';
 import { Button, Card, ErrorBanner, Heading, Loading, Muted, Pill, Row, Screen } from '@/ui/components';
 import { CaseTimeline, Footnote, HistoryStrip, Recommendation, SpectralViews, VisitCompare } from '@/ui/clinical';
+import { OutcomeCard } from '@/ui/outcome';
 import { formatDateTime, patientLabel, siteLabel, STATUS_LABELS, statusTone } from '@/ui/labels';
 import { colors, radius, spacing } from '@/ui/theme';
 
@@ -48,7 +49,8 @@ export default function ClinicianCase() {
                   <Text style={styles.arrivedText}>Recommendation received just now</Text>
                 </View>
               ) : null}
-              <Recommendation review={c.review} />
+              <Recommendation review={c.review} due={c.follow_up_due} />
+              <OutcomeCard c={c} editable />
               <Button
                 label="Referral summary"
                 variant="secondary"

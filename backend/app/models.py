@@ -1,11 +1,12 @@
 import uuid
-from datetime import UTC, datetime
+from datetime import UTC, date, datetime
 from typing import Any
 
 from sqlalchemy import (
     Boolean,
     CheckConstraint,
     Column,
+    Date,
     DateTime,
     ForeignKey,
     Integer,
@@ -48,6 +49,8 @@ CAPTURE_STATUSES = ("processed", "qc_failed")
 DEVICE_TYPES = ("virtual",)
 CASE_STATUSES = ("submitted", "in_review", "answered")
 REVIEW_ACTIONS = ("observe", "biopsy", "refer")
+OUTCOME_ACTIONS = ("observed", "biopsied", "excised", "referred", "declined")
+HISTOPATHOLOGY = ("pending", "benign", "malignant", "indeterminate")
 
 
 def utcnow() -> datetime:
@@ -186,6 +189,7 @@ class Case(Base):
         secondary=case_captures, order_by="Capture.captured_at"
     )
     review: Mapped["Review | None"] = relationship(back_populates="case")
+    outcome: Mapped["Outcome | None"] = relationship(back_populates="case")
 
 
 class Review(Base):
@@ -208,6 +212,35 @@ class Review(Base):
 
     case: Mapped[Case] = relationship(back_populates="review")
     reviewer: Mapped[User] = relationship()
+
+
+class Outcome(Base):
+    """What the treating clinician did after the recommendation, and the histopathology result if
+    tissue was taken. Entered by people; it closes the loop and is the label future models need."""
+
+    __tablename__ = "outcomes"
+    __table_args__ = (
+        CheckConstraint(_in("action_taken", OUTCOME_ACTIONS), name="action_taken_valid"),
+        CheckConstraint(
+            "histopathology IS NULL OR " + _in("histopathology", HISTOPATHOLOGY),
+            name="histopathology_valid",
+        ),
+    )
+
+    id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid.uuid4)
+    case_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("cases.id"), unique=True)
+    action_taken: Mapped[str] = mapped_column(String(16))
+    procedure_date: Mapped[date | None] = mapped_column(Date)
+    histopathology: Mapped[str | None] = mapped_column(String(16))
+    histopathology_notes: Mapped[str | None] = mapped_column(Text)
+    recorded_by: Mapped[uuid.UUID] = mapped_column(ForeignKey("users.id"), index=True)
+    recorded_at: Mapped[datetime] = _created_at()
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=utcnow, onupdate=utcnow
+    )
+
+    case: Mapped[Case] = relationship(back_populates="outcome")
+    recorder: Mapped[User] = relationship()
 
 
 class AuditEvent(Base):

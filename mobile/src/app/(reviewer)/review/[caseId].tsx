@@ -21,6 +21,7 @@ import {
 import { CaseTimeline, Footnote, HistoryStrip, Recommendation, SpectralViews, VisitCompare } from '@/ui/clinical';
 import { areaChange, AutomatedAnalysis, formatSize } from '@/ui/analysis';
 import { TriageSupport } from '@/ui/triage';
+import { OutcomeCard } from '@/ui/outcome';
 import { SpectralSignature } from '@/ui/measurement';
 import { isAcral } from '@/ui/labels';
 import { formatArea, formatDateTime, siteLabel, STATUS_LABELS, statusTone } from '@/ui/labels';
@@ -184,7 +185,8 @@ export default function ReviewCase() {
                     </Text>
                   </View>
                 ) : null}
-                <Recommendation review={c.review} />
+                <Recommendation review={c.review} due={c.follow_up_due} />
+                <OutcomeCard c={c} editable={false} />
                 <Button label="Back to queue" variant="secondary" onPress={() => router.navigate('/review')} />
               </>
             ) : (

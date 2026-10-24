@@ -7,10 +7,12 @@ import { api } from '@/api/client';
 import { absoluteUrl } from '@/api/config';
 import { useSession } from '@/api/session';
 import { Button, Card, Empty, ErrorBanner, Field, Heading, ListItem, Loading, Muted, Pill, Row, Screen } from '@/ui/components';
+import { nextStep } from '@/ui/outcome';
 import { ACTION_LABELS, demographics, duration, formatDate, siteLabel } from '@/ui/labels';
 import { colors, radius, spacing } from '@/ui/theme';
 
 const POLL_MS = 5_000;
+const TODO_SHOWN = 5;
 
 export default function Home() {
   const router = useRouter();
@@ -20,6 +22,10 @@ export default function Home() {
   const cases = useQuery({ queryKey: ['cases', 'mine'], queryFn: () => api.cases(), refetchInterval: POLL_MS });
   const waiting = cases.data?.filter((c) => c.status !== 'answered') ?? [];
   const answered = cases.data?.filter((c) => c.status === 'answered') ?? [];
+  const todo = answered.flatMap((c) => {
+    const step = nextStep(c);
+    return step ? [{ c, step }] : [];
+  });
   const latestAnswer = [...answered].sort((a, b) => (b.answered_at ?? '').localeCompare(a.answered_at ?? ''))[0];
   const query = search.trim().toUpperCase();
   const shown = patients.data?.filter((p) => !query || p.code.includes(query)) ?? [];
@@ -53,6 +59,23 @@ export default function Home() {
             onPress={() => router.push({ pathname: '/cases/[caseId]', params: { caseId: latestAnswer.id } })}
             testID="latest-recommendation"
           />
+        </Card>
+      ) : null}
+
+      {todo.length ? (
+        <Card testID="todo">
+          <Heading>To do</Heading>
+          {todo.slice(0, TODO_SHOWN).map(({ c, step }) => (
+            <ListItem
+              key={c.id}
+              title={`${c.patient.code} · ${siteLabel(c.lesion)}`}
+              subtitle={step}
+              right={<Pill label={ACTION_LABELS[c.review_action!]} tone="neutral" />}
+              onPress={() => router.push({ pathname: '/cases/[caseId]', params: { caseId: c.id } })}
+              testID={`todo-${c.id}`}
+            />
+          ))}
+          {todo.length > TODO_SHOWN ? <Muted>and {todo.length - TODO_SHOWN} more in My cases</Muted> : null}
         </Card>
       ) : null}
 

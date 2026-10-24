@@ -247,13 +247,14 @@ export function HistoryStrip({
   );
 }
 
-export function Recommendation({ review }: { review: Schemas['ReviewOut'] }) {
+export function Recommendation({ review, due }: { review: Schemas['ReviewOut']; due?: string | null }) {
   return (
     <Card style={styles.recommendation} testID="recommendation">
       <Muted style={{ color: colors.accent, fontWeight: '700' }}>DERMATOLOGIST RECOMMENDATION</Muted>
       <Text style={styles.recommendationAction} testID="recommendation-action">
         {ACTION_LABELS[review.action]}
         {review.follow_up_days != null ? ` · follow up in ${review.follow_up_days} days` : ''}
+        {due ? ` (by ${formatDate(due)})` : ''}
       </Text>
       <Text style={styles.recommendationText}>{review.impression}</Text>
       {review.notes ? <Muted>Notes: {review.notes}</Muted> : null}

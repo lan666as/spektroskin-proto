@@ -20,6 +20,7 @@ export type Validation = Schemas['ValidationOut'];
 export type AuditEvent = Schemas['AuditEventOut'];
 export type ReviewAction = Schemas['ReviewCreate']['action'];
 export type CaseStatus = Schemas['CaseSummary']['status'];
+export type OutcomeIn = Schemas['OutcomeIn'];
 
 export class ApiError extends Error {
   constructor(
@@ -97,6 +98,7 @@ async function request<T>(
 
 const get = <T>(path: string) => request<T>('GET', path);
 const post = <T>(path: string, body: unknown) => request<T>('POST', path, JSON.stringify(body));
+const put = <T>(path: string, body: unknown) => request<T>('PUT', path, JSON.stringify(body));
 
 export const api = {
   login(username: string, password: string) {
@@ -127,4 +129,5 @@ export const api = {
     get<AuditEvent[]>(`/audit?limit=50${before ? `&before=${encodeURIComponent(before)}` : ''}`),
   validation: (captureId: string) => get<Validation>(`/validation/${captureId}`),
   review: (caseId: string, body: ReviewCreate) => post<CaseDetail>(`/cases/${caseId}/review`, body),
+  recordOutcome: (caseId: string, body: OutcomeIn) => put<CaseDetail>(`/cases/${caseId}/outcome`, body),
 };

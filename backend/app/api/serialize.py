@@ -1,12 +1,15 @@
 """ORM → response schemas. Image URLs are signed for the viewing user."""
 
+from datetime import date, timedelta
+
 from app.auth import sign_image_url
-from app.models import Capture, Case, Lesion, User
+from app.models import Capture, Case, Lesion, Outcome, User
 from app.schemas import (
     CaptureOut,
     CaseDetail,
     CaseSummary,
     LesionOut,
+    OutcomeOut,
     PatientOut,
     QCOut,
     ReviewOut,
@@ -69,7 +72,17 @@ def case_summary(case: Case, viewer: User, requested_by: str) -> CaseSummary:
         lesion=lesion_out(case.lesion),
         thumbnail_url=sign_image_url(latest.id, "standard", viewer.id) if latest else None,
         review_action=case.review.action if case.review else None,
+        follow_up_due=follow_up_due(case),
+        outcome_action=case.outcome.action_taken if case.outcome else None,
+        histopathology=case.outcome.histopathology if case.outcome else None,
     )
+
+
+def follow_up_due(case: Case) -> date | None:
+    review = case.review
+    if review is None or review.follow_up_days is None or case.answered_at is None:
+        return None
+    return case.answered_at.date() + timedelta(days=review.follow_up_days)
 
 
 def case_detail(case: Case, viewer: User, requested_by: str) -> CaseDetail:
@@ -91,4 +104,17 @@ def case_detail(case: Case, viewer: User, requested_by: str) -> CaseDetail:
         )
         if review
         else None,
+        outcome=outcome_out(case.outcome) if case.outcome else None,
+    )
+
+
+def outcome_out(outcome: Outcome) -> OutcomeOut:
+    return OutcomeOut(
+        action_taken=outcome.action_taken,
+        procedure_date=outcome.procedure_date,
+        histopathology=outcome.histopathology,
+        histopathology_notes=outcome.histopathology_notes,
+        recorded_by_name=outcome.recorder.display_name,
+        recorded_at=outcome.recorded_at,
+        updated_at=outcome.updated_at,
     )

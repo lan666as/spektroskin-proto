@@ -1,8 +1,8 @@
 import uuid
-from datetime import datetime
+from datetime import date, datetime
 from typing import Annotated, Literal
 
-from pydantic import BaseModel, ConfigDict, Field, StringConstraints
+from pydantic import BaseModel, ConfigDict, Field, StringConstraints, model_validator
 
 Role = Literal["clinician", "dermatologist"]
 Sex = Literal["female", "male"]
@@ -32,6 +32,8 @@ Laterality = Literal["left", "right", "midline"]
 CaptureStatus = Literal["processed", "qc_failed"]
 CaseStatus = Literal["submitted", "in_review", "answered"]
 ReviewAction = Literal["observe", "biopsy", "refer"]
+OutcomeAction = Literal["observed", "biopsied", "excised", "referred", "declined"]
+Histopathology = Literal["pending", "benign", "malignant", "indeterminate"]
 ViewName = Literal["standard", "pigment", "vascular"]
 
 PatientCode = Annotated[str, StringConstraints(pattern=r"^PT-\d{4}$")]
@@ -201,6 +203,29 @@ class ReviewOut(BaseModel):
     created_at: datetime
 
 
+class OutcomeIn(BaseModel):
+    action_taken: OutcomeAction
+    procedure_date: date | None = None
+    histopathology: Histopathology | None = Field(
+        default=None, description="Only when tissue was taken (biopsied or excised)"
+    )
+    histopathology_notes: (
+        Annotated[str, StringConstraints(strip_whitespace=True, max_length=2000)] | None
+    ) = None
+
+    @model_validator(mode="after")
+    def _tissue_only(self) -> "OutcomeIn":
+        if self.histopathology and self.action_taken not in ("biopsied", "excised"):
+            raise ValueError("Histopathology needs a biopsy or excision")
+        return self
+
+
+class OutcomeOut(OutcomeIn):
+    recorded_by_name: str
+    recorded_at: datetime
+    updated_at: datetime
+
+
 class CaseSummary(BaseModel):
     id: uuid.UUID
     status: CaseStatus
@@ -213,12 +238,18 @@ class CaseSummary(BaseModel):
     lesion: LesionOut
     thumbnail_url: str | None
     review_action: ReviewAction | None
+    follow_up_due: date | None = Field(
+        default=None, description="Answer date + the dermatologist's follow-up interval"
+    )
+    outcome_action: OutcomeAction | None = None
+    histopathology: Histopathology | None = None
 
 
 class CaseDetail(CaseSummary):
     captures: list[CaptureOut]
     lesion_history: list[CaptureOut]
     review: ReviewOut | None
+    outcome: OutcomeOut | None = None
 
 
 class ValidationOut(BaseModel):

@@ -217,3 +217,16 @@ Timestamped record of what was built during GENOHACK (Sat 24 – Sun 25 Oct 2026
   probability or risk score text appears.
 - Seeded captures processed before this change carry no triage opinion (no backfill on production
   data); new captures do.
+
+## 2026-10-25 00:57 WIB — Iteration loop, batch 4: care lifecycle (backlog items 5, 6)
+
+- Migration 0005 `outcomes` (one per case, CHECK-constrained action and histopathology, FK indexes);
+  `PUT /api/cases/{id}/outcome` (requesting clinician only, after the review, row-locked, idempotent
+  upsert, audited). Histopathology only with a biopsy or excision (422 otherwise). Additive fields on
+  cases: `follow_up_due`, `outcome_action`, `histopathology`, `outcome`.
+- App: outcome form and summary on the clinician case (action, date, histopathology, report
+  summary); the dermatologist sees the outcome on the case; the recommendation shows the follow-up
+  due date; the clinician home gets a "To do" list (record outcome, histopathology pending,
+  follow-up due or overdue).
+- Tests: outcome ordering, ownership, idempotent replace, tissue rule; smoke covers the endpoint;
+  the demo-script e2e records biopsy → pending → benign and checks the reviewer sees it.

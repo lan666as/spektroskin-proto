@@ -9,8 +9,8 @@ from app import audit
 from app.api.serialize import case_detail, case_summary
 from app.auth import Clinician, CurrentUser, Dermatologist, same_group
 from app.db import get_session
-from app.models import Capture, Case, Lesion, Review, User, utcnow
-from app.schemas import CaseCreate, CaseDetail, CaseStatus, CaseSummary, ReviewCreate
+from app.models import Capture, Case, Lesion, Outcome, Review, User, utcnow
+from app.schemas import CaseCreate, CaseDetail, CaseStatus, CaseSummary, OutcomeIn, ReviewCreate
 
 router = APIRouter(prefix="/cases", tags=["cases"])
 SessionDep = Annotated[Session, Depends(get_session)]
@@ -20,6 +20,7 @@ _LOAD = (
     selectinload(Case.lesion).selectinload(Lesion.captures),
     selectinload(Case.captures),
     selectinload(Case.review).selectinload(Review.reviewer),
+    selectinload(Case.outcome).selectinload(Outcome.recorder),
 )
 
 
@@ -117,3 +118,27 @@ def review_case(
     session.expire_all()
     case = _load_case(session, case_id, user)
     return case_detail(case, user, _requester_names(session, [case])[case.created_by])
+
+
+@router.put("/{case_id}/outcome", response_model=CaseDetail)
+def record_outcome(
+    case_id: uuid.UUID, body: OutcomeIn, user: Clinician, session: SessionDep
+) -> CaseDetail:
+    """The requesting clinician records what was done and, after tissue sampling, the
+    histopathology result. Idempotent: a repeat replaces the previous entry."""
+    case = session.scalar(select(Case).where(Case.id == case_id).with_for_update())
+    if case is None or case.created_by != user.id:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Case not found")
+    if case.status != "answered":
+        raise HTTPException(status.HTTP_409_CONFLICT, "Record the outcome after the review")
+    outcome = session.scalar(select(Outcome).where(Outcome.case_id == case.id))
+    if outcome is None:
+        outcome = Outcome(case_id=case.id, recorded_by=user.id)
+        session.add(outcome)
+    for field, value in body.model_dump().items():
+        setattr(outcome, field, value)
+    outcome.recorded_by = user.id
+    audit.record(session, user, "outcome", "case", case.id)
+    session.commit()
+    session.expire_all()
+    return case_detail(_load_case(session, case_id, user), user, user.display_name)

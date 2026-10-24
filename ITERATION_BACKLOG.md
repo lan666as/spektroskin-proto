@@ -42,8 +42,8 @@ Score = judge impact (1–5) × 2 − risk (1–5) − effort (S=1, M=2, L=3). D
 | 2 | "Automated analysis" card (results + reviewer): quality check, outline, change since first visit, each labelled automated assistance with its limits; a greyed "Triage support: not active" row | 5 | 1 | M | 7 | done (batch 1) |
 | 3 | Train a small image-quality classifier (scikit-learn) on synthetic phantoms; real held-out metrics; integrate as an advisory second opinion beside the rule-based QC; model card | 5 | 3 | M | 5 | done (batch 2: 0.97 held-out vs rules 0.90) |
 | 4 | In-app "AI roadmap" view: tiers active / shadow mode / not active, RGB-vs-spectral ablation as the optics kill test | 4 | 1 | S | 6 | done (batch 1) |
-| 5 | Care lifecycle: follow-up date and outcome entry (action taken, biopsy date, histopathology result) closing the loop on the recommendation; dermatologist sees the outcome | 5 | 3 | L | 4 | todo |
-| 6 | "Follow-ups due" and "needs outcome" on the clinician home | 4 | 2 | S | 5 | todo |
+| 5 | Care lifecycle: follow-up date and outcome entry (action taken, biopsy date, histopathology result) closing the loop on the recommendation; dermatologist sees the outcome | 5 | 3 | L | 4 | done (batch 4) |
+| 6 | "Follow-ups due" and "needs outcome" on the clinician home | 4 | 2 | S | 5 | done (batch 4) |
 | 7 | "Data for validation" page: how consented, reviewed, histopathology-confirmed cases would feed the future validation set (counts, eligibility rules) | 4 | 2 | M | 4 | todo |
 | 8 | Visual refresh: light-gray canvas with white cards, initials avatars, compact device card | 3 | 2 | M | 2 | todo |
 | 9 | Referral summary: add measurements, automated-analysis notes and the outcome | 3 | 1 | S | 4 | todo |
