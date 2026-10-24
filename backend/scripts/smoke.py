@@ -138,13 +138,24 @@ def run(base: str) -> None:
 
     code = f"PT-{random.randint(9000, 9999)}"
     status, patient = c.request(
-        "POST", "/api/patients", body={"code": code, "age": 50, "sex": "female", "fitzpatrick": "V"}
+        "POST",
+        "/api/patients",
+        body={
+            "code": code,
+            "age": 50,
+            "sex": "female",
+            "fitzpatrick": "V",
+            "research_consent": True,
+        },
     )
     if status == 409:  # a previous smoke run used this code; reuse it
         _, patients = c.request("GET", "/api/patients")
         patient = next(p for p in patients if p["code"] == code)
         status = 201
     expect(status == 201, f"POST /patients: {status} {patient}")
+    expect(patient["research_consent"] is True, "research consent recorded")
+    status, _ = c.request("GET", "/api/audit")
+    expect(status == 403, f"clinician cannot read the audit log: {status}")
     status, err = c.request(
         "POST",
         "/api/patients",
@@ -233,6 +244,10 @@ def run(base: str) -> None:
         body={"code": "PT-0001", "age": 1, "sex": "male", "fitzpatrick": "I"},
     )
     expect(status == 403, f"dermatologist cannot create patients: {status}")
+    status, events = c.request("GET", "/api/audit?limit=20")
+    expect(status == 200 and len(events) > 0, f"GET /audit (dermatologist): {status}")
+    status, older = c.request("GET", f"/api/audit?limit=5&before={events[-1]['at']}")
+    expect(status == 200, f"GET /audit paging with before cursor: {status}")
     status, queue = c.request("GET", "/api/cases?status=submitted&status=in_review")
     expect(status == 200 and any(x["id"] == case["id"] for x in queue), "GET /cases queue")
     status, opened = c.request("GET", f"/api/cases/{case['id']}")

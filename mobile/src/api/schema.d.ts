@@ -256,10 +256,56 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/audit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Audit
+         * @description Newest first. Page with `before` = the `at` of the last event received.
+         */
+        get: operations["list_audit_api_audit_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** AuditEventOut */
+        AuditEventOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * At
+             * Format: date-time
+             */
+            at: string;
+            /** Actor */
+            actor: string;
+            /**
+             * Actor Role
+             * @enum {string}
+             */
+            actor_role: "clinician" | "dermatologist";
+            /** Action */
+            action: string;
+            /** Entity Type */
+            entity_type: string;
+            /** Entity Id */
+            entity_id: string;
+        };
         /** Body_create_capture_api_captures_post */
         Body_create_capture_api_captures_post: {
             /**
@@ -554,6 +600,12 @@ export interface components {
              * @enum {string}
              */
             fitzpatrick: "I" | "II" | "III" | "IV" | "V" | "VI";
+            /**
+             * Research Consent
+             * @description Patient consented to research use of their images
+             * @default false
+             */
+            research_consent: boolean;
         };
         /** PatientDetail */
         PatientDetail: {
@@ -576,6 +628,8 @@ export interface components {
              * @enum {string}
              */
             fitzpatrick: "I" | "II" | "III" | "IV" | "V" | "VI";
+            /** Research Consent */
+            research_consent: boolean;
             /**
              * Created At
              * Format: date-time
@@ -605,6 +659,8 @@ export interface components {
              * @enum {string}
              */
             fitzpatrick: "I" | "II" | "III" | "IV" | "V" | "VI";
+            /** Research Consent */
+            research_consent: boolean;
             /**
              * Created At
              * Format: date-time
@@ -1219,6 +1275,40 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ValidationOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_audit_api_audit_get: {
+        parameters: {
+            query?: {
+                limit?: number;
+                /** @description Cursor: events strictly older */
+                before?: string | null;
+                entity_type?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AuditEventOut"][];
                 };
             };
             /** @description Validation Error */

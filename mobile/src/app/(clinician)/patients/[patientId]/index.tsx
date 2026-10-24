@@ -33,6 +33,7 @@ export default function PatientScreen() {
             <KeyValue label="Age" value={`${p.age} years`} />
             <KeyValue label="Sex" value={p.sex === 'female' ? 'Female' : 'Male'} />
             <KeyValue label="Fitzpatrick" value={p.fitzpatrick} />
+            <KeyValue label="Research consent" value={p.research_consent ? 'Yes' : 'No'} />
           </Card>
           <Heading>Lesions</Heading>
           {p.lesions.length === 0 ? <Empty>No lesions recorded yet.</Empty> : null}

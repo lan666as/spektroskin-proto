@@ -22,6 +22,7 @@ test('clinician: login → patient → lesion → capture → results with histo
   await byId(page, 'patient-age').fill('54');
   await byId(page, 'sex-female').click();
   await byId(page, 'fitzpatrick-V').click();
+  await byId(page, 'consent-no').click();
   await byId(page, 'create-patient').click();
   await expect(byId(page, 'patient-screen')).toBeVisible();
 

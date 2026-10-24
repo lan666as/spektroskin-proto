@@ -9,6 +9,10 @@ const SEX = [
   { value: 'female', label: 'Female' },
   { value: 'male', label: 'Male' },
 ] as const;
+const CONSENT = [
+  { value: 'yes', label: 'Yes' },
+  { value: 'no', label: 'No' },
+] as const;
 const FITZPATRICK = (['I', 'II', 'III', 'IV', 'V', 'VI'] as const).map((v) => ({ value: v, label: v }));
 
 function nextCode(codes: string[]): string {
@@ -24,16 +28,23 @@ export default function NewPatient() {
   const [age, setAge] = useState('');
   const [sex, setSex] = useState<PatientCreate['sex'] | null>(null);
   const [fitzpatrick, setFitzpatrick] = useState<PatientCreate['fitzpatrick'] | null>(null);
+  const [consent, setConsent] = useState<'yes' | 'no' | null>(null);
 
   const suggested = existing.data ? nextCode(existing.data.map((p) => p.code)) : '';
   const codeValue = code ?? suggested;
   const ageNumber = Number(age);
   const valid =
-    /^PT-\d{4}$/.test(codeValue) && age !== '' && ageNumber >= 0 && ageNumber <= 120 && sex && fitzpatrick;
+    /^PT-\d{4}$/.test(codeValue) && age !== '' && ageNumber >= 0 && ageNumber <= 120 && sex && fitzpatrick && consent;
 
   const create = useMutation({
     mutationFn: () =>
-      api.createPatient({ code: codeValue, age: ageNumber, sex: sex!, fitzpatrick: fitzpatrick! }),
+      api.createPatient({
+        code: codeValue,
+        age: ageNumber,
+        sex: sex!,
+        fitzpatrick: fitzpatrick!,
+        research_consent: consent === 'yes',
+      }),
     onSuccess: (patient) => {
       queryClient.invalidateQueries({ queryKey: ['patients'] });
       router.replace({ pathname: '/patients/[patientId]', params: { patientId: patient.id } });
@@ -68,6 +79,14 @@ export default function NewPatient() {
           onChange={setFitzpatrick}
           testIDPrefix="fitzpatrick"
         />
+        <Chips
+          label="Consent to research use of images"
+          options={CONSENT}
+          value={consent}
+          onChange={setConsent}
+          testIDPrefix="consent"
+        />
+        <Muted>Care does not depend on this answer. Only consented images may enter research datasets.</Muted>
         <ErrorBanner error={create.error} />
         <Button
           label="Create patient"

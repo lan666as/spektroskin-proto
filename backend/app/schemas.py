@@ -60,6 +60,9 @@ class PatientCreate(BaseModel):
     age: int = Field(ge=0, le=120)
     sex: Sex
     fitzpatrick: Fitzpatrick
+    research_consent: bool = Field(
+        default=False, description="Patient consented to research use of their images"
+    )
 
 
 class PatientOut(ORM):
@@ -68,6 +71,7 @@ class PatientOut(ORM):
     age: int
     sex: Sex
     fitzpatrick: Fitzpatrick
+    research_consent: bool
     created_at: datetime
 
 
@@ -171,3 +175,13 @@ class ValidationOut(BaseModel):
     measured_area_mm2: float
     true_area_mm2: float
     scope: str
+
+
+class AuditEventOut(BaseModel):
+    id: uuid.UUID
+    at: datetime
+    actor: str
+    actor_role: Role
+    action: str
+    entity_type: str
+    entity_id: str

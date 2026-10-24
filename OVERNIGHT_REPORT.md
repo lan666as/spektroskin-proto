@@ -59,3 +59,15 @@ Result (22:04 WIB): **done (native path NEEDS PHONE CHECK)**, commit `4fa48fc`.
   3. Go back to the lesion: "1 capture(s) saved on this phone, waiting for a connection."
   4. Turn airplane mode off. Within ~30 s (or tap "Try upload now") the banner disappears and the
      new visit appears in the history strip.
+
+## Item 4 — Research-consent flag + audit log page
+
+Plan:
+- Alembic 0003 (additive): `patients.research_consent BOOLEAN NOT NULL DEFAULT false`. Existing rows
+  read as "no consent". `PatientCreate.research_consent` optional (default false); `PatientOut` gains
+  the field (additive).
+- New patient form: explicit Yes/No choice. Shown on the patient screen and in the reviewer's case
+  detail.
+- `GET /api/audit?limit=&before=&entity_type=` (dermatologist only, newest first, cursor by time):
+  actor, action, entity, time. Reviewer portal: "Audit log" page.
+- Smoke: consent round-trip; audit visible to dermatologist, 403 for clinician.

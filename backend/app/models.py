@@ -3,6 +3,7 @@ from datetime import UTC, datetime
 from typing import Any
 
 from sqlalchemy import (
+    Boolean,
     CheckConstraint,
     Column,
     DateTime,
@@ -14,6 +15,7 @@ from sqlalchemy import (
     Text,
     Uuid,
 )
+from sqlalchemy import false as sa_false
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
@@ -98,6 +100,10 @@ class Patient(Base):
     age: Mapped[int] = mapped_column(Integer)
     sex: Mapped[str] = mapped_column(String(16))
     fitzpatrick: Mapped[str] = mapped_column(String(4))
+    # Consent to research use of this patient's images; clinical care does not depend on it.
+    research_consent: Mapped[bool] = mapped_column(
+        Boolean, default=False, server_default=sa_false()
+    )
     created_by: Mapped[uuid.UUID] = mapped_column(ForeignKey("users.id"), index=True)
     created_at: Mapped[datetime] = _created_at()
 

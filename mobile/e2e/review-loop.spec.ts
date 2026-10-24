@@ -17,6 +17,7 @@ test('review loop: clinician submits → dermatologist reviews → clinician see
   await byId(clinician, 'patient-age').fill('54');
   await byId(clinician, 'sex-female').click();
   await byId(clinician, 'fitzpatrick-V').click();
+  await byId(clinician, 'consent-yes').click();
   await byId(clinician, 'create-patient').click();
   await byId(clinician, 'add-lesion').click();
   await byId(clinician, 'site-sole').click();
@@ -35,6 +36,7 @@ test('review loop: clinician submits → dermatologist reviews → clinician see
   await row.click();
   await expect(byId(reviewer, 'case-question-text')).toHaveText(question);
   await expect(byId(reviewer, 'history-strip')).toBeVisible();
+  await expect(byId(reviewer, 'review-case-screen')).toContainText('Research consent');
   await byId(reviewer, 'review-impression').fill('Irregular pigment on an acral site with growth over visits.');
   await byId(reviewer, 'action-biopsy').click();
   await byId(reviewer, 'follow-up-14').click();
@@ -44,6 +46,12 @@ test('review loop: clinician submits → dermatologist reviews → clinician see
   // The clinician's case page polls every 5 s.
   await expect(byId(clinician, 'recommendation-action')).toContainText('Biopsy', { timeout: 15_000 });
   await expect(byId(clinician, 'recommendation')).toContainText('treating clinician decides');
+
+  await byId(reviewer, 'nav-audit').click();
+  await expect(byId(reviewer, 'audit-screen')).toBeVisible();
+  await expect(
+    reviewer.getByTestId('audit-row').filter({ hasText: 'Smoke Test Dermatologist' }).filter({ hasText: 'review case' }).first(),
+  ).toBeVisible();
 
   await clinicianContext.close();
   await reviewerContext.close();

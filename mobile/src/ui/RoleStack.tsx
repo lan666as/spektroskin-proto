@@ -7,7 +7,7 @@ import { useSession } from '@/api/session';
 import { Loading } from './components';
 import { colors, spacing } from './theme';
 
-type Link = { label: string; href: '/cases' | '/patients' | '/review'; testID: string };
+type Link = { label: string; href: '/cases' | '/patients' | '/review' | '/audit'; testID: string };
 
 /** Stack navigator for one role: redirects anyone else, adds header links and sign-out. */
 export function RoleStack({ role, links }: { role: User['role']; links: Link[] }) {

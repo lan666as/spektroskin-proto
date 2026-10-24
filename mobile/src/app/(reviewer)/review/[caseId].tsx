@@ -93,6 +93,7 @@ function CaseInfo({ c }: { c: CaseDetail }) {
       </Row>
       <KeyValue label="Age / sex" value={`${c.patient.age} · ${c.patient.sex === 'female' ? 'Female' : 'Male'}`} />
       <KeyValue label="Fitzpatrick" value={c.patient.fitzpatrick} />
+      <KeyValue label="Research consent" value={c.patient.research_consent ? 'Yes' : 'No'} />
       <KeyValue label="Site" value={siteLabel(c.lesion)} />
       <KeyValue label="Area (latest)" value={formatArea(latest?.area_mm2)} />
       <KeyValue label="Requested by" value={c.requested_by} />
