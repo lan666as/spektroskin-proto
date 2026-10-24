@@ -535,3 +535,10 @@ Timestamped record of what was built during GENOHACK (Sat 24 – Sun 25 Oct 2026
 - Submit screen: "Draft the question from the measurements" fills the question with size, growth,
   asymmetry and border and the research-mode AI suggestions (labelled), ending "Biopsy, observe or
   refer?"; editable. Demo e2e asserts the draft.
+
+## 2026-10-25 05:30 WIB — Iteration loop, batch 34: neural-network experiment (not deployed)
+
+- `scripts/experiment_mlp.py` → `docs/evidence/experiment_mlp_vs_features.md`: scikit-learn MLP (64
+  hidden units) on 2 × 32×32 pigment and blood map crops, same lesions and split as the triage
+  model. Held-out 0.93 (dark skin 0.91) vs 0.98 (0.96) for the deployed explainable model, which
+  stays. Added as assumption 12 in `assumptions_tested.md`.

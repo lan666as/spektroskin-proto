@@ -18,6 +18,7 @@ training.
 | 9 | Growth between visits can be measured, not just eyeballed | Day 01 → Day 30 registered outline comparison; repeat captures of a stable lesion | 7–13 mm² new area detected on the growth series; < 1.5 mm² on repeats | Holds | `backend/tests/test_change.py` |
 | 10 | Dermatologist reads can validate a model before it is shown (shadow mode) | Pattern reads in the review form, blind reads, agreement on the AI page | The loop works end to end; agreement numbers so far come from test accounts only | Mechanism holds; no clinical data yet | AI page, `backend/tests/test_ai_summary.py` |
 | 11 | Reviewed cases can become a validation set without leaking identity | Export of consented, histopathology-confirmed cases | No names, patient codes, free text or exact ages; withdrawal of consent removes a case at once | Holds | `/api/ai/validation-set`, e2e demo script |
+| 12 | A neural network on the raw maps would beat engineered features | Same lesions and split; MLP on 2 × 32×32 map crops vs the deployed 12-feature model | 0.93 vs 0.98 (dark skin 0.91 vs 0.96) | Does not hold on simulated data: the explainable model stays; an image encoder waits for real images | `experiment_mlp_vs_features.md` |
 
 ## What we deliberately did not test, and why
 
