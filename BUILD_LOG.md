@@ -16,6 +16,12 @@ Timestamped record of what was built during GENOHACK (Sat 24 – Sun 25 Oct 2026
   (VPS ports 80/443 belong to an existing Nginx Proxy Manager).
 - No application code written.
 
+### 2026-10-24 21:15 WIB — Phase 0: pre-flight closed
+- Tunnel ingress for spektroskin.zidan.dev applied by the builder; verified (502 = no origin yet).
+- Added docs/context/chat-handoff.md (context from the claude.ai planning chat); PLAN.md updated:
+  deploy ssh fallback, extended-demo dependency, README target-vs-prototype section, pre-flight table.
+- Overnight-stall risks checked: Keychain reads without prompts; SSH needs no expiring token.
+
 ## Decisions made alone
 
 ## Deviations

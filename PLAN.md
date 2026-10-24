@@ -23,6 +23,7 @@ Taken from the team's Drive (proposal, rewritten deck, pitch strategy, GENOHACK 
   BUILD_LOG.md). Deck slide 6 (RealFigures v3) says "Only the spectral views are simulated", which is
   wrong for this build: the optical module and its frames are simulated too. Correct wording:
   *"Working app and processing pipeline, end to end. The optical module and its images are simulated."*
+  Other morning deck fixes are listed in `docs/context/chat-handoff.md` §3.
 - Deck judge Q6 (skin-tone bias) is answered with evidence by the skin-tone-stratified validation
   report: it validates the processing math on simulated data only.
 
@@ -143,7 +144,7 @@ history, review form) → submit; the clinician sees the recommendation.
 sees "Dermatologist recommendation: Biopsy" within 10 s.
 
 **M6: deploy.** `scripts/deploy.sh`: refuses unless on `main` with a clean tree and a green gate; pushes;
-ssh → `git pull --ff-only` → `docker compose up -d --build`; streams the tested `mobile/dist` to `web-dist/`;
+ssh (host `elang.zidan.dev`; if the connection itself fails, retry once via `elang-direct`) → `git pull --ff-only` → `docker compose up -d --build`; streams the tested `mobile/dist` to `web-dist/`;
 pipes Keychain passwords into `create_user`; runs the seed; checks `https://spektroskin.zidan.dev/api/health`.
 *Done when:* deploy succeeds; smoke + Playwright e2e pass against https://spektroskin.zidan.dev; tag
 `v-core` pushed.
@@ -168,7 +169,8 @@ autofill). Left, ~390 px wide: clinician on lesion "PT-0007 · Left sole". Right
 
 **Extended, +60 s (Grand Final / Q&A):** start with the `pigmented_dark_glare` capture → QC fails with
 retake guidance → retake passes; then the validation panel: recovered maps vs ground truth by skin
-tone (simulated data only). Background cases: PT-0003 (answered, observe) in "My cases", PT-0005
+tone (simulated data only). The validation panel comes from overnight item 1; if that item doesn't land,
+the extended demo ends after the QC retake. Background cases: PT-0003 (answered, observe) in "My cases", PT-0005
 (submitted) in the queue.
 
 ## 7. Seed data (synthetic, idempotent)
@@ -194,7 +196,8 @@ case) are acceptable; the builder can create a fresh lesion for the live run.
 4. Printable referral summary for answered cases (web view; PDF only if trivial).
 5. UI polish: loading, empty and error states; consistent spacing and type.
 6. README: architecture (Mermaid), run instructions, real-vs-simulated table, before/during-GENOHACK
-   table, link to BUILD_LOG.md.
+   table, a "target vs prototype" section built from `docs/context/chat-handoff.md` §2 (described as
+   target design, not as built), and a link to BUILD_LOG.md.
 
 (Longitudinal history moved into M4.)
 
@@ -221,10 +224,11 @@ touching the VPS outside `deploy.sh`; NPM or cloudflared config; deleting data.
 | VPS Docker 29.1.3, Compose v5.0.1, user in `docker` group, 39 GB free | OK |
 | VPS → GitHub ssh auth | OK |
 | DNS `spektroskin.zidan.dev` → tunnel CNAME | OK |
-| Tunnel ingress rule for spektroskin.zidan.dev | **Pending: builder runs the sudo command** |
-| VPS project dir cloned, VPS `.env` | After the first push |
-| Local `.env` | Created from `.env.example` |
-| Demo passwords in Keychain | OK |
+| Tunnel ingress rule for spektroskin.zidan.dev | OK (applied 21:01 WIB; returns 502 until the stack runs; backup `/etc/cloudflared/config.yml.bak-20261024`) |
+| VPS project dir cloned, VPS `.env` | OK (`.env` generated on the VPS, mode 600) |
+| Local `.env` | OK (mode 600) |
+| Demo passwords in Keychain | OK; login keychain `no-timeout`, no lock-on-sleep; `security` reads without a dialog |
+| SSH unattended | OK: a fresh connection (no ControlMaster) works over the tunnel; no Cloudflare Access token on the Mac, so nothing expires overnight; `elang-direct` also works as a fallback |
 
 ## 11. How to start Phase A
 
