@@ -136,7 +136,12 @@ export function VisitCompare({ captures, selectedId }: { captures: Capture[]; se
         </Heading>
         <SimulatedBadge />
       </Row>
-      <Chips options={VIEW_OPTIONS} value={view} onChange={setView} testIDPrefix="compare-view" />
+      <Chips
+        options={VIEW_OPTIONS.filter((o) => first.views[o.value] && second.views[o.value])}
+        value={view}
+        onChange={setView}
+        testIDPrefix="compare-view"
+      />
       <View style={styles.compareRow}>
         {[first, second].map((c) => {
           const uri = absoluteUrl(c.views[view] ?? c.views.standard);

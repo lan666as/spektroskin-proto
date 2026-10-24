@@ -517,3 +517,9 @@ Timestamped record of what was built during GENOHACK (Sat 24 – Sun 25 Oct 2026
 - Test: owner and same-group access allowed; another clinician and an other-group dermatologist get
   404 for patient, lesion and case. Full gate green; the live smoke and e2e are the check after
   deploy.
+
+## 2026-10-25 05:06 WIB — Iteration loop, batch 31: compare shows only views both visits have
+
+- Read-only check on live as the demo clinician (PT-0007 seeded Day 14 visit): "Run AI on this
+  capture" shows as intended. The visit compare card offered AI evidence / change views that the
+  older visit lacks; it now lists only views both visits have.
