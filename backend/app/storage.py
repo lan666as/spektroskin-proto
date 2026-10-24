@@ -2,6 +2,7 @@
 LocalStorage without touching callers."""
 
 import os
+import shutil
 import tempfile
 from functools import lru_cache
 from pathlib import Path
@@ -18,6 +19,8 @@ class Storage(Protocol):
     def put(self, key: str, data: bytes) -> None: ...
 
     def get(self, key: str) -> bytes: ...
+
+    def delete_prefix(self, prefix: str) -> None: ...
 
 
 class LocalStorage:
@@ -43,6 +46,12 @@ class LocalStorage:
         if not path.is_file():
             raise ObjectNotFound(key)
         return path.read_bytes()
+
+    def delete_prefix(self, prefix: str) -> None:
+        """Remove every object under a key prefix such as "captures/<id>/" (no-op if absent)."""
+        path = self._path(prefix)
+        if path.is_dir():
+            shutil.rmtree(path)
 
 
 @lru_cache
