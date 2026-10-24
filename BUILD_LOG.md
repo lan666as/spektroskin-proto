@@ -110,6 +110,17 @@ Timestamped record of what was built during GENOHACK (Sat 24 – Sun 25 Oct 2026
   PT-0003 (answered); clinician sees PT-0003 / 0005 / 0007 / 0009; PT-0007 and PT-0009 each have
   Day 01 (18.4 mm²) and Day 14 (22.6 mm²) visits.
 
+### 2026-10-24 23:18 WIB — Demo iteration with the builder (deployed after each step)
+- Simple demo passwords (builder's request; provisioning resets them from Keychain).
+- Visible multispectral capture: each LED band frame (470/550/660/850 nm + dark) appears as it fires.
+- Day 01 vs latest visit compare (same view, same scale, area change); selectable visits on the
+  lesion page; tap-to-enlarge images.
+- Live-feel review loop: 2 s polling, "New" highlight in the queue, "Recommendation received just
+  now" banner, "Sent to …" state for the reviewer.
+- UX pass: quick-question chips, review phrase chips (picked by the human reviewer), role chips on
+  login, lesion thumbnails, submit button earlier on the results screen, wrapping chips.
+- Every step: gate green, deployed with scripts/deploy.sh, public smoke + Playwright 4/4.
+
 ## Decisions made alone
 - M1: Expo routes live in `mobile/src/app/` (SDK 58 template convention) instead of `mobile/app/`.
 - M1: web export uses `web.output: "single"` (SPA) so Caddy can serve deep links via `try_files`.
