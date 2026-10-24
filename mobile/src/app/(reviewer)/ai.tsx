@@ -90,6 +90,43 @@ function ModelCard({ m }: { m: Schemas['ModelSummary'] }) {
   );
 }
 
+function Tile({ value, label, warn }: { value: string; label: string; warn?: boolean }) {
+  return (
+    <View style={[styles.tone, warn ? styles.toneLow : null]}>
+      <Text style={styles.toneValue}>{value}</Text>
+      <Muted>{label}</Muted>
+    </View>
+  );
+}
+
+function MonitoringCard({ m }: { m: Schemas['Monitoring'] }) {
+  const rate = (n: number, d: number) => (d ? pct(n / d) : '–');
+  const outOfRange = m.with_triage ? m.triage_out_of_range / m.with_triage : 0;
+  return (
+    <Card testID="monitoring">
+      <Heading>Monitoring: last {m.window_days} days</Heading>
+      <Muted>
+        Live from every capture in this group. When real-module images start to differ from the
+        training data, these numbers move first.
+      </Muted>
+      <Row style={{ flexWrap: 'wrap', gap: spacing.md }}>
+        <Tile value={String(m.captures)} label="captures" />
+        <Tile value={rate(m.qc_passed, m.captures)} label="passed the quality check" />
+        <Tile value={rate(m.quality_disagreements, m.captures)} label="quality model vs rules disagree" />
+        <Tile value={rate(m.triage_abstained, m.with_triage)} label="triage abstained" />
+        <Tile value={pct(outOfRange)} label="outside the training range" warn={outOfRange > 0.05} />
+        <Tile value={String(m.acral_ridge)} label="acral ridge patterns" />
+      </Row>
+      <Muted>
+        Suggested patterns:{' '}
+        {Object.entries(m.patterns)
+          .map(([p, n]) => `${p} ${n}`)
+          .join(' · ') || 'none yet'}
+      </Muted>
+    </Card>
+  );
+}
+
 /** Model cards, live shadow-mode agreement with dermatologists, and the validation-data funnel. */
 export default function AiOverview() {
   const router = useRouter();
@@ -120,6 +157,8 @@ export default function AiOverview() {
           {s.models.map((m) => (
             <ModelCard key={m.version} m={m} />
           ))}
+
+          {s.monitoring ? <MonitoringCard m={s.monitoring} /> : null}
 
           <Card testID="shadow-mode">
             <Heading>Shadow mode: model vs dermatologist</Heading>

@@ -385,3 +385,12 @@ Timestamped record of what was built during GENOHACK (Sat 24 – Sun 25 Oct 2026
   recall 24/24. In the stress test it now calls ×4 and ×8 captures noisy and flags some ×2 captures
   the rules accept (shown in the app as a disagreement). Model card, AI roadmap and evaluation
   report updated; test added.
+
+## 2026-10-25 03:21 WIB — Iteration loop, batch 19: measured-findings draft, live model monitoring
+
+- Reviewer form: "Insert measured findings (edit before sending)" fills the impression with size,
+  growth, asymmetry and border change and, unless the read is blind, the research-mode AI
+  suggestions, labelled as such. The interpretation stays the dermatologist's. Demo e2e asserts it.
+- `/api/ai/summary` `monitoring` over the group's captures in the last 30 days: QC pass, quality
+  model vs rules disagreement, triage abstentions, out-of-range rate, suggested patterns, acral
+  ridge reads. AI page "Monitoring" card with an out-of-range warning above 5 %. Test added.

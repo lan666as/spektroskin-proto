@@ -43,3 +43,28 @@ def test_only_consented_confirmed_cases_are_validation_eligible() -> None:
 def test_model_cards_load() -> None:
     names = [m.name for m in _models()]
     assert names == ["Image quality", "Lesion pattern triage", "Acral pattern"]
+
+
+def test_monitoring_counts_disagreements_abstentions_and_out_of_range() -> None:
+    from app.api.ai import _monitoring
+
+    def capture(status, quality, pattern, ood=False, acral=None):
+        return NS(
+            status=status,
+            result={
+                "quality_model": {"label": quality},
+                "triage_model": {"pattern": pattern, "out_of_distribution": ood},
+                "acral_model": {"pattern": acral} if acral else None,
+            },
+        )
+
+    m = _monitoring(
+        [
+            capture("processed", "good", "pigmented", acral="ridge"),
+            capture("processed", "noisy", None, ood=True),
+            capture("qc_failed", "glare", None),
+        ]
+    )
+    assert (m.captures, m.qc_passed, m.quality_disagreements) == (3, 2, 1)
+    assert (m.triage_abstained, m.triage_out_of_range, m.acral_ridge) == (2, 1, 1)
+    assert m.patterns == {"pigmented": 1}

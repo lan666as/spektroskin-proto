@@ -397,6 +397,7 @@ export interface components {
             models: components["schemas"]["ModelSummary"][];
             shadow: components["schemas"]["ShadowAgreement"];
             data: components["schemas"]["DataFlywheel"];
+            monitoring?: components["schemas"]["Monitoring"] | null;
         };
         /**
          * AcralOpinion
@@ -893,6 +894,35 @@ export interface components {
                     [key: string]: number;
                 };
             } | null;
+        };
+        /**
+         * Monitoring
+         * @description Live signals over recent captures; drift shows as rising out-of-range or disagreement.
+         */
+        Monitoring: {
+            /** Window Days */
+            window_days: number;
+            /** Captures */
+            captures: number;
+            /** Qc Passed */
+            qc_passed: number;
+            /**
+             * Quality Disagreements
+             * @description Learned quality model vs rules disagree
+             */
+            quality_disagreements: number;
+            /** With Triage */
+            with_triage: number;
+            /** Triage Abstained */
+            triage_abstained: number;
+            /** Triage Out Of Range */
+            triage_out_of_range: number;
+            /** Patterns */
+            patterns: {
+                [key: string]: number;
+            };
+            /** Acral Ridge */
+            acral_ridge: number;
         };
         /** Morphology */
         Morphology: {

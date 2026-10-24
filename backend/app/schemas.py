@@ -385,12 +385,27 @@ class DataFlywheel(BaseModel):
     )
 
 
+class Monitoring(BaseModel):
+    """Live signals over recent captures; drift shows as rising out-of-range or disagreement."""
+
+    window_days: int
+    captures: int
+    qc_passed: int
+    quality_disagreements: int = Field(description="Learned quality model vs rules disagree")
+    with_triage: int
+    triage_abstained: int
+    triage_out_of_range: int
+    patterns: dict[str, int]
+    acral_ridge: int
+
+
 class AISummary(BaseModel):
     computed_at: datetime
     scope: str
     models: list[ModelSummary]
     shadow: ShadowAgreement
     data: DataFlywheel
+    monitoring: Monitoring | None = None
 
 
 class SimilarCase(BaseModel):

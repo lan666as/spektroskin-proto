@@ -6,6 +6,7 @@ prototype is simulated, so these numbers describe the demo system, not clinical 
 
 import json
 from collections import Counter
+from datetime import timedelta
 from typing import Annotated
 
 from fastapi import APIRouter, Depends
@@ -15,9 +16,16 @@ from sqlalchemy.orm import Session, selectinload
 from app import audit
 from app.auth import Dermatologist, same_group
 from app.db import get_session
-from app.models import Case, Lesion, utcnow
+from app.models import Capture, Case, Lesion, utcnow
 from app.processing import acral_model, quality_model, triage_model
-from app.schemas import AISummary, DataFlywheel, HeldOut, ModelSummary, ShadowAgreement
+from app.schemas import (
+    AISummary,
+    DataFlywheel,
+    HeldOut,
+    ModelSummary,
+    Monitoring,
+    ShadowAgreement,
+)
 
 router = APIRouter(prefix="/ai", tags=["ai"])
 SCOPE = (
@@ -26,6 +34,7 @@ SCOPE = (
     "not clinical performance."
 )
 PATTERNS = ("pigmented", "vascular", "mixed")
+MONITORING_DAYS = 30
 
 
 def _tone_accuracy(held_out: dict) -> dict[str, float]:
@@ -134,6 +143,43 @@ def _data(cases: list[Case]) -> DataFlywheel:
     )
 
 
+def _monitoring(captures: list[Capture]) -> Monitoring:
+    counts: Counter = Counter()
+    patterns: Counter = Counter()
+    for capture in captures:
+        result = capture.result or {}
+        passed = capture.status == "processed"
+        counts["qc_passed"] += passed
+        quality = result.get("quality_model")
+        if quality is not None:
+            counts["quality_disagreements"] += (quality["label"] == "good") != passed
+        triage = result.get("triage_model")
+        if triage is not None:
+            counts["with_triage"] += 1
+            counts["triage_out_of_range"] += bool(triage.get("out_of_distribution"))
+            if triage.get("pattern"):
+                patterns[triage["pattern"]] += 1
+            else:
+                counts["triage_abstained"] += 1
+        counts["acral_ridge"] += (result.get("acral_model") or {}).get("pattern") == "ridge"
+    return Monitoring(
+        window_days=MONITORING_DAYS,
+        captures=len(captures),
+        patterns=dict(patterns),
+        **{
+            k: counts[k]
+            for k in (
+                "qc_passed",
+                "quality_disagreements",
+                "with_triage",
+                "triage_abstained",
+                "triage_out_of_range",
+                "acral_ridge",
+            )
+        },
+    )
+
+
 @router.get("/summary", response_model=AISummary)
 def ai_summary(user: Dermatologist, session: Annotated[Session, Depends(get_session)]) -> AISummary:
     # ponytail: loads every case of the group per call; fine at demo scale, aggregate in SQL
@@ -150,6 +196,14 @@ def ai_summary(user: Dermatologist, session: Annotated[Session, Depends(get_sess
             )
         )
     )
+    recent = list(
+        session.scalars(
+            select(Capture).where(
+                Capture.created_by.in_(same_group(user)),
+                Capture.created_at >= utcnow() - timedelta(days=MONITORING_DAYS),
+            )
+        )
+    )
     audit.record(session, user, "ai_summary", "case", "*")
     session.commit()
     return AISummary(
@@ -158,4 +212,5 @@ def ai_summary(user: Dermatologist, session: Annotated[Session, Depends(get_sess
         models=_models(),
         shadow=_shadow(cases),
         data=_data(cases),
+        monitoring=_monitoring(recent),
     )
