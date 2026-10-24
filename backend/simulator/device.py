@@ -71,10 +71,12 @@ def capture(
     blur_sigma: float = 3.5,
     glare_amplitude: float = 2.5,
     glare_radius: float = 16.0,
+    noise_scale: float = 1.0,
 ) -> FrameSet:
     """Render one capture. `repeat` selects an independent draw of noise, gain drift and hand
     motion for the same phantom (None = the canonical capture bundled in the app). The blur and
-    glare parameters set the severity of those bad-capture variants."""
+    glare parameters set the severity of those bad-capture variants; noise_scale multiplies sensor
+    noise (stress tests)."""
     suffix = ":capture" if repeat is None else f":capture:{repeat}"
     rng = np.random.default_rng(seed_for(spec.id + suffix))
     skin = skin_reflectance(gt)
@@ -103,9 +105,9 @@ def capture(
         drift = rng.uniform(0.94, 1.06)
         signal = drift * GAIN[band] * _illumination(i) * scene * FULL_SCALE
         signal = signal + AMBIENT + SENSOR_OFFSET
-        frames[band] = _to_counts(signal + _noise(rng, signal))
+        frames[band] = _to_counts(signal + noise_scale * _noise(rng, signal))
     dark_signal = np.full((FRAME_SIZE, FRAME_SIZE), AMBIENT + SENSOR_OFFSET)
-    dark = _to_counts(dark_signal + _noise(rng, dark_signal))
+    dark = _to_counts(dark_signal + noise_scale * _noise(rng, dark_signal))
 
     meta = {
         "phantom_id": spec.id,

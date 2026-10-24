@@ -85,6 +85,9 @@ export function QualityDetails({ capture }: { capture: Capture }) {
           <KeyValue label="Saturated pixels (glare)" value={`${((m.saturated_fraction ?? 0) * 100).toFixed(2)}% (max 0.20%)`} />
           <KeyValue label="Reference patch ratio 50%/18%" value={`${m.patch_ratio?.toFixed(2)} (expected 2.78)`} />
           <KeyValue label="Reference patch uniformity (CV)" value={`${m.patch_cv?.toFixed(3)} (max 0.100)`} />
+          {m.patch_noise != null ? (
+            <KeyValue label="Sensor noise on the gray patches" value={`${m.patch_noise.toFixed(4)} (max 0.0200)`} />
+          ) : null}
           {Object.entries(shifts).map(([band, [dy, dx]]) => (
             <KeyValue key={band} label={`Hand-motion correction, ${band}`} value={`${dy.toFixed(1)}, ${dx.toFixed(1)} px`} />
           ))}

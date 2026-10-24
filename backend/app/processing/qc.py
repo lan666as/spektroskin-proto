@@ -4,7 +4,13 @@ import numpy as np
 from scipy import ndimage
 
 from app.processing.calibration import flat_field, patch_means, patch_uniformity
-from app.processing.optics import BANDS, FULL_SCALE, REFERENCE_BAND, spacer_mask
+from app.processing.optics import (
+    BANDS,
+    FULL_SCALE,
+    REFERENCE_BAND,
+    REFERENCE_PATCHES,
+    spacer_mask,
+)
 from app.processing.types import DeviceProfile, FrameSet, QCResult
 
 # Thresholds set from the simulated clean vs blur/glare phantoms (see tests/test_processing.py).
@@ -13,6 +19,9 @@ MAX_SATURATED_FRACTION = 0.002
 PATCH_RATIO_EXPECTED = 0.50 / 0.18
 PATCH_RATIO_TOLERANCE = 0.20
 MAX_PATCH_CV = 0.10
+# Pixel noise inside the uniform gray patches; the simulated module sits near 0.007. Added after
+# docs/evidence/ai_evaluation.md showed heavy noise passed every other check.
+MAX_PATCH_NOISE = 0.02
 SATURATION_LEVEL = 0.98 * FULL_SCALE
 
 
@@ -21,6 +30,16 @@ def sharpness(reflectance: np.ndarray, exclude: np.ndarray) -> float:
     norm = reflectance / max(float(np.mean(reflectance[~exclude])), 1e-6)
     lap = ndimage.laplace(ndimage.gaussian_filter(norm, 1.0))
     return float(lap[~exclude].var())
+
+
+def patch_noise(reflectance: np.ndarray) -> float:
+    """Median over the gray patches of high-passed pixel noise relative to the patch level."""
+    values = []
+    for patch in REFERENCE_PATCHES:
+        inner = reflectance[patch.rows, patch.cols][3:-3, 3:-3]
+        residual = inner - ndimage.gaussian_filter(inner, 2.0)
+        values.append(residual.std() / max(float(inner.mean()), 1e-6))
+    return float(np.median(values))
 
 
 def run_qc(frame_set: FrameSet, profile: DeviceProfile) -> QCResult:
@@ -39,11 +58,13 @@ def run_qc(frame_set: FrameSet, profile: DeviceProfile) -> QCResult:
     cv = patch_uniformity(reflectance[REFERENCE_BAND])
     ratio_ok = abs(ratio / PATCH_RATIO_EXPECTED - 1) <= PATCH_RATIO_TOLERANCE
     patches_ok = ratio_ok and cv <= MAX_PATCH_CV
+    noise = patch_noise(reflectance[REFERENCE_BAND])
 
     checks = {
         "sharp": sharp >= MIN_SHARPNESS,
         "no_glare": saturated_fraction <= MAX_SATURATED_FRACTION,
         "reference_patches": patches_ok,
+        "low_noise": noise <= MAX_PATCH_NOISE,
     }
     guidance = []
     if not checks["sharp"]:
@@ -60,6 +81,11 @@ def run_qc(frame_set: FrameSet, profile: DeviceProfile) -> QCResult:
             "Reference patches not found. Check that the spacer ring is clean and fully seated, "
             "and retake."
         )
+    if not checks["low_noise"]:
+        guidance.append(
+            "Image is noisy. Shield the module from bright light, let it warm up for a few "
+            "seconds, and retake."
+        )
     return QCResult(
         passed=all(checks.values()),
         metrics={
@@ -67,6 +93,7 @@ def run_qc(frame_set: FrameSet, profile: DeviceProfile) -> QCResult:
             "saturated_fraction": round(saturated_fraction, 5),
             "patch_ratio": round(ratio, 3),
             "patch_cv": round(cv, 4),
+            "patch_noise": round(noise, 4),
         },
         checks=checks,
         guidance=guidance,

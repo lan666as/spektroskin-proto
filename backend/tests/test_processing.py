@@ -117,3 +117,12 @@ def test_measurements_match_lesion_scale() -> None:
     # A 28 mm² irregular lesion: diameter a little above the equal-area circle (6.0 mm).
     assert 6.0 <= m["diameter_mm"] <= 8.5
     assert 4.5 <= m["width_mm"] <= m["diameter_mm"]
+
+
+def test_qc_rejects_heavy_sensor_noise_with_guidance() -> None:
+    spec = spec_by_id("pigmented_light")
+    noisy = run(capture(spec, ground_truth(spec), repeat=1, noise_scale=8.0), PROFILE)
+    assert not noisy.qc.passed and noisy.qc.checks["low_noise"] is False
+    assert any("noisy" in g for g in noisy.qc.guidance)
+    normal = run(capture(spec, ground_truth(spec), repeat=1, noise_scale=2.0), PROFILE)
+    assert normal.qc.checks["low_noise"] is True

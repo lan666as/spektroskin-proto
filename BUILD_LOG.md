@@ -362,3 +362,18 @@ Timestamped record of what was built during GENOHACK (Sat 24 – Sun 25 Oct 2026
 - Results screen: "AI assist · research mode" strip right under the quality check (pattern, acral
   pattern on acral sites, new area since Day 01), so the AI shows within the first screen of the demo.
 - Light-grey canvas with white, softly shadowed cards and list rows; white stat tiles on home.
+
+## 2026-10-25 03:03 WIB — Iteration loop, batch 17: AI evaluation report, and the noise check it led to
+
+- `scripts/ai_evaluation.py` → `docs/evidence/ai_evaluation.md` (deterministic):
+  - Repeatability: 12 phantoms × 10 captures. Same triage output 100 %, triage right 100 %, same
+    acral output 100 %, area CV ≤ 0.1 %, border SD ≤ 0.007.
+  - Sensor-noise stress at ×1, ×2, ×4 and ×8.
+- Finding: the first run showed every ×8-noise capture passed the quality check, and so did the
+  learned quality model; only the triage model's abstention and out-of-distribution guard reacted
+  (28 % withheld).
+- Fix: a QC rule on high-passed pixel noise inside the gray reference patches (> 0.02, about 3×
+  the simulated module), with retake guidance. ×1 and ×2 pass; ×4 and ×8 are rejected. Test added;
+  the quality details panel shows the metric. The learned quality model still misses noise:
+  documented as the next retraining target.
+- Simulator `capture()` gained `noise_scale` (default 1.0: existing phantoms unchanged).
