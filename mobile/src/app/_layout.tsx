@@ -2,19 +2,42 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Stack } from 'expo-router';
 import { useState } from 'react';
 
+import { ApiError } from '@/api/client';
+import { SessionProvider } from '@/api/session';
 import { colors } from '@/ui/theme';
 
+function makeQueryClient() {
+  return new QueryClient({
+    defaultOptions: {
+      queries: {
+        // Retry transient failures only; 4xx answers will not change on retry.
+        retry: (count, error) =>
+          count < 2 && !(error instanceof ApiError && error.status >= 400 && error.status < 500),
+        staleTime: 2_000,
+      },
+    },
+  });
+}
+
 export default function RootLayout() {
-  const [queryClient] = useState(() => new QueryClient());
+  const [queryClient] = useState(makeQueryClient);
   return (
     <QueryClientProvider client={queryClient}>
-      <Stack
-        screenOptions={{
-          headerStyle: { backgroundColor: colors.background },
-          headerTintColor: colors.text,
-          contentStyle: { backgroundColor: colors.background },
-        }}
-      />
+      <SessionProvider>
+        <Stack
+          screenOptions={{
+            headerStyle: { backgroundColor: colors.background },
+            headerTintColor: colors.text,
+            headerTitleStyle: { fontWeight: '600' },
+            contentStyle: { backgroundColor: colors.background },
+          }}
+        >
+          <Stack.Screen name="index" options={{ headerShown: false }} />
+          <Stack.Screen name="login" options={{ headerShown: false }} />
+          <Stack.Screen name="(clinician)" options={{ headerShown: false }} />
+          <Stack.Screen name="(reviewer)" options={{ headerShown: false }} />
+        </Stack>
+      </SessionProvider>
     </QueryClientProvider>
   );
 }

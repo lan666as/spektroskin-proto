@@ -179,7 +179,7 @@ the extended demo ends after the QC retake. Background cases: PT-0003 (answered,
 |---|---|---|---|---|---|
 | PT-0003 | 41 M | IV | upper back | `mixed_medium` | answered: observe, follow-up 90 d |
 | PT-0005 | 29 F | IV | forearm | `vascular_medium` | submitted (queue) |
-| PT-0007 | 54 F | V | sole | `acral_dark_d01` (now − 29 d), `acral_dark_d14` (now − 15 d) | none; the live demo creates it |
+| PT-0007 | 54 F | V | sole | `acral_dark_d01` (now − 29 d), `acral_dark_d14` (now − 16 d) | none; the live demo creates it |
 
 Users: `clinician` ("dr. Demo Clinician", role clinician), `dermatologist` ("dr. Demo Dermatologist,
 Sp.D.V.E.", role dermatologist). No real people or institutions appear in seed data.

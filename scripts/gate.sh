@@ -20,7 +20,7 @@ echo "== backend: ruff, pytest"
 (cd backend && uv run ruff check . && uv run ruff format --check . && uv run pytest -q)
 
 echo "== mobile: tsc, web export"
-(cd mobile && npx tsc --noEmit && npx expo export -p web >/dev/null)
+(cd mobile && npx tsc --noEmit && npx tsc --noEmit -p e2e && npx expo export -p web >/dev/null)
 rm -rf web-dist && cp -R mobile/dist web-dist
 docker compose up -d --wait caddy >/dev/null
 

@@ -64,6 +64,26 @@ Timestamped record of what was built during GENOHACK (Sat 24 – Sun 25 Oct 2026
 - Verified: smoke 32/32 checks against the local stack (incl. 401/403/409/422 paths, idempotent
   retry, QC failure, tampered image signature); seed re-run idempotent; gate green.
 
+### 2026-10-24 21:48 WIB — M4: clinician flow + longitudinal history (gate green)
+- Expo app (web + Android): demo login (autofill-friendly), patients (list/create with suggested
+  pseudonymous code), patient → lesions, body-site picker (acral sites first), capture screen
+  (device card "Virtual module connected · Simulated", band-by-band progress, hidden dev phantom
+  picker, default `acral_dark_d30`), results (QC card with retake guidance, Standard / Pigment /
+  Vascular tabs with outline and Simulated badge, area, Day 01/14/30 history strip with area change,
+  footnote), submit for review, My cases (polls 5 s), case page with the recommendation.
+- `CaptureDevice` interface + `VirtualCaptureDevice` (bundled phantom frames via expo-asset;
+  platform files `frameSource.ts` / `frameSource.web.ts`); upload retries reuse the capture id.
+- Verified: Playwright at 390 px — login → patient → lesion → glare capture fails QC → retake →
+  three visits → three views → area change → submit → My cases.
+
+### 2026-10-24 21:48 WIB — M5: reviewer portal + answer loop (gate green)
+- Reviewer queue (submitted + in review, polls 5 s; recently answered), case detail (two columns on
+  wide web: views + lesion history | patient metadata, question, review form), recommendation sent
+  back to the clinician ("The dermatologist recommends; the treating clinician decides").
+- Verified: Playwright with two browser contexts (390 px clinician, 1280 px dermatologist):
+  clinician submits → dermatologist sees it in the queue and recommends Biopsy / 14 days →
+  clinician page shows the recommendation via polling. Full gate: pytest 32, smoke 32/32, e2e 4/4.
+
 ## Decisions made alone
 - M1: Expo routes live in `mobile/src/app/` (SDK 58 template convention) instead of `mobile/app/`.
 - M1: web export uses `web.output: "single"` (SPA) so Caddy can serve deep links via `try_files`.
@@ -80,6 +100,12 @@ Timestamped record of what was built during GENOHACK (Sat 24 – Sun 25 Oct 2026
 - M3: clinicians list only patients they registered; dermatologists see all (demo-friendly scoping).
 - M3: added `GET /patients/{id}` (additive) for the patient → lesion screen.
 - M3: dermatologist opening a submitted case moves it to `in_review`.
+- M4: web session token in `sessionStorage` (per tab), not AsyncStorage/localStorage: the demo
+  runs clinician and dermatologist windows side by side on one origin. Native uses SecureStore.
+- M4: `expo-asset` (Expo SDK module, `npx expo install`, ~58.0.18) declared explicitly for loading
+  bundled phantom frames; `typedRoutes` experiment disabled to keep `tsc` independent of codegen.
+- M4: seed visit d14 at now − 16 d so the strip reads Day 01 / 14 / 30 (local dev DB keeps its
+  earlier row; prod is seeded fresh).
 
 ## Deviations
 - M2: pipeline order is QC → calibration → registration (spec says registration before calibration),

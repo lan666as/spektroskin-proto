@@ -69,7 +69,7 @@ SEED = (
     ),
     SeedPatient(
         "PT-0007", 54, "female", "V", "sole", "left",
-        (SeedCapture("acral_dark_d01", 29), SeedCapture("acral_dark_d14", 15)),
+        (SeedCapture("acral_dark_d01", 29), SeedCapture("acral_dark_d14", 16)),
         None,
     ),
 )  # fmt: skip
