@@ -236,6 +236,11 @@ def run(base: str) -> None:
         f"GET /validation for a generated lesion: {status}",
     )
 
+    status, again_ai = c.request("POST", f"/api/captures/{capture_id}/ai", body={})
+    expect(
+        status == 200 and again_ai["triage_model"] is not None,
+        f"POST /captures/{{id}}/ai (already current, idempotent): {status}",
+    )
     status, got = c.request("GET", f"/api/captures/{capture_id}")
     expect(status == 200 and got["area_mm2"] > 0, f"GET /captures/{{id}}: {status}")
     status, png = c.request("GET", got["views"]["pigment"], raw=True)

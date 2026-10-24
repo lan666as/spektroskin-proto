@@ -20,7 +20,7 @@ import {
 } from '@/ui/components';
 import { CaseTimeline, Footnote, HistoryStrip, Recommendation, SpectralViews, VisitCompare } from '@/ui/clinical';
 import { areaChange, AutomatedAnalysis, formatSize, measuredFindings, MorphologyCard } from '@/ui/analysis';
-import { AcralPattern, TriageSupport } from '@/ui/triage';
+import { AcralPattern, RunAiBanner, TriageSupport } from '@/ui/triage';
 import { OutcomeCard } from '@/ui/outcome';
 import { SimilarCases } from '@/ui/similar';
 import { SpectralSignature } from '@/ui/measurement';
@@ -224,6 +224,7 @@ export default function ReviewCase() {
           </View>
           <View style={{ flex: twoColumns ? 2 : undefined, width: twoColumns ? undefined : '100%', gap: spacing.lg }}>
             <CaseInfo c={c} />
+            {latest && !hideAI ? <RunAiBanner capture={latest} /> : null}
             {!c.review ? (
               <Card testID="blind-read">
                 <Chips

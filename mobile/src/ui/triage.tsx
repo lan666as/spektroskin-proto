@@ -1,9 +1,10 @@
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
-import type { BodySite, Capture } from '@/api/client';
+import { api, type BodySite, type Capture } from '@/api/client';
 
-import { Card, Heading, Muted, Row } from './components';
+import { Button, Card, ErrorBanner, Heading, Muted, Row } from './components';
 import { isAcral } from './labels';
 import { SimulatedBadge } from './SimulatedBadge';
 import { colors, radius, spacing } from './theme';
@@ -183,6 +184,29 @@ export function AiGlance({ capture, site }: { capture: Capture; site?: BodySite 
       ) : null}
       <Text style={styles.glanceNote}>Suggestions, not a diagnosis. Details and reasons below.</Text>
     </View>
+  );
+}
+
+/** Captures processed before the AI models existed can get the AI outputs on request. */
+export function RunAiBanner({ capture }: { capture: Capture }) {
+  const queryClient = useQueryClient();
+  const run = useMutation({
+    mutationFn: () => api.runAi(capture.id),
+    onSuccess: () => queryClient.invalidateQueries(),
+  });
+  if (capture.status !== 'processed' || capture.triage_model) return null;
+  return (
+    <Card testID="run-ai">
+      <Muted>This capture was processed before the AI models existed.</Muted>
+      <Button
+        label="Run AI on this capture"
+        variant="secondary"
+        onPress={() => run.mutate()}
+        busy={run.isPending}
+        testID="run-ai-button"
+      />
+      <ErrorBanner error={run.error} />
+    </Card>
   );
 }
 

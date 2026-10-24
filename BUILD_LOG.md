@@ -487,3 +487,18 @@ Timestamped record of what was built during GENOHACK (Sat 24 – Sun 25 Oct 2026
   report exactly.
 - About page evidence card: four AI rows (triage held-out, RGB-vs-spectral, repeatability, noise
   finding).
+
+## 2026-10-25 04:50 WIB — Iteration loop, batch 29: "Run AI on this capture"
+
+- `app.captures.add_newer_outputs` (shared by the reprocess script and a new endpoint): re-runs the
+  deterministic pipeline on stored raw frames and adds only the missing outputs. It refuses if the
+  stored area would change (409) and drops the acral read on non-acral sites.
+- `POST /api/captures/{id}/ai`: allowed for the capturing clinician and for dermatologists of the
+  same group (per-object check; 404 otherwise); idempotent and audited.
+- App: results screen and reviewer case show "Run AI on this capture" on captures processed before
+  the models existed, such as the seeded demo history. The builder can light up the AI on old demo
+  data with one click; nothing is backfilled automatically.
+- Tests: DB test (outputs added once, area unchanged, second run is "current"); smoke covers the
+  endpoint.
+- Finding, not changed tonight: `GET /captures/{id}` has no per-object check (any signed-in user
+  can read any capture by id). Listed for the morning.

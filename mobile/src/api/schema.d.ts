@@ -189,6 +189,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/captures/{capture_id}/ai": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Run Ai
+         * @description Add the AI outputs to a capture processed before they existed. Idempotent; never changes
+         *     stored measurements. Allowed for the capturing clinician and dermatologists of the group.
+         */
+        post: operations["run_ai_api_captures__capture_id__ai_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/cases": {
         parameters: {
             query?: never;
@@ -1925,6 +1946,37 @@ export interface operations {
         };
     };
     get_capture_api_captures__capture_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                capture_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CaptureOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    run_ai_api_captures__capture_id__ai_post: {
         parameters: {
             query?: never;
             header?: never;

@@ -114,3 +114,44 @@ def _change_since_first(session, storage: Storage, lesion: Lesion, captured_at, 
         standard_view(result.reflectance),
     )
     return mask_spacer(image), {**stats, "first_capture_id": str(first.id)}
+
+
+NEWER_OUTPUTS = ("quality_model", "triage_model", "acral_model", "morphology")
+AREA_TOLERANCE_MM2 = 0.01
+
+
+def lacks_newer_outputs(capture: Capture) -> bool:
+    return capture.status == "processed" and "triage_model" not in (capture.result or {})
+
+
+def add_newer_outputs(storage: Storage, capture: Capture, *, apply: bool) -> str:
+    """Re-run the deterministic pipeline on the stored raw frames and add only the outputs the
+    capture lacks (AI opinions, morphology, missing views). Stored measurements are never changed:
+    if the area would differ, nothing is written. Returns "current", "skipped" or "updated" (or
+    "would_update" without apply). The caller commits."""
+    if not lacks_newer_outputs(capture):
+        return "current"
+    shape = (FRAME_SIZE, FRAME_SIZE)
+    frames = {
+        n: decode_png16(storage.get(raw_frame_key(capture.id, n)), shape) for n in FRAME_NAMES
+    }
+    result = run(
+        FrameSet(frames={b: frames[b] for b in BANDS}, dark=frames["dark"]),
+        load_profile(capture.device_id),
+    )
+    summary = result.summary()
+    if abs((summary["area_mm2"] or 0) - (capture.area_mm2 or 0)) > AREA_TOLERANCE_MM2:
+        return "skipped"
+    if not apply:
+        return "would_update"
+    if capture.lesion.body_site not in ACRAL_SITES:
+        summary["acral_model"] = None
+    new_views = sorted(set(result.views) - set(capture.result.get("views", [])))
+    for name in new_views:
+        storage.put(view_key(capture.id, name), encode_png_rgb(result.views[name]))
+    capture.result = {
+        **capture.result,
+        **{k: summary[k] for k in NEWER_OUTPUTS if k not in capture.result},
+        "views": sorted(set(capture.result.get("views", [])) | set(new_views)),
+    }
+    return "updated"

@@ -5,14 +5,15 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, File, Form, HTTPException, Response, UploadFile, status
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
+from sqlalchemy.orm.attributes import flag_modified
 
 from app import audit
 from app.api.serialize import capture_out
 from app.auth import Clinician, CurrentUser
-from app.captures import ingest
+from app.captures import add_newer_outputs, ingest
 from app.db import get_session
 from app.devices import UnknownDevice
-from app.models import Capture, Lesion
+from app.models import Capture, Lesion, User
 from app.processing.frameio import FrameDecodeError
 from app.schemas import CaptureOut
 from app.storage import get_storage
@@ -109,5 +110,32 @@ def get_capture(capture_id: uuid.UUID, user: CurrentUser, session: SessionDep) -
     if capture is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Capture not found")
     audit.record(session, user, "read", "capture", capture.id)
+    session.commit()
+    return capture_out(capture, user)
+
+
+@router.post("/{capture_id}/ai", response_model=CaptureOut)
+def run_ai(capture_id: uuid.UUID, user: CurrentUser, session: SessionDep) -> CaptureOut:
+    """Add the AI outputs to a capture processed before they existed. Idempotent; never changes
+    stored measurements. Allowed for the capturing clinician and dermatologists of the group."""
+    capture = session.get(Capture, capture_id)
+    if capture is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Capture not found")
+    creator = session.get(User, capture.created_by)
+    allowed = (
+        capture.created_by == user.id
+        if user.role == "clinician"
+        else creator is not None and creator.is_test == user.is_test
+    )
+    if not allowed:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Capture not found")
+    outcome = add_newer_outputs(get_storage(), capture, apply=True)
+    if outcome == "skipped":
+        raise HTTPException(
+            status.HTTP_409_CONFLICT, "Re-processing would change stored measurements; not applied"
+        )
+    if outcome == "updated":
+        flag_modified(capture, "result")
+        audit.record(session, user, "run_ai", "capture", capture.id)
     session.commit()
     return capture_out(capture, user)
