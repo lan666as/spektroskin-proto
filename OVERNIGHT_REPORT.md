@@ -119,3 +119,21 @@ Plan:
   group (test vs real). Nothing is deleted; the audit log still shows everything.
 - `create_user --test-user`; provision.sh marks the smoke users.
 - Clinician e2e closes its own case through the API so test queues stay small.
+
+Result (22:18 WIB): **done**, commit `9a7ed51`. **Must merge before the demo** (production queue
+currently shows at least one automated e2e case to the demo dermatologist).
+- Verified: new pytest (real vs test dermatologist see only their group's cases and patients);
+  locally after migration 0004 the demo dermatologist's list is exactly PT-0005 (submitted) and
+  PT-0003 (answered); smoke and e2e (smoke users) still pass. Gate green (pytest 41, e2e 4/4).
+
+## Item 6 — UI polish
+
+Plan: screenshot every screen (390 px clinician, 1280 px reviewer), fix what is visibly wrong.
+
+Result (22:18 WIB): **done**, commit `da9bd49`.
+- 390 px headers overlapped titles ("New patientPatients", "Case · PT-…" under the links): below
+  700 px the navigation moves to a bottom bar (same test ids); wide screens keep header links.
+- Patients list no longer repeats the code in the subtitle.
+- Loading, empty and error states were already present on every screen (checked in screenshots:
+  login error banner, empty lists, loading spinners); spacing and type come from one theme file.
+- Verified: screenshots re-taken and inspected; gate green.
