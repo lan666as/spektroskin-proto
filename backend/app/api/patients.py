@@ -9,7 +9,7 @@ from sqlalchemy.orm import Session, selectinload
 from app import audit
 from app.api.serialize import lesion_out
 from app.attention import lesion_flags, looks_different
-from app.auth import Clinician, CurrentUser, same_group, sign_image_url
+from app.auth import Clinician, CurrentUser, authorize, same_group, sign_image_url
 from app.db import get_session
 from app.models import Lesion, Patient
 from app.schemas import (
@@ -87,6 +87,7 @@ def get_patient(patient_id: uuid.UUID, user: CurrentUser, session: SessionDep) -
     )
     if patient is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Patient not found")
+    authorize(session, user, patient.created_by)
     audit.record(session, user, "read", "patient", patient.id)
     session.commit()
     different = looks_different(patient.lesions)

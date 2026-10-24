@@ -16,7 +16,7 @@ from pydantic import BaseModel
 from sqlalchemy.orm import Session, selectinload
 
 from app import audit
-from app.auth import Clinician
+from app.auth import Clinician, authorize
 from app.db import get_session
 from app.models import Lesion
 from app.processing.frameio import encode_png16
@@ -87,6 +87,7 @@ def simulate_capture(
     )
     if lesion is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Lesion not found")
+    authorize(session, user, lesion.patient.created_by)
     rng = random.Random(secrets.randbits(64))
     spec = _choose_spec(lesion, body.phantom_id, rng, allow_bad=not user.is_test)
     frame_set = capture(spec, ground_truth(spec), repeat=rng.randrange(1_000_000))

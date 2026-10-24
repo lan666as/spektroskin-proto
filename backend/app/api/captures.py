@@ -9,11 +9,11 @@ from sqlalchemy.orm.attributes import flag_modified
 
 from app import audit
 from app.api.serialize import capture_out
-from app.auth import Clinician, CurrentUser
+from app.auth import Clinician, CurrentUser, authorize
 from app.captures import add_newer_outputs, ingest
 from app.db import get_session
 from app.devices import UnknownDevice
-from app.models import Capture, Lesion, User
+from app.models import Capture, Lesion
 from app.processing.frameio import FrameDecodeError
 from app.schemas import CaptureOut
 from app.storage import get_storage
@@ -55,6 +55,7 @@ def create_capture(
     """Upload one frame set (16-bit PNG per band + dark frame); processing runs synchronously."""
     existing = session.get(Capture, id)
     if existing is not None:
+        authorize(session, user, existing.lesion.patient.created_by)
         return _existing(existing, lesion_id, user, response)
     if captured_at.tzinfo is None:
         raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, "captured_at needs a timezone")
@@ -63,6 +64,7 @@ def create_capture(
     lesion = session.get(Lesion, lesion_id)
     if lesion is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Lesion not found")
+    authorize(session, user, lesion.patient.created_by)
 
     frames = {
         "blue": _read(blue, "blue"),
@@ -109,6 +111,7 @@ def get_capture(capture_id: uuid.UUID, user: CurrentUser, session: SessionDep) -
     capture = session.get(Capture, capture_id)
     if capture is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Capture not found")
+    authorize(session, user, capture.lesion.patient.created_by)
     audit.record(session, user, "read", "capture", capture.id)
     session.commit()
     return capture_out(capture, user)
@@ -117,18 +120,11 @@ def get_capture(capture_id: uuid.UUID, user: CurrentUser, session: SessionDep) -
 @router.post("/{capture_id}/ai", response_model=CaptureOut)
 def run_ai(capture_id: uuid.UUID, user: CurrentUser, session: SessionDep) -> CaptureOut:
     """Add the AI outputs to a capture processed before they existed. Idempotent; never changes
-    stored measurements. Allowed for the capturing clinician and dermatologists of the group."""
+    stored measurements."""
     capture = session.get(Capture, capture_id)
     if capture is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Capture not found")
-    creator = session.get(User, capture.created_by)
-    allowed = (
-        capture.created_by == user.id
-        if user.role == "clinician"
-        else creator is not None and creator.is_test == user.is_test
-    )
-    if not allowed:
-        raise HTTPException(status.HTTP_404_NOT_FOUND, "Capture not found")
+    authorize(session, user, capture.lesion.patient.created_by)
     outcome = add_newer_outputs(get_storage(), capture, apply=True)
     if outcome == "skipped":
         raise HTTPException(

@@ -12,7 +12,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app import audit
-from app.auth import CurrentUser
+from app.auth import CurrentUser, authorize
 from app.captures import FRAME_NAMES
 from app.config import get_settings
 from app.db import get_session
@@ -63,6 +63,7 @@ def validate_capture(
     capture = session.get(Capture, capture_id)
     if capture is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Capture not found")
+    authorize(session, user, capture.lesion.patient.created_by)
     truth = _ground_truth(capture.phantom_id)
     if truth is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "No simulated ground truth for this capture")

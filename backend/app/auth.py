@@ -126,6 +126,19 @@ def same_group(user: User) -> Select[tuple[uuid.UUID]]:
     return select(User.id).where(User.is_test == user.is_test)
 
 
+def authorize(session: Session, user: User, owner_id: uuid.UUID) -> None:
+    """Per-object check for records owned by a clinician (the patient's registering clinician):
+    clinicians reach only their own patients' records; dermatologists those of their group.
+    404, not 403, so ids of other people's records are not confirmed."""
+    if user.role == "clinician":
+        allowed = owner_id == user.id
+    else:
+        owner = session.get(User, owner_id)
+        allowed = owner is not None and owner.is_test == user.is_test
+    if not allowed:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Not found")
+
+
 CurrentUser = Annotated[User, Depends(current_user)]
 Clinician = Annotated[User, Depends(require_role("clinician"))]
 Dermatologist = Annotated[User, Depends(require_role("dermatologist"))]

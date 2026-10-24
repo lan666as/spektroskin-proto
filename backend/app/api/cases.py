@@ -8,7 +8,14 @@ from sqlalchemy.orm import Session, selectinload
 
 from app import audit
 from app.api.serialize import case_detail, case_summary
-from app.auth import Clinician, CurrentUser, Dermatologist, same_group, sign_image_url
+from app.auth import (
+    Clinician,
+    CurrentUser,
+    Dermatologist,
+    authorize,
+    same_group,
+    sign_image_url,
+)
 from app.db import get_session
 from app.models import Capture, Case, Lesion, Outcome, Patient, Review, User, utcnow
 from app.schemas import (
@@ -45,9 +52,10 @@ def _requester_names(session: Session, cases: list[Case]) -> dict[uuid.UUID, str
 
 def _load_case(session: Session, case_id: uuid.UUID, user: User) -> Case:
     case = session.get(Case, case_id, options=_LOAD)
-    # Clinicians may only open cases they submitted; 404 avoids confirming that others exist.
-    if case is None or (user.role == "clinician" and case.created_by != user.id):
+    if case is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Case not found")
+    # Clinicians open only cases they submitted; dermatologists only their group's.
+    authorize(session, user, case.created_by)
     return case
 
 
@@ -78,6 +86,7 @@ def create_case(body: CaseCreate, user: Clinician, session: SessionDep) -> CaseD
     lesion = session.get(Lesion, body.lesion_id)
     if lesion is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Lesion not found")
+    authorize(session, user, lesion.patient.created_by)
     captures = list(session.scalars(select(Capture).where(Capture.id.in_(body.capture_ids))))
     if len(captures) != len(set(body.capture_ids)):
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Capture not found")
@@ -120,6 +129,7 @@ def review_case(
     case = session.scalar(select(Case).where(Case.id == case_id).with_for_update())
     if case is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Case not found")
+    authorize(session, user, case.created_by)
     if case.status == "answered":
         raise HTTPException(status.HTTP_409_CONFLICT, "Case already answered")
     session.add(Review(case_id=case.id, reviewer_id=user.id, **body.model_dump()))

@@ -500,5 +500,20 @@ Timestamped record of what was built during GENOHACK (Sat 24 – Sun 25 Oct 2026
   data with one click; nothing is backfilled automatically.
 - Tests: DB test (outputs added once, area unchanged, second run is "current"); smoke covers the
   endpoint.
-- Finding, not changed tonight: `GET /captures/{id}` has no per-object check (any signed-in user
+- Finding (fixed in batch 30): `GET /captures/{id}` had no per-object check (any signed-in user
   can read any capture by id). Listed for the morning.
+
+## 2026-10-25 04:58 WIB — Iteration loop, batch 30: per-object authorization everywhere
+
+- `auth.authorize(session, user, owner_id)`: clinicians reach only records of patients they
+  registered; dermatologists only their group's (real vs automated-test accounts); 404 otherwise.
+- Applied to:
+  - reads: `GET` patient, lesion, capture and validation;
+  - creates: `POST` lesions (patient), captures (lesion, including the idempotent retry path) and
+    cases (lesion);
+  - case open and review;
+  - the server simulator and run-AI.
+- Before, any signed-in user could read a patient, lesion or capture by id.
+- Test: owner and same-group access allowed; another clinician and an other-group dermatologist get
+  404 for patient, lesion and case. Full gate green; the live smoke and e2e are the check after
+  deploy.

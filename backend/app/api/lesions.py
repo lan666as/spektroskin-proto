@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session, selectinload
 
 from app import audit
 from app.api.serialize import capture_out, lesion_out
-from app.auth import Clinician, CurrentUser
+from app.auth import Clinician, CurrentUser, authorize
 from app.db import get_session
 from app.models import Lesion, Patient
 from app.schemas import LesionCreate, LesionDetail, LesionOut, PatientOut
@@ -17,8 +17,10 @@ SessionDep = Annotated[Session, Depends(get_session)]
 
 @router.post("", response_model=LesionOut, status_code=status.HTTP_201_CREATED)
 def create_lesion(body: LesionCreate, user: Clinician, session: SessionDep) -> LesionOut:
-    if session.get(Patient, body.patient_id) is None:
+    patient = session.get(Patient, body.patient_id)
+    if patient is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Patient not found")
+    authorize(session, user, patient.created_by)
     lesion = Lesion(**body.model_dump(), created_by=user.id)
     session.add(lesion)
     session.flush()
@@ -35,6 +37,7 @@ def get_lesion(lesion_id: uuid.UUID, user: CurrentUser, session: SessionDep) -> 
     )
     if lesion is None:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Lesion not found")
+    authorize(session, user, lesion.patient.created_by)
     audit.record(session, user, "read", "lesion", lesion.id)
     session.commit()
     return LesionDetail(

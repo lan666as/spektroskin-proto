@@ -42,3 +42,30 @@ def test_dermatologist_lists_only_their_group(db: Session) -> None:
 
     real_codes = {p.code for p in list_patients(real_derm, db)}
     assert "PT-7001" in real_codes and "PT-7002" not in real_codes
+
+
+def test_single_records_are_reachable_only_by_owner_or_same_group(db: Session) -> None:
+    import pytest
+    from fastapi import HTTPException
+
+    from app.api.cases import get_case
+    from app.api.lesions import get_lesion
+    from app.api.patients import get_patient
+
+    owner = _user(db, "o-real-clin", "clinician", False)
+    other = _user(db, "o-other-clin", "clinician", False)
+    derm = _user(db, "o-real-derm", "dermatologist", False)
+    test_derm = _user(db, "o-test-derm", "dermatologist", True)
+    case = _case(db, owner, "PT-7501")
+
+    assert get_patient(case.lesion.patient_id, owner, db).code == "PT-7501"
+    assert get_case(case.id, derm, db).id == case.id
+    for call, user in (
+        (lambda u: get_patient(case.lesion.patient_id, u, db), other),
+        (lambda u: get_lesion(case.lesion_id, u, db), other),
+        (lambda u: get_case(case.id, u, db), other),
+        (lambda u: get_case(case.id, u, db), test_derm),
+    ):
+        with pytest.raises(HTTPException) as err:
+            call(user)
+        assert err.value.status_code == 404
