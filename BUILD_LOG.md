@@ -592,11 +592,3 @@ Timestamped record of what was built during GENOHACK (Sat 24 – Sun 25 Oct 2026
 - Reviewer case: triage, acral and checklist cards moved to the left column under the images. The
   right column is case info → blind-read toggle → review form (now on the first screen at
   1440 px) → similar lesions and timeline.
-
-## 2026-10-25 06:40 WIB — UX batch 2: journey shortcuts
-
-- Answered case with a follow-up interval: "Capture follow-up visit (due …)" goes straight to the
-  capture screen for that lesion. Demo e2e asserts it.
-- Dermatologist: after sending, "Next waiting case: PT-…" opens the oldest waiting case.
-- Results: spectral signature, quality metrics and validation fold under "Technical details"; e2e
-  opens it before the validation step.
