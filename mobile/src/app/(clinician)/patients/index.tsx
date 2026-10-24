@@ -8,7 +8,7 @@ import { absoluteUrl } from '@/api/config';
 import { useSession } from '@/api/session';
 import { Button, Card, Empty, ErrorBanner, Field, Heading, ListItem, Loading, Muted, Pill, Row, Screen } from '@/ui/components';
 import { nextStep } from '@/ui/outcome';
-import { ACTION_LABELS, demographics, duration, formatDate, siteLabel } from '@/ui/labels';
+import { ACTION_LABELS, demographics, duration, FLAG_LABELS, formatDate, siteLabel } from '@/ui/labels';
 import { colors, radius, spacing } from '@/ui/theme';
 
 const POLL_MS = 5_000;
@@ -26,6 +26,9 @@ export default function Home() {
     const step = nextStep(c);
     return step ? [{ c, step }] : [];
   });
+  const secondLook = (patients.data ?? []).flatMap((patient) =>
+    patient.lesion_flags.map((flag) => ({ patient, flag })),
+  );
   const latestAnswer = [...answered].sort((a, b) => (b.answered_at ?? '').localeCompare(a.answered_at ?? ''))[0];
   const query = search.trim().toUpperCase();
   const shown = patients.data?.filter((p) => !query || p.code.includes(query)) ?? [];
@@ -76,6 +79,23 @@ export default function Home() {
             />
           ))}
           {todo.length > TODO_SHOWN ? <Muted>and {todo.length - TODO_SHOWN} more in My cases</Muted> : null}
+        </Card>
+      ) : null}
+
+      {secondLook.length ? (
+        <Card testID="second-look">
+          <Heading>Worth a second look</Heading>
+          {secondLook.slice(0, TODO_SHOWN).map(({ patient, flag }) => (
+            <ListItem
+              key={`${flag.lesion_id}-${flag.flag}`}
+              title={`${patient.code} · ${siteLabel(flag)}`}
+              subtitle={FLAG_LABELS[flag.flag].why}
+              right={<Pill label={FLAG_LABELS[flag.flag].label} tone={FLAG_LABELS[flag.flag].tone} />}
+              onPress={() => router.push({ pathname: '/lesions/[lesionId]', params: { lesionId: flag.lesion_id } })}
+              testID={`second-look-${flag.lesion_id}`}
+            />
+          ))}
+          <Muted>Automated flags from measurements and lesion comparison; consider asking a dermatologist.</Muted>
         </Card>
       ) : null}
 

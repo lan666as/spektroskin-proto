@@ -56,3 +56,11 @@ def test_ugly_duckling_needs_three_lesions_and_a_clear_outlier() -> None:
     assert looks_different(moles) == set()
     assert looks_different([*moles, _lesion("odd", [6, 6])]) == {"odd"}
     assert looks_different([moles[0], _lesion("odd", [6, 6])]) == set()
+
+
+def test_lesion_flags_growth_and_looks_different() -> None:
+    from app.attention import lesion_flags
+
+    lesion = NS(id="x", captures=[_capture(1, 0, 18.0, 1.2), _capture(2, 30, 28.0, 1.3)])
+    assert lesion_flags(lesion, set()) == ["growing"]
+    assert lesion_flags(lesion, {"x"}) == ["growing", "looks_different"]

@@ -51,6 +51,7 @@ test('ugly duckling: the lesion unlike the others is flagged', async ({ page, re
   }
 
   await login(page, 'smoke-clinician');
+  await expect(byId(page, 'second-look')).toContainText(`${code} · Right lower back`);
   await byId(page, `patient-${code}`).click();
   await expect(byId(page, 'looks-different-lower_back')).toBeVisible();
   await expect(byId(page, 'looks-different-chest')).toHaveCount(0);

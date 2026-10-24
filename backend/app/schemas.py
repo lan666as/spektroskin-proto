@@ -101,8 +101,18 @@ class LesionOut(ORM):
     )
 
 
+class LesionFlag(BaseModel):
+    lesion_id: uuid.UUID
+    body_site: BodySite
+    laterality: Laterality | None
+    flag: Literal["growing", "looks_different"]
+
+
 class PatientListItem(PatientOut):
     lesion_count: int = 0
+    lesion_flags: list[LesionFlag] = Field(
+        default=[], description="Lesions growing or unlike the patient's others"
+    )
     last_visit_at: datetime | None = None
     latest_thumbnail_url: str | None = Field(
         default=None, description="Signed standard view of the patient's most recent visit"

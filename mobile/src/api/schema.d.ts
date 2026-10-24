@@ -874,6 +874,26 @@ export interface components {
             /** Captures */
             captures: components["schemas"]["CaptureOut"][];
         };
+        /** LesionFlag */
+        LesionFlag: {
+            /**
+             * Lesion Id
+             * Format: uuid
+             */
+            lesion_id: string;
+            /**
+             * Body Site
+             * @enum {string}
+             */
+            body_site: "face" | "scalp" | "neck" | "chest" | "abdomen" | "upper_back" | "lower_back" | "upper_arm" | "forearm" | "palm" | "hand_dorsum" | "thigh" | "lower_leg" | "sole" | "foot_dorsum" | "fingernail" | "toenail" | "genital" | "other";
+            /** Laterality */
+            laterality: ("left" | "right" | "midline") | null;
+            /**
+             * Flag
+             * @enum {string}
+             */
+            flag: "growing" | "looks_different";
+        };
         /** LesionOut */
         LesionOut: {
             /**
@@ -1150,6 +1170,12 @@ export interface components {
              * @default 0
              */
             lesion_count: number;
+            /**
+             * Lesion Flags
+             * @description Lesions growing or unlike the patient's others
+             * @default []
+             */
+            lesion_flags: components["schemas"]["LesionFlag"][];
             /** Last Visit At */
             last_visit_at?: string | null;
             /**

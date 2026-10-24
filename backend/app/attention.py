@@ -86,3 +86,19 @@ def looks_different(lesions: list[Lesion]) -> set:
         if distance >= DUCKLING_MIN_DISTANCE and distance >= DUCKLING_RATIO * others:
             flagged.add(i)
     return flagged
+
+
+def lesion_flags(lesion: Lesion, different: set) -> list[str]:
+    """Flags for a lesion from its own visits ("growing") and from its patient's other lesions
+    ("looks_different"; pass looks_different(patient.lesions))."""
+    flags = []
+    history = sorted(
+        (c for c in lesion.captures if c.status == "processed"), key=lambda c: c.captured_at
+    )
+    if len(history) >= 2:
+        growth = _area_growth(history[0], history[-1])
+        if growth is not None and growth >= GROWTH_FLAG:
+            flags.append("growing")
+    if lesion.id in different:
+        flags.append("looks_different")
+    return flags

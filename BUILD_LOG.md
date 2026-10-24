@@ -451,3 +451,9 @@ Timestamped record of what was built during GENOHACK (Sat 24 – Sun 25 Oct 2026
   PLAN §7 updated.
 - Tests: unit (needs 3 lesions, flags only a clear outlier); new e2e spec builds such a patient as
   the smoke user and checks only the lower-back lesion is flagged.
+
+## 2026-10-25 04:24 WIB — Iteration loop, batch 26: "Worth a second look" on the clinician home
+
+- `GET /patients` items carry `lesion_flags` (growing ≥ 20 % since the first visit; looks different
+  from the patient's other lesions). Clinician home lists up to five with the reason and links to
+  the lesion. Unit test; the ugly-duckling e2e checks the card.

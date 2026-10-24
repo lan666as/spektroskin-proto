@@ -8,11 +8,11 @@ from sqlalchemy.orm import Session, selectinload
 
 from app import audit
 from app.api.serialize import lesion_out
-from app.attention import looks_different
+from app.attention import lesion_flags, looks_different
 from app.auth import Clinician, CurrentUser, same_group, sign_image_url
 from app.db import get_session
 from app.models import Lesion, Patient
-from app.schemas import PatientCreate, PatientDetail, PatientListItem, PatientOut
+from app.schemas import LesionFlag, PatientCreate, PatientDetail, PatientListItem, PatientOut
 
 router = APIRouter(prefix="/patients", tags=["patients"])
 SessionDep = Annotated[Session, Depends(get_session)]
@@ -36,9 +36,20 @@ def list_patients(user: CurrentUser, session: SessionDep) -> list[PatientListIte
 def _list_item(patient: Patient, viewer) -> PatientListItem:
     visits = [c for lesion in patient.lesions for c in lesion.captures if c.status == "processed"]
     latest = max(visits, key=lambda c: c.captured_at, default=None)
+    different = looks_different(patient.lesions)
     return PatientListItem(
         **PatientOut.model_validate(patient).model_dump(),
         lesion_count=len(patient.lesions),
+        lesion_flags=[
+            LesionFlag(
+                lesion_id=lesion.id,
+                body_site=lesion.body_site,
+                laterality=lesion.laterality,
+                flag=flag,
+            )
+            for lesion in patient.lesions
+            for flag in lesion_flags(lesion, different)
+        ],
         last_visit_at=latest.captured_at if latest else None,
         latest_thumbnail_url=sign_image_url(latest.id, "standard", viewer.id) if latest else None,
     )
