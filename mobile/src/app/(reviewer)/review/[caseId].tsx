@@ -19,7 +19,7 @@ import {
   Screen,
 } from '@/ui/components';
 import { CaseTimeline, Footnote, HistoryStrip, Recommendation, SpectralViews, VisitCompare } from '@/ui/clinical';
-import { areaChange, AutomatedAnalysis, formatSize, MorphologyCard } from '@/ui/analysis';
+import { areaChange, AutomatedAnalysis, formatSize, measuredFindings, MorphologyCard } from '@/ui/analysis';
 import { AcralPattern, TriageSupport } from '@/ui/triage';
 import { OutcomeCard } from '@/ui/outcome';
 import { SimilarCases } from '@/ui/similar';
@@ -56,7 +56,18 @@ const PHRASES = [
   'Vascular pattern visible on the hemoglobin map.',
 ] as const;
 
-function ReviewForm({ caseId, aiHidden, onSent }: { caseId: string; aiHidden: boolean; onSent: () => void }) {
+function ReviewForm({
+  caseId,
+  aiHidden,
+  findings,
+  onSent,
+}: {
+  caseId: string;
+  aiHidden: boolean;
+  /** Measured findings as text, offered as a starting point for the impression. */
+  findings: string | null;
+  onSent: () => void;
+}) {
   const queryClient = useQueryClient();
   const [impression, setImpression] = useState('');
   const [action, setAction] = useState<ReviewAction | null>(null);
@@ -92,6 +103,14 @@ function ReviewForm({ caseId, aiHidden, onSent }: { caseId: string; aiHidden: bo
         placeholder="What you see and why"
         testID="review-impression"
       />
+      {findings ? (
+        <Button
+          label="Insert measured findings (edit before sending)"
+          variant="secondary"
+          onPress={() => setImpression((current) => (current.trim() ? `${current.trim()} ` : '') + findings)}
+          testID="insert-findings"
+        />
+      ) : null}
       <Chips
         label="Add a phrase"
         options={PHRASES.map((phrase, i) => ({ value: String(i), label: phrase }))}
@@ -241,7 +260,12 @@ export default function ReviewCase() {
                 <Button label="Back to queue" variant="secondary" onPress={() => router.navigate('/review')} />
               </>
             ) : (
-              <ReviewForm caseId={c.id} aiHidden={hideAI} onSent={() => setJustSent(true)} />
+              <ReviewForm
+                caseId={c.id}
+                aiHidden={hideAI}
+                findings={reviewed ? measuredFindings(reviewed, c.lesion_history, c.lesion.body_site, !hideAI) : null}
+                onSent={() => setJustSent(true)}
+              />
             )}
           </View>
         </View>

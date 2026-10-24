@@ -298,3 +298,38 @@ export function MorphologyCard({ capture, visits }: { capture: Capture; visits: 
     </Card>
   );
 }
+
+/**
+ * Measured findings as editable text for the dermatologist's impression. Assembled from the
+ * automated outputs only; the interpretation stays the dermatologist's.
+ */
+export function measuredFindings(
+  capture: Capture,
+  visits: Capture[],
+  site: BodySite,
+  includeAI: boolean,
+): string {
+  const parts: string[] = [];
+  const size = formatSize(capture);
+  parts.push(`Measured ${formatArea(capture.area_mm2)}${size ? ` (${size})` : ''}.`);
+  const first = visits.find((v) => v.status === 'processed');
+  const change = areaChange(first, capture);
+  if (change) {
+    parts.push(`Area ${change.percent >= 0 ? '+' : ''}${change.percent.toFixed(0)}% over ${change.days} days.`);
+  }
+  const m = capture.morphology;
+  const before = first && first.id !== capture.id ? first.morphology : null;
+  if (m) {
+    const border = before
+      ? ` (${m.border_irregularity - before.border_irregularity >= 0 ? '+' : ''}${(m.border_irregularity - before.border_irregularity).toFixed(2)} since Day 01)`
+      : '';
+    parts.push(`Asymmetry ${m.asymmetry.toFixed(2)}, border irregularity ${m.border_irregularity.toFixed(2)}${border}.`);
+  }
+  if (includeAI && capture.triage_model?.pattern) {
+    parts.push(`AI pattern suggestion (research mode): ${capture.triage_model.pattern}.`);
+  }
+  if (includeAI && isAcral(site) && capture.acral_model?.pattern) {
+    parts.push(`AI acral read (research mode): pigment along the ${capture.acral_model.pattern === 'ridge' ? 'ridges' : 'furrows'}.`);
+  }
+  return parts.join(' ');
+}

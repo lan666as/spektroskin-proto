@@ -138,6 +138,8 @@ test('PLAN §6 demo script: 60 s core + extended', async ({ browser, request }) 
   // The clinician spec runs first and leaves a reviewed acral case, so there is always a neighbour.
   await expect(byId(reviewer, 'similar-cases')).toContainText('Recommended');
   await shot(reviewer, '08-review-case');
+  await byId(reviewer, 'insert-findings').click();
+  await expect(byId(reviewer, 'review-impression')).toHaveValue(/Measured .* mm².*Area \+5\d% over 29 days/);
   await byId(reviewer, 'phrase-0').click();
   await byId(reviewer, 'action-biopsy').click();
   await byId(reviewer, 'follow-up-14').click();
