@@ -24,6 +24,10 @@ echo "== mobile: tsc, web export"
 rm -rf web-dist && cp -R mobile/dist web-dist
 docker compose up -d --wait caddy >/dev/null
 
+echo "== provision users + seed, API smoke"
+scripts/provision.sh >/dev/null
+(cd backend && uv run python -m scripts.smoke --base http://localhost:8480 >/dev/null)
+
 if (( run_e2e )); then
   echo "== e2e: playwright against http://localhost:8480"
   (cd mobile && npx playwright test)

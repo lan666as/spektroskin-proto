@@ -51,6 +51,19 @@ Timestamped record of what was built during GENOHACK (Sat 24 – Sun 25 Oct 2026
   mask Dice ≥ 0.96, |area error| ≤ 7.6% (measured); registration error ≤ 0.25 px; blur and glare
   rejected with retake guidance; growth series monotonic and within 3% of truth. Simulated data only.
 
+### 2026-10-24 21:38 WIB — M3: data model, API, demo auth, images, audit (gate green)
+- Alembic 0002: patients, lesions, captures (client UUID, JSONB qc/result), cases (+ status index),
+  case_captures, reviews (one per case), audit_events. CHECK constraints for every enum field.
+- API under /api: auth (token, me), patients (list/create/get), lesions (create, get with history),
+  captures (multipart upload → synchronous processing, idempotent on client id), cases (list/queue,
+  create, get, review), images (signed short-lived URLs). Role checks server-side; clinicians see
+  only their own patients and cases. Audit event on every read/write of patient data.
+- `scripts/create_user` (password via stdin), `scripts/seed` (idempotent PLAN §7 data),
+  `scripts/provision.sh` (Keychain → create_user → seed, local or over ssh), `scripts/smoke.py`.
+- TS types generated from OpenAPI (`mobile/src/api/schema.d.ts`).
+- Verified: smoke 32/32 checks against the local stack (incl. 401/403/409/422 paths, idempotent
+  retry, QC failure, tampered image signature); seed re-run idempotent; gate green.
+
 ## Decisions made alone
 - M1: Expo routes live in `mobile/src/app/` (SDK 58 template convention) instead of `mobile/app/`.
 - M1: web export uses `web.output: "single"` (SPA) so Caddy can serve deep links via `try_files`.
@@ -60,6 +73,13 @@ Timestamped record of what was built during GENOHACK (Sat 24 – Sun 25 Oct 2026
   saturated ≤ 0.2% (glare 2.9%); patch ratio 0.50/0.18 within ±20%; Otsu with hysteresis down to 0.5×.
 - M2: unmixing adds a band-independent offset term (skin-line shading) beside melanin and hemoglobin.
 - M2: phantoms are 256×256 px at 0.04 mm/px; the Docker build regenerates them from the same seeds.
+- M3: images use short-lived signed URLs (JWT, 2 h, bound to capture, view and viewer) because
+  `<img>` on web cannot send an Authorization header; each image fetch is audited for that viewer.
+- M3: dedicated `smoke-clinician` / `smoke-dermatologist` users (Keychain items
+  `spektroskin-smoke-*`) for smoke and e2e runs, so automated runs never touch demo-account data.
+- M3: clinicians list only patients they registered; dermatologists see all (demo-friendly scoping).
+- M3: added `GET /patients/{id}` (additive) for the patient → lesion screen.
+- M3: dermatologist opening a submitted case moves it to `in_review`.
 
 ## Deviations
 - M2: pipeline order is QC → calibration → registration (spec says registration before calibration),
