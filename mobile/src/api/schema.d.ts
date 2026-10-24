@@ -422,6 +422,7 @@ export interface components {
              * @description Width (ellipse minor axis)
              */
             width_mm?: number | null;
+            quality_model?: components["schemas"]["QualityOpinion"] | null;
             /** Registration Shift Px */
             registration_shift_px?: {
                 [key: string]: number[];
@@ -760,6 +761,28 @@ export interface components {
             };
             /** Guidance */
             guidance: string[];
+        };
+        /**
+         * QualityOpinion
+         * @description Advisory output of the learned image-quality model; the rule-based QC decides.
+         */
+        QualityOpinion: {
+            /** Model */
+            model: string;
+            /**
+             * Label
+             * @enum {string}
+             */
+            label: "good" | "blurry" | "glare";
+            /** Probabilities */
+            probabilities: {
+                [key: string]: number;
+            };
+            /**
+             * Held Out Accuracy
+             * @description Accuracy on held-out synthetic phantoms (docs/evidence/quality_model_card.md)
+             */
+            held_out_accuracy: number;
         };
         /** ReviewCreate */
         ReviewCreate: {

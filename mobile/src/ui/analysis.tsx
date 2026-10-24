@@ -1,5 +1,4 @@
 import { useRouter } from 'expo-router';
-import type { ReactNode } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import type { Capture } from '@/api/client';
@@ -77,20 +76,25 @@ function StepRow({ step }: { step: Step }) {
   );
 }
 
+const QUALITY_LABEL = { good: 'good image', blurry: 'blurry', glare: 'glare' } as const;
+
+export function qualityStep(q: NonNullable<Capture['quality_model']>, rulesPassed: boolean): Step {
+  const agrees = (q.label === 'good') === rulesPassed;
+  const confidence = Math.round((q.probabilities[q.label] ?? 0) * 100);
+  return {
+    title: 'Learned quality model (second opinion)',
+    result: `Looks ${QUALITY_LABEL[q.label]} (${confidence}%) · ${agrees ? 'agrees with the rules' : 'disagrees with the rules: check the image'}`,
+    how: `Small classifier trained on simulated captures only; ${Math.round(q.held_out_accuracy * 100)}% accurate on held-out simulated captures. Advisory: the rules decide. Judges image quality, never the lesion.`,
+    active: true,
+    testID: 'quality-model',
+  };
+}
+
 /**
  * What the software did automatically for this capture, each step with how it works and its
  * limits. Assistance only: it measures and checks images; people interpret them.
  */
-export function AutomatedAnalysis({
-  capture,
-  visits,
-  extra,
-}: {
-  capture: Capture;
-  visits: Capture[];
-  /** Additional rows, e.g. the learned quality model's second opinion. */
-  extra?: ReactNode;
-}) {
+export function AutomatedAnalysis({ capture, visits }: { capture: Capture; visits: Capture[] }) {
   const router = useRouter();
   const first = visits.find((v) => v.status === 'processed');
   const change = areaChange(first, capture);
@@ -104,6 +108,7 @@ export function AutomatedAnalysis({
       how: 'Rule-based: focus, saturated pixels, gray patch ratio. Cannot judge clinical relevance.',
       active: true,
     },
+    ...(capture.quality_model ? [qualityStep(capture.quality_model, capture.qc.passed)] : []),
     {
       title: 'Lesion outline and size',
       result: capture.area_mm2
@@ -140,7 +145,6 @@ export function AutomatedAnalysis({
       {steps.map((s) => (
         <StepRow key={s.title} step={s} />
       ))}
-      {extra}
       <StepRow
         step={{
           title: 'Lesion assessment (triage support)',

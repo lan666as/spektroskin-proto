@@ -1,6 +1,7 @@
 from app.processing import render
 from app.processing.calibration import calibrate
 from app.processing.qc import run_qc
+from app.processing.quality_model import predict as quality_opinion
 from app.processing.registration import register
 from app.processing.segmentation import measurements, segment
 from app.processing.signature import spectral_signature
@@ -12,15 +13,21 @@ def run(frame_set: FrameSet, device_profile: DeviceProfile) -> ProcessingResult:
     """QC → calibration → registration → spectral maps → segmentation.
 
     Calibration runs before registration because flat-field and reference patches live in
-    sensor coordinates, while hand motion shifts only the skin. Deterministic; no ML.
+    sensor coordinates, while hand motion shifts only the skin. Deterministic. The learned quality
+    model is an advisory second opinion stored beside the rule-based QC; it never gates.
     """
     qc = run_qc(frame_set, device_profile)
+    quality = quality_opinion(frame_set, device_profile)
     reflectance, gains = calibrate(frame_set, device_profile)
     aligned, shifts = register(reflectance)
     standard = render.mask_spacer(render.standard_view(aligned))
     if not qc.passed:
         return ProcessingResult(
-            qc=qc, views={"standard": standard}, shifts_px=shifts, gain_correction=gains
+            qc=qc,
+            views={"standard": standard},
+            quality_model=quality,
+            shifts_px=shifts,
+            gain_correction=gains,
         )
 
     melanin, hemoglobin = unmix(aligned)
@@ -39,6 +46,7 @@ def run(frame_set: FrameSet, device_profile: DeviceProfile) -> ProcessingResult:
         area_mm2=area_mm2,
         signature=spectral_signature(aligned, melanin, hemoglobin, mask),
         measurements=measurements(mask),
+        quality_model=quality,
         shifts_px=shifts,
         gain_correction=gains,
     )

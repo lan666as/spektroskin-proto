@@ -180,3 +180,18 @@ Timestamped record of what was built during GENOHACK (Sat 24 – Sun 25 Oct 2026
   the skin; flat-fielding after shifting would misalign the vignetting correction.
 - M1: `openapi-typescript@7.13.0` declares a TypeScript 5 peer, but SDK 58 ships TypeScript 6. It runs
   pinned via `npx -y openapi-typescript@7.13.0` (npm script `gen:api`) instead of as a devDependency.
+
+## 2026-10-25 00:32 WIB — Iteration loop, batch 2: learned image-quality classifier (backlog item 3)
+
+- scikit-learn (dev-only, pinned in uv.lock) trains a multinomial logistic regression on 12 image
+  statistics from simulated captures with randomized blur and glare severities
+  (`backend/scripts/train_quality_model.py`, deterministic). Held out: every capture of the mixed
+  lesion type (72). Held-out accuracy 0.97 vs 0.90 for the rule-based check on the same captures.
+  Model card: `docs/evidence/quality_model_card.md`.
+- Production runs numpy inference over exported JSON weights (`app/processing/models/quality_v1.json`);
+  the result carries `quality_model` as an advisory second opinion. The rules still gate.
+- App: QC card shows the second opinion and whether it agrees with the rules; the automated analysis
+  card has a "Learned quality model" row; AI roadmap Tier 1 and README updated.
+- Builder override at 00:30 WIB: start a diagnosis-assist model. Agreed path: synthetic lesion-pattern
+  triage model with real held-out metrics and an RGB-vs-spectral ablation, research mode, no
+  malignancy probability (phantoms carry no such labels).

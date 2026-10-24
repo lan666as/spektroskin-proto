@@ -126,6 +126,17 @@ class SpectralSignature(BaseModel):
     hemoglobin: ChromophoreContrast
 
 
+class QualityOpinion(BaseModel):
+    """Advisory output of the learned image-quality model; the rule-based QC decides."""
+
+    model: str
+    label: Literal["good", "blurry", "glare"]
+    probabilities: dict[str, float]
+    held_out_accuracy: float = Field(
+        description="Accuracy on held-out synthetic phantoms (docs/evidence/quality_model_card.md)"
+    )
+
+
 class CaptureOut(BaseModel):
     id: uuid.UUID
     lesion_id: uuid.UUID
@@ -141,6 +152,7 @@ class CaptureOut(BaseModel):
     spectral_signature: SpectralSignature | None = None
     diameter_mm: float | None = Field(default=None, description="Longest diameter of the outline")
     width_mm: float | None = Field(default=None, description="Width (ellipse minor axis)")
+    quality_model: QualityOpinion | None = None
     registration_shift_px: dict[str, list[float]] | None = None
     gain_correction: dict[str, float] | None = None
 

@@ -64,20 +64,29 @@ def skin_reflectance(gt: GroundTruth) -> np.ndarray:
     return R0[:, None, None] * np.exp(-absorb) * gt.shading
 
 
-def capture(spec: PhantomSpec, gt: GroundTruth, repeat: int | None = None) -> FrameSet:
+def capture(
+    spec: PhantomSpec,
+    gt: GroundTruth,
+    repeat: int | None = None,
+    blur_sigma: float = 3.5,
+    glare_amplitude: float = 2.5,
+    glare_radius: float = 16.0,
+) -> FrameSet:
     """Render one capture. `repeat` selects an independent draw of noise, gain drift and hand
-    motion for the same phantom (None = the canonical capture bundled in the app)."""
+    motion for the same phantom (None = the canonical capture bundled in the app). The blur and
+    glare parameters set the severity of those bad-capture variants."""
     suffix = ":capture" if repeat is None else f":capture:{repeat}"
     rng = np.random.default_rng(seed_for(spec.id + suffix))
     skin = skin_reflectance(gt)
 
     if spec.variant == "blur":
-        skin = np.stack([ndimage.gaussian_filter(b, 3.5) for b in skin])
+        skin = np.stack([ndimage.gaussian_filter(b, blur_sigma) for b in skin])
     if spec.variant == "glare":
         yy, xx = np.mgrid[0:FRAME_SIZE, 0:FRAME_SIZE].astype(float)
         cy, cx = rng.uniform(90, 160, size=2)
-        hotspot = 2.5 * np.exp(-((yy - cy) ** 2 + (xx - cx) ** 2) / (2 * 16.0**2))
-        speckle = (rng.random((FRAME_SIZE, FRAME_SIZE)) > 0.996) * 2.0
+        r2 = (yy - cy) ** 2 + (xx - cx) ** 2
+        hotspot = glare_amplitude * np.exp(-r2 / (2 * glare_radius**2))
+        speckle = (rng.random((FRAME_SIZE, FRAME_SIZE)) > 0.996) * 0.8 * glare_amplitude
         skin = skin + hotspot + ndimage.gaussian_filter(speckle, 0.8)
 
     frames: dict[str, np.ndarray] = {}

@@ -6,6 +6,7 @@ import { api, type Capture, type Schemas } from '@/api/client';
 import { absoluteUrl } from '@/api/config';
 
 import { Button, Card, Chips, ErrorBanner, Heading, KeyValue, Loading, Muted, Pill, Row } from './components';
+import { qualityStep } from './analysis';
 import { ACTION_LABELS, duration, formatArea, formatDate, formatDateTime, visitDay } from './labels';
 import { ImageViewer } from './ImageViewer';
 import { SimulatedBadge } from './SimulatedBadge';
@@ -174,6 +175,12 @@ export function QCCard({ capture, onRetake }: { capture: Capture; onRetake?: () 
           {g}
         </Text>
       ))}
+      {capture.quality_model ? (
+        <Muted testID="qc-second-opinion">
+          Second opinion, learned model (advisory):{' '}
+          {qualityStep(capture.quality_model, qc.passed).result}
+        </Muted>
+      ) : null}
       {!qc.passed && onRetake ? (
         <Pressable onPress={onRetake} accessibilityRole="button" style={styles.retake} testID="retake">
           <Text style={styles.retakeText}>Retake</Text>

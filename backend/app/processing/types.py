@@ -41,6 +41,7 @@ class ProcessingResult:
     area_mm2: float | None = None
     signature: dict[str, Any] | None = None
     measurements: dict[str, float] | None = None
+    quality_model: dict[str, Any] | None = None
     shifts_px: dict[str, tuple[float, float]] = field(default_factory=dict)
     gain_correction: dict[str, float] = field(default_factory=dict)
 
@@ -61,4 +62,5 @@ class ProcessingResult:
             "views": sorted(self.views),
             "signature": self.signature,
             "measurements": self.measurements,
+            "quality_model": self.quality_model,
         }

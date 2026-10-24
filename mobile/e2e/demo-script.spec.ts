@@ -96,6 +96,7 @@ test('PLAN §6 demo script: 60 s core + extended', async ({ browser, request }) 
   // 1–2: capture; QC passes.
   await byId(clinician, 'capture-button').click();
   await expect(byId(clinician, 'qc-passed')).toBeVisible({ timeout: 30_000 });
+  await expect(byId(clinician, 'qc-second-opinion')).toContainText('agrees with the rules');
   await shot(clinician, '05-results');
   // 3: switch the three views; outline and area.
   for (const view of ['pigment', 'vascular', 'standard']) {
@@ -144,6 +145,7 @@ test('PLAN §6 demo script: 60 s core + extended', async ({ browser, request }) 
   await byId(clinician, 'phantom-pigmented_dark_glare').click();
   await byId(clinician, 'capture-button').click();
   await expect(byId(clinician, 'qc-failed')).toContainText('Glare', { timeout: 30_000 });
+  await expect(byId(clinician, 'qc-second-opinion')).toContainText('Looks glare');
   await shot(clinician, '11-qc-failed');
   await byId(clinician, 'retake').click();
   await byId(clinician, 'dev-toggle').click();
