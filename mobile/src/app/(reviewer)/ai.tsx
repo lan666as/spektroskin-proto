@@ -46,6 +46,12 @@ function ModelCard({ m }: { m: Schemas['ModelSummary'] }) {
             <Muted>answered (abstains otherwise)</Muted>
           </View>
         ) : null}
+        {m.calibration_ece != null ? (
+          <View>
+            <Text style={styles.big} testID="calibration">{m.calibration_ece.toFixed(3)}</Text>
+            <Muted>calibration error (0 = its % match reality)</Muted>
+          </View>
+        ) : null}
         {m.held_out.accuracy_when_answered != null ? (
           <View>
             <Text style={styles.big}>{pct(m.held_out.accuracy_when_answered)}</Text>

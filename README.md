@@ -33,6 +33,39 @@ carries a "Simulated" badge. No real or public patient images are used anywhere.
 | Dermatologist review portal, case loop, polling | **Real** |
 | Records, audit log, consent flag, demo auth | **Real** (demo auth only: no SSO or password reset) |
 | Validation numbers | **Real computation on simulated data**: validates the processing math, not clinical performance |
+| AI models (image quality, lesion-pattern triage, acral pattern) | **Real models**, trained and tested on simulated data only; research mode, never a diagnosis |
+| AI accuracy, calibration, per-tone results | **Real measurements on held-out simulated data**, not patients |
+
+## AI-assisted review (built during GENOHACK)
+
+Three small models assist. None of them diagnoses, and none outputs a cancer probability or risk
+score: the simulated training data has no such labels, so any such number would be invented. The
+dermatologist recommends; the treating clinician decides.
+
+| Model | What it does | Held-out (simulated) | Card |
+|---|---|---|---|
+| Image quality `quality_v2` | Second opinion beside the QC rules: good, blurry, glare or noisy | 0.96 vs 0.88 for the rules | [card](docs/evidence/quality_model_card.md) |
+| Lesion-pattern triage `triage_v1` | Pigment-dominant / vascular / mixed. It abstains when unsure or when a capture is outside the training range, and explains its top reasons | 0.98 overall; 0.96 on Fitzpatrick V; calibration error 0.03; RGB-only ablation 0.95 | [card](docs/evidence/triage_model_card.md) |
+| Acral pattern `acral_v1` | Palms, soles, nails: pigment along the furrows or the ridges. A ridge pattern prompts review | 0.99; abstains on faint patterns | [card](docs/evidence/acral_model_card.md) |
+
+Around the models:
+- **AI evidence view:** where the pigment and blood evidence sits in the lesion.
+- **Change since Day 01:** the first visit's outline, registered onto the current visit.
+- **Dermoscopy-style measurements:** asymmetry, border, colour and evolution, each shown on its
+  own and never summed into a score.
+- **Attention flags in the queue:** ridge pattern, growth, border change, AI unsure.
+- **Similar reviewed lesions** with their outcomes.
+- **Measured-findings draft** for the dermatologist's impression.
+- **Shadow-mode validation:** dermatologist pattern reads, with optional blind reads.
+- **AI & validation page:** model cards, per-tone results, live monitoring, a learning queue, and
+  the reviewed → consented → histopathology-confirmed funnel, with a privacy-minimised export.
+
+Evaluation: [docs/evidence/ai_evaluation.md](docs/evidence/ai_evaluation.md) covers:
+- repeatability, which is 100 % for the same lesion captured again;
+- a sensor-noise stress test. Its first run found noisy captures passing QC; that led to a QC noise
+  check and the quality model's v2.
+
+Roadmap and what stays off: the in-app AI roadmap (`/ai-roadmap`).
 
 ## Built before vs during GENOHACK
 

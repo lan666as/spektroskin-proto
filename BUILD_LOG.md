@@ -420,3 +420,12 @@ Timestamped record of what was built during GENOHACK (Sat 24 – Sun 25 Oct 2026
   Demo e2e asserts it.
 - PLAN §6 demo script rewritten around the AI moments (AI assist strip, evidence and change views,
   flags, reasons, similar lesions, findings draft, AI page, outcome → validation export).
+
+## 2026-10-25 03:54 WIB — Iteration loop, batch 23: triage calibration, README AI section
+
+- Triage model card and metrics now include calibration on held-out data: expected calibration
+  error 0.034, with reliability per confidence bin. The model is slightly under-confident at
+  70–90 % (says 0.85, right 0.94), the safer direction. Same weights (deterministic retrain). The AI
+  page shows the calibration error.
+- README: "AI-assisted review" section (models, held-out numbers, cards, surrounding features,
+  evaluation) and AI rows in the real-vs-simulated table.

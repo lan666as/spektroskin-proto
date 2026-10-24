@@ -939,6 +939,11 @@ export interface components {
                 [key: string]: number;
             };
             /**
+             * Calibration Ece
+             * @description Expected calibration error on held-out data (0 = calibrated)
+             */
+            calibration_ece?: number | null;
+            /**
              * Ablation By Tone
              * @description Triage only: held-out accuracy per tone for each feature set
              */

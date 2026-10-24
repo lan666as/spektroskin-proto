@@ -83,8 +83,8 @@
   6.69943842
  ],
  "ood_norm": 7.2031,
- "trained_at": "2026-10-24 19:27 UTC",
- "trained_from_commit": "690c4ec",
+ "trained_at": "2026-10-24 20:51 UTC",
+ "trained_from_commit": "95be3b6",
  "data": "synthetic phantoms only; train and test lesions generated from disjoint seeds",
  "metrics": {
   "spectral": {
@@ -130,7 +130,42 @@
       2,
       279
      ]
-    ]
+    ],
+    "calibration": {
+     "ece": 0.0365,
+     "bins": [
+      {
+       "range": "0.00-0.50",
+       "n": 1,
+       "mean_confidence": 0.4885,
+       "accuracy": 1.0
+      },
+      {
+       "range": "0.50-0.70",
+       "n": 29,
+       "mean_confidence": 0.6144,
+       "accuracy": 0.4828
+      },
+      {
+       "range": "0.70-0.90",
+       "n": 99,
+       "mean_confidence": 0.8488,
+       "accuracy": 0.9495
+      },
+      {
+       "range": "0.90-0.97",
+       "n": 229,
+       "mean_confidence": 0.9434,
+       "accuracy": 1.0
+      },
+      {
+       "range": "0.97-1.00",
+       "n": 533,
+       "mean_confidence": 0.9902,
+       "accuracy": 1.0
+      }
+     ]
+    }
    },
    "held_out": {
     "n": 445,
@@ -173,7 +208,42 @@
       0,
       140
      ]
-    ]
+    ],
+    "calibration": {
+     "ece": 0.0342,
+     "bins": [
+      {
+       "range": "0.00-0.50",
+       "n": 1,
+       "mean_confidence": 0.4724,
+       "accuracy": 1.0
+      },
+      {
+       "range": "0.50-0.70",
+       "n": 15,
+       "mean_confidence": 0.6057,
+       "accuracy": 0.5333
+      },
+      {
+       "range": "0.70-0.90",
+       "n": 51,
+       "mean_confidence": 0.8504,
+       "accuracy": 0.9412
+      },
+      {
+       "range": "0.90-0.97",
+       "n": 112,
+       "mean_confidence": 0.9425,
+       "accuracy": 1.0
+      },
+      {
+       "range": "0.97-1.00",
+       "n": 266,
+       "mean_confidence": 0.9904,
+       "accuracy": 1.0
+      }
+     ]
+    }
    },
    "held_out_ood_rate": 0.009
   },
@@ -220,7 +290,42 @@
       7,
       263
      ]
-    ]
+    ],
+    "calibration": {
+     "ece": 0.062,
+     "bins": [
+      {
+       "range": "0.00-0.50",
+       "n": 6,
+       "mean_confidence": 0.471,
+       "accuracy": 0.3333
+      },
+      {
+       "range": "0.50-0.70",
+       "n": 59,
+       "mean_confidence": 0.6011,
+       "accuracy": 0.5763
+      },
+      {
+       "range": "0.70-0.90",
+       "n": 227,
+       "mean_confidence": 0.8287,
+       "accuracy": 0.9692
+      },
+      {
+       "range": "0.90-0.97",
+       "n": 297,
+       "mean_confidence": 0.9408,
+       "accuracy": 1.0
+      },
+      {
+       "range": "0.97-1.00",
+       "n": 302,
+       "mean_confidence": 0.9887,
+       "accuracy": 1.0
+      }
+     ]
+    }
    },
    "held_out": {
     "n": 445,
@@ -263,7 +368,42 @@
       4,
       127
      ]
-    ]
+    ],
+    "calibration": {
+     "ece": 0.0555,
+     "bins": [
+      {
+       "range": "0.00-0.50",
+       "n": 4,
+       "mean_confidence": 0.4246,
+       "accuracy": 0.0
+      },
+      {
+       "range": "0.50-0.70",
+       "n": 30,
+       "mean_confidence": 0.5971,
+       "accuracy": 0.6333
+      },
+      {
+       "range": "0.70-0.90",
+       "n": 112,
+       "mean_confidence": 0.8245,
+       "accuracy": 0.9286
+      },
+      {
+       "range": "0.90-0.97",
+       "n": 150,
+       "mean_confidence": 0.9438,
+       "accuracy": 1.0
+      },
+      {
+       "range": "0.97-1.00",
+       "n": 149,
+       "mean_confidence": 0.9876,
+       "accuracy": 1.0
+      }
+     ]
+    }
    }
   }
  }

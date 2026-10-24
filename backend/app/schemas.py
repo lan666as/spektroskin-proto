@@ -358,6 +358,9 @@ class ModelSummary(BaseModel):
     by_tone: dict[str, float] = Field(
         default={}, description="Held-out accuracy per simulated skin tone (Fitzpatrick)"
     )
+    calibration_ece: float | None = Field(
+        default=None, description="Expected calibration error on held-out data (0 = calibrated)"
+    )
     ablation_by_tone: dict[str, dict[str, float]] | None = Field(
         default=None, description="Triage only: held-out accuracy per tone for each feature set"
     )

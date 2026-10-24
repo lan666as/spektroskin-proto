@@ -1,6 +1,6 @@
 # Model card: lesion-pattern triage model `triage_v1` (research mode)
 
-Trained 2026-10-24 19:27 UTC on top of commit `690c4ec` with
+Trained 2026-10-24 20:51 UTC on top of commit `95be3b6` with
 `uv run python -m scripts.train_triage_model` (deterministic).
 
 ## What it does
@@ -45,6 +45,20 @@ A capture whose standardised features lie further from the training centre than
 the training range". 0.9% of held-out simulated
 lesions were withheld this way. This is what should happen first when real-module images differ
 from the simulator.
+
+## Calibration (held-out): does a stated confidence match how often it is right?
+Expected calibration error **0.034** (0 = perfectly calibrated).
+
+| Confidence | n | Mean confidence | Actually right |
+|---|---|---|---|
+| 0.00-0.50 | 1 | 0.47 | 1.00 |
+| 0.50-0.70 | 15 | 0.61 | 0.53 |
+| 0.70-0.90 | 51 | 0.85 | 0.94 |
+| 0.90-0.97 | 112 | 0.94 | 1.00 |
+| 0.97-1.00 | 266 | 0.99 | 1.00 |
+
+Where "actually right" exceeds the mean confidence, the model is under-confident: it says less
+than it knows, which is the safer direction for a triage aid.
 
 ## Ablation: RGB bands only vs RGB + NIR + spectral maps (the optics kill test, on simulated data)
 | Arm | Features | Held-out accuracy | Answered | Accuracy when answered |

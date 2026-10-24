@@ -67,6 +67,29 @@ def dataset(split: str, n: int) -> list:
         return [r for r in pool.map(row, [(split, i) for i in range(n)]) if r is not None]
 
 
+CALIBRATION_BINS = (0.0, 0.5, 0.7, 0.9, 0.97, 1.0001)
+
+
+def calibration(confidence: np.ndarray, correct: np.ndarray) -> dict:
+    """Expected calibration error and reliability per confidence bin: does 99 % mean 99 %?"""
+    bins, ece = [], 0.0
+    for low, high in zip(CALIBRATION_BINS[:-1], CALIBRATION_BINS[1:], strict=True):
+        sel = (confidence >= low) & (confidence < high)
+        if not sel.any():
+            continue
+        gap = abs(confidence[sel].mean() - correct[sel].mean())
+        ece += sel.mean() * gap
+        bins.append(
+            {
+                "range": f"{low:.2f}-{min(high, 1.0):.2f}",
+                "n": int(sel.sum()),
+                "mean_confidence": round(float(confidence[sel].mean()), 4),
+                "accuracy": round(float(correct[sel].mean()), 4),
+            }
+        )
+    return {"ece": round(float(ece), 4), "bins": bins}
+
+
 def evaluate(scaler, model, x, y, tones) -> dict:
     w = export(scaler, model)
     p = np.array([probabilities(v, w) for v in x])
@@ -93,6 +116,7 @@ def evaluate(scaler, model, x, y, tones) -> dict:
         "accuracy_when_answered": acc(answered),
         "by_tone": by_tone,
         "confusion": confusion_matrix(y, pred, labels=CLASSES).tolist(),
+        "calibration": calibration(p.max(axis=1), correct),
     }
 
 
@@ -177,6 +201,15 @@ def _tone_table(m: dict) -> str:
     return "\n".join(lines)
 
 
+def _calibration_table(c: dict) -> str:
+    lines = ["| Confidence | n | Mean confidence | Actually right |", "|---|---|---|---|"]
+    lines += [
+        f"| {b['range']} | {b['n']} | {b['mean_confidence']:.2f} | {b['accuracy']:.2f} |"
+        for b in c["bins"]
+    ]
+    return "\n".join(lines)
+
+
 def _arm_row(name: str, arm: dict) -> str:
     h = arm["held_out"]
     return (
@@ -229,6 +262,14 @@ A capture whose standardised features lie further from the training centre than
 the training range". {w["metrics"]["spectral"]["held_out_ood_rate"]:.1%} of held-out simulated
 lesions were withheld this way. This is what should happen first when real-module images differ
 from the simulator.
+
+## Calibration (held-out): does a stated confidence match how often it is right?
+Expected calibration error **{s["calibration"]["ece"]:.3f}** (0 = perfectly calibrated).
+
+{_calibration_table(s["calibration"])}
+
+Where "actually right" exceeds the mean confidence, the model is under-confident: it says less
+than it knows, which is the safer direction for a triage aid.
 
 ## Ablation: RGB bands only vs RGB + NIR + spectral maps (the optics kill test, on simulated data)
 | Arm | Features | Held-out accuracy | Answered | Accuracy when answered |

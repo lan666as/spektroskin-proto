@@ -78,6 +78,7 @@ def _models() -> list[ModelSummary]:
             },
             model_card="docs/evidence/triage_model_card.md",
             by_tone=_tone_accuracy(t["spectral"]["held_out"]),
+            calibration_ece=t["spectral"]["held_out"]["calibration"]["ece"],
             ablation_by_tone={
                 arm: _tone_accuracy(t[arm]["held_out"]) for arm in ("rgb_only", "spectral")
             },
