@@ -14,6 +14,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session, selectinload
 
 from app import audit
+from app.attention import ACRAL_SITES
 from app.auth import Dermatologist, same_group
 from app.db import get_session
 from app.models import Capture, Case, Lesion, utcnow
@@ -165,7 +166,8 @@ def _monitoring(captures: list[Capture]) -> Monitoring:
                 patterns[triage["pattern"]] += 1
             else:
                 counts["triage_abstained"] += 1
-        counts["acral_ridge"] += (result.get("acral_model") or {}).get("pattern") == "ridge"
+        if capture.lesion.body_site in ACRAL_SITES:
+            counts["acral_ridge"] += (result.get("acral_model") or {}).get("pattern") == "ridge"
     return Monitoring(
         window_days=MONITORING_DAYS,
         captures=len(captures),
@@ -227,10 +229,12 @@ def ai_summary(user: Dermatologist, session: Annotated[Session, Depends(get_sess
     )
     recent = list(
         session.scalars(
-            select(Capture).where(
+            select(Capture)
+            .where(
                 Capture.created_by.in_(same_group(user)),
                 Capture.created_at >= utcnow() - timedelta(days=MONITORING_DAYS),
             )
+            .options(selectinload(Capture.lesion))
         )
     )
     audit.record(session, user, "ai_summary", "case", "*")

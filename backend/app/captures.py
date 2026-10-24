@@ -6,6 +6,7 @@ from datetime import datetime
 from sqlalchemy import select
 
 from app import audit
+from app.attention import ACRAL_SITES
 from app.devices import KNOWN_DEVICES, load_profile
 from app.models import Capture, Lesion, User
 from app.processing import FrameSet, run
@@ -56,6 +57,9 @@ def ingest(
         storage.put(view_key(capture_id, name), encode_png_rgb(image))
 
     summary = result.summary()
+    if lesion.body_site not in ACRAL_SITES:
+        # The acral pattern read only means something on palms, soles and nails.
+        summary["acral_model"] = None
     if change is not None:
         summary["views"] = sorted(views)
         summary["change_since_first"] = change[1]

@@ -429,3 +429,11 @@ Timestamped record of what was built during GENOHACK (Sat 24 – Sun 25 Oct 2026
   page shows the calibration error.
 - README: "AI-assisted review" section (models, held-out numbers, cards, surrounding features,
   evaluation) and AI rows in the real-vs-simulated table.
+
+## 2026-10-25 04:05 WIB — Iteration loop, batch 24: audit 3 fix
+
+- Audit 3 (docs/screenshots/20261025-0359-audit-3). The monitoring tile counted acral ridge reads on
+  non-acral lesions. Two fixes:
+  - the capture ingest now stores no acral read for non-acral sites (root cause; smoke asserts it on
+    a forearm lesion);
+  - monitoring counts acral sites only (unit test).

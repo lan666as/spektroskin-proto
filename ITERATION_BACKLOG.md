@@ -79,3 +79,20 @@ Findings and fixes:
 
 Re-ranked next items: referral summary with AI and outcome (9), visual refresh (8), demo-script
 update in PLAN §6 for the AI moments.
+
+## Audit 3 — 04:00 WIB, live site, after batches 13–23
+
+Screenshots: `docs/screenshots/20261025-0359-audit-3/` (demo script against live; full AI page at
+1440 px).
+
+- **Wrong count (fixed, batch 24):** the AI page's monitoring tile counted acral ridge reads on
+  non-acral lesions. The ingest now drops the acral read for non-acral sites, and monitoring counts
+  acral sites only.
+- **Numbers that look too good:** shadow-mode agreement shows 100 % on the smoke account, because
+  smoke and e2e reads use the generating pattern. This is labelled live and simulated. In the pitch,
+  say it shows the loop working, not model quality.
+- **Quality model by tone:** quality_v2 is lowest on Fitzpatrick IV (0.94). The page's fairness
+  note correctly speaks only about the pattern models.
+- **AI story completeness:** the demo path now shows AI within the first 15 s on the phone (AI
+  assist strip) and on the reviewer page (flags, triage card, similar lesions, findings draft).
+  The AI page closes with evidence (per tone, calibration, ablation, monitoring, data funnel).

@@ -48,9 +48,10 @@ def test_model_cards_load() -> None:
 def test_monitoring_counts_disagreements_abstentions_and_out_of_range() -> None:
     from app.api.ai import _monitoring
 
-    def capture(status, quality, pattern, ood=False, acral=None):
+    def capture(status, quality, pattern, ood=False, acral=None, site="sole"):
         return NS(
             status=status,
+            lesion=NS(body_site=site),
             result={
                 "quality_model": {"label": quality},
                 "triage_model": {"pattern": pattern, "out_of_distribution": ood},
@@ -63,11 +64,12 @@ def test_monitoring_counts_disagreements_abstentions_and_out_of_range() -> None:
             capture("processed", "good", "pigmented", acral="ridge"),
             capture("processed", "noisy", None, ood=True),
             capture("qc_failed", "glare", None),
+            capture("processed", "good", "pigmented", acral="ridge", site="forearm"),
         ]
     )
-    assert (m.captures, m.qc_passed, m.quality_disagreements) == (3, 2, 1)
+    assert (m.captures, m.qc_passed, m.quality_disagreements) == (4, 3, 1)
     assert (m.triage_abstained, m.triage_out_of_range, m.acral_ridge) == (2, 1, 1)
-    assert m.patterns == {"pigmented": 1}
+    assert m.patterns == {"pigmented": 2}
 
 
 def test_validation_export_keeps_only_eligible_cases_and_minimum_fields() -> None:

@@ -222,6 +222,7 @@ def run(base: str) -> None:
         status == 201 and generated["status"] == "processed" and generated["triage_model"],
         f"simulated capture uploads and processes: {status}",
     )
+    expect(generated["acral_model"] is None, "no acral pattern read on a forearm lesion")
     status, check = c.request("GET", f"/api/validation/{generated['id']}")
     expect(
         status == 200 and check["metrics"]["mask_dice"] > 0.8,
