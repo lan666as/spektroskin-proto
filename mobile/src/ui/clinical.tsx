@@ -7,6 +7,7 @@ import { absoluteUrl } from '@/api/config';
 
 import { Button, Card, Chips, ErrorBanner, Heading, KeyValue, Loading, Muted, Pill, Row } from './components';
 import { ACTION_LABELS, formatArea, formatDate, formatDateTime, visitDay } from './labels';
+import { ImageViewer } from './ImageViewer';
 import { SimulatedBadge } from './SimulatedBadge';
 import { colors, radius, spacing } from './theme';
 
@@ -20,7 +21,7 @@ const VIEW_OPTIONS = [
   { value: 'pigment', label: 'Pigment' },
   { value: 'vascular', label: 'Vascular' },
 ] as const;
-type ViewName = (typeof VIEW_OPTIONS)[number]['value'];
+export type ViewName = (typeof VIEW_OPTIONS)[number]['value'];
 
 const VIEW_HELP: Record<ViewName, string> = {
   standard: 'Pseudo-colour image from the blue, green and red bands.',
@@ -28,27 +29,96 @@ const VIEW_HELP: Record<ViewName, string> = {
   vascular: 'Estimated hemoglobin map (darker red = more blood).',
 };
 
-export function SpectralViews({ capture }: { capture: Capture }) {
-  const [view, setView] = useState<ViewName>('standard');
+export function SpectralViews({
+  capture,
+  caption,
+  view: controlledView,
+  onViewChange,
+}: {
+  capture: Capture;
+  /** Shown above the image and in the full-screen viewer, e.g. "Day 30 · 28.7 mm²". */
+  caption?: string;
+  view?: ViewName;
+  onViewChange?: (view: ViewName) => void;
+}) {
+  const [ownView, setOwnView] = useState<ViewName>('standard');
+  const [zoomed, setZoomed] = useState(false);
+  const view = controlledView ?? ownView;
+  const setView = onViewChange ?? setOwnView;
   const available = VIEW_OPTIONS.filter((o) => capture.views[o.value]);
   const current = capture.views[view] ? view : 'standard';
+  const uri = absoluteUrl(capture.views[current]);
+  const label = `${VIEW_OPTIONS.find((o) => o.value === current)?.label} view${caption ? ` · ${caption}` : ''}`;
   return (
     <View style={{ gap: spacing.md }} testID="spectral-views">
       <Chips options={available} value={current} onChange={setView} testIDPrefix="view" />
-      <View style={styles.imageFrame}>
-        <Image
-          source={{ uri: absoluteUrl(capture.views[current]) }}
-          style={styles.image}
-          resizeMode="contain"
-          accessibilityLabel={`${current} view (simulated)`}
-          testID={`view-image-${current}`}
-        />
+      {caption ? <Text style={styles.caption}>{caption}</Text> : null}
+      <Pressable
+        style={styles.imageFrame}
+        onPress={() => setZoomed(true)}
+        accessibilityRole="imagebutton"
+        accessibilityLabel={`${current} view (simulated), tap to enlarge`}
+      >
+        <Image source={{ uri }} style={styles.image} resizeMode="contain" testID={`view-image-${current}`} />
         <View style={styles.badgeOverlay}>
           <SimulatedBadge />
         </View>
-      </View>
+        <View style={styles.zoomHint}>
+          <Text style={styles.zoomHintText}>Tap to enlarge</Text>
+        </View>
+      </Pressable>
       <Muted>{VIEW_HELP[current]}</Muted>
+      <ImageViewer uri={zoomed ? uri : null} title={label} onClose={() => setZoomed(false)} />
     </View>
+  );
+}
+
+/** First visit next to the selected (default: latest) visit, same view, with the area change. */
+export function VisitCompare({ captures, selectedId }: { captures: Capture[]; selectedId?: string }) {
+  const [view, setView] = useState<ViewName>('standard');
+  const [zoom, setZoom] = useState<{ uri: string; title: string } | null>(null);
+  const visits = captures.filter((c) => c.status === 'processed');
+  if (visits.length < 2) return null;
+  const first = visits[0];
+  const second = visits.find((c) => c.id === selectedId && c.id !== first.id) ?? visits[visits.length - 1];
+  const change =
+    first.area_mm2 && second.area_mm2 ? ((second.area_mm2 - first.area_mm2) / first.area_mm2) * 100 : null;
+  const dayLabel = (c: Capture) => `Day ${String(visitDay(c.captured_at, first.captured_at)).padStart(2, '0')}`;
+  const viewLabel = VIEW_OPTIONS.find((o) => o.value === view)?.label;
+  return (
+    <Card testID="visit-compare">
+      <Row style={{ justifyContent: 'space-between' }}>
+        <Heading>
+          Compare {dayLabel(first)} → {dayLabel(second)}
+        </Heading>
+        <SimulatedBadge />
+      </Row>
+      <Chips options={VIEW_OPTIONS} value={view} onChange={setView} testIDPrefix="compare-view" />
+      <View style={styles.compareRow}>
+        {[first, second].map((c) => {
+          const uri = absoluteUrl(c.views[view] ?? c.views.standard);
+          const title = `${viewLabel} · ${dayLabel(c)} · ${formatArea(c.area_mm2)}`;
+          return (
+            <Pressable key={c.id} style={styles.compareCell} onPress={() => setZoom({ uri, title })}>
+              <Image source={{ uri }} style={styles.compareImage} />
+              <Text style={styles.visitDay}>{dayLabel(c)}</Text>
+              <Text style={styles.visitArea}>{formatArea(c.area_mm2)}</Text>
+              <Muted>{formatDate(c.captured_at)}</Muted>
+            </Pressable>
+          );
+        })}
+      </View>
+      {change !== null ? (
+        <View style={[styles.changePill, change > 0 ? styles.changeUp : styles.changeFlat]}>
+          <Text style={styles.changeText} testID="compare-change">
+            Area {change >= 0 ? '+' : ''}
+            {change.toFixed(0)}% ({formatArea(first.area_mm2)} → {formatArea(second.area_mm2)})
+          </Text>
+        </View>
+      ) : null}
+      <Muted>Same view, same scale. Area from automated segmentation of simulated images.</Muted>
+      <ImageViewer uri={zoom?.uri ?? null} title={zoom?.title ?? ''} onClose={() => setZoom(null)} />
+    </Card>
   );
 }
 
@@ -207,6 +277,24 @@ const styles = StyleSheet.create({
   },
   image: { width: '100%', height: '100%' },
   badgeOverlay: { position: 'absolute', top: spacing.sm, right: spacing.sm },
+  zoomHint: {
+    position: 'absolute',
+    bottom: spacing.sm,
+    right: spacing.sm,
+    backgroundColor: 'rgba(15, 23, 42, 0.6)',
+    borderRadius: radius.sm,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 2,
+  },
+  zoomHintText: { color: '#F8FAFC', fontSize: 12, fontWeight: '600' },
+  caption: { fontSize: 16, fontWeight: '700', color: colors.text },
+  compareRow: { flexDirection: 'row', gap: spacing.sm },
+  compareCell: { flex: 1, gap: 2 },
+  compareImage: { width: '100%', aspectRatio: 1, borderRadius: radius.md, backgroundColor: colors.surface },
+  changePill: { borderRadius: radius.md, padding: spacing.sm },
+  changeUp: { backgroundColor: '#FEF3C7' },
+  changeFlat: { backgroundColor: colors.surface },
+  changeText: { fontSize: 16, fontWeight: '700', color: colors.text },
   guidance: { fontSize: 15, color: colors.text },
   retake: {
     minHeight: 48,

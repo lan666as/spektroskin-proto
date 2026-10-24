@@ -58,6 +58,7 @@ test('clinician: login → patient → lesion → capture → results with histo
   await expect(history).toBeVisible();
   await expect(history.getByText(/mm²/)).toHaveCount(4); // 3 visit areas + change line
   await expect(byId(page, 'area-change')).toContainText('+');
+  await expect(byId(page, 'compare-change')).toContainText('+');
   await byId(page, 'show-validation').click();
   await expect(byId(page, 'validation-scope')).toContainText('simulated data only');
 

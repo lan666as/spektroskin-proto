@@ -45,6 +45,7 @@ test('review loop: clinician submits → dermatologist reviews → clinician see
 
   // The clinician's case page polls every 5 s.
   await expect(byId(clinician, 'recommendation-action')).toContainText('Biopsy', { timeout: 15_000 });
+  await expect(byId(clinician, 'recommendation-arrived')).toBeVisible();
   await expect(byId(clinician, 'recommendation')).toContainText('treating clinician decides');
 
   await byId(clinician, 'open-summary').click();

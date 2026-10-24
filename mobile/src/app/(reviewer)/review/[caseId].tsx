@@ -18,7 +18,7 @@ import {
   Row,
   Screen,
 } from '@/ui/components';
-import { Footnote, HistoryStrip, Recommendation, SpectralViews } from '@/ui/clinical';
+import { Footnote, HistoryStrip, Recommendation, SpectralViews, VisitCompare } from '@/ui/clinical';
 import { formatArea, formatDateTime, siteLabel, STATUS_LABELS, statusTone } from '@/ui/labels';
 import { spacing } from '@/ui/theme';
 
@@ -111,7 +111,9 @@ export default function ReviewCase() {
   const { width } = useWindowDimensions();
   const query = useQuery({ queryKey: ['review-case', caseId], queryFn: () => api.case(caseId) });
   const c = query.data;
-  const latest = c?.captures[c.captures.length - 1];
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const reviewed = c?.captures[c.captures.length - 1];
+  const latest = c?.lesion_history.find((v) => v.id === selectedId) ?? reviewed;
   const twoColumns = width >= 960;
 
   return (
@@ -122,8 +124,13 @@ export default function ReviewCase() {
       {c ? (
         <View style={{ flexDirection: twoColumns ? 'row' : 'column', gap: spacing.lg, alignItems: 'flex-start' }}>
           <View style={{ flex: twoColumns ? 3 : undefined, width: twoColumns ? undefined : '100%', gap: spacing.lg }}>
-            {latest ? <SpectralViews capture={latest} /> : null}
-            <HistoryStrip captures={c.lesion_history} currentId={latest?.id} />
+            {latest ? <SpectralViews key={latest.id} capture={latest} /> : null}
+            <HistoryStrip
+              captures={c.lesion_history}
+              currentId={latest?.id}
+              onSelect={(v) => setSelectedId(v.id)}
+            />
+            <VisitCompare captures={c.lesion_history} selectedId={reviewed?.id} />
             <Footnote />
           </View>
           <View style={{ flex: twoColumns ? 2 : undefined, width: twoColumns ? undefined : '100%', gap: spacing.lg }}>

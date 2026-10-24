@@ -3,7 +3,7 @@ import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 
 import { api } from '@/api/client';
 import { Button, Card, ErrorBanner, Heading, KeyValue, Loading, Muted, Screen } from '@/ui/components';
-import { Footnote, HistoryStrip, QCCard, SpectralViews, ValidationPanel } from '@/ui/clinical';
+import { Footnote, HistoryStrip, QCCard, SpectralViews, ValidationPanel, VisitCompare } from '@/ui/clinical';
 import { formatArea, formatDateTime, patientLabel, siteLabel } from '@/ui/labels';
 
 export default function Results() {
@@ -43,7 +43,17 @@ export default function Results() {
                 <Heading>Measurement</Heading>
                 <KeyValue label="Lesion area (outline)" value={<Muted testID="lesion-area">{formatArea(c.area_mm2)}</Muted>} />
               </Card>
-              {lesion.data ? <HistoryStrip captures={lesion.data.captures} currentId={c.id} /> : null}
+              {lesion.data ? <VisitCompare captures={lesion.data.captures} selectedId={c.id} /> : null}
+              {lesion.data ? (
+                <HistoryStrip
+                  captures={lesion.data.captures}
+                  currentId={c.id}
+                  onSelect={(v) =>
+                    v.id !== c.id &&
+                    router.push({ pathname: '/captures/[captureId]', params: { captureId: v.id } })
+                  }
+                />
+              ) : null}
               <ValidationPanel capture={c} />
               <Button
                 label="Submit for dermatologist review"

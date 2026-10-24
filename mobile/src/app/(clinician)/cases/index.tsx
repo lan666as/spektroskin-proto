@@ -5,7 +5,7 @@ import { api } from '@/api/client';
 import { Empty, ErrorBanner, ListItem, Loading, Pill, Screen } from '@/ui/components';
 import { ACTION_LABELS, STATUS_LABELS, siteLabel, statusTone } from '@/ui/labels';
 
-const POLL_MS = 5_000;
+const POLL_MS = 3_000;
 
 export default function MyCases() {
   const router = useRouter();

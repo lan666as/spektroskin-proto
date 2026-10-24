@@ -1,12 +1,15 @@
 import { useQuery } from '@tanstack/react-query';
+import { useEffect, useRef, useState } from 'react';
+import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 
 import { api } from '@/api/client';
 import { Button, Card, ErrorBanner, Heading, Loading, Muted, Pill, Row, Screen } from '@/ui/components';
-import { Footnote, HistoryStrip, Recommendation, SpectralViews } from '@/ui/clinical';
+import { Footnote, HistoryStrip, Recommendation, SpectralViews, VisitCompare } from '@/ui/clinical';
 import { formatDateTime, patientLabel, siteLabel, STATUS_LABELS, statusTone } from '@/ui/labels';
+import { colors, radius, spacing } from '@/ui/theme';
 
-const POLL_MS = 5_000;
+const POLL_MS = 2_000;
 
 export default function ClinicianCase() {
   const { caseId } = useLocalSearchParams<{ caseId: string }>();
@@ -17,7 +20,19 @@ export default function ClinicianCase() {
     refetchInterval: (q) => (q.state.data?.status === 'answered' ? false : POLL_MS),
   });
   const c = query.data;
-  const latest = c?.captures[c.captures.length - 1];
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const reviewed = c?.captures[c.captures.length - 1];
+  const latest = c?.lesion_history.find((v) => v.id === selectedId) ?? reviewed;
+  // Announce an answer that arrives while this page is open (not one that was already there).
+  const seenStatus = useRef<string | null>(null);
+  const [justAnswered, setJustAnswered] = useState(false);
+  useEffect(() => {
+    if (!c) return;
+    if (seenStatus.current && seenStatus.current !== 'answered' && c.status === 'answered') {
+      setJustAnswered(true);
+    }
+    seenStatus.current = c.status;
+  }, [c]);
 
   return (
     <Screen testID="clinician-case-screen">
@@ -28,6 +43,11 @@ export default function ClinicianCase() {
         <>
           {c.review ? (
             <>
+              {justAnswered ? (
+                <View style={styles.arrived} testID="recommendation-arrived">
+                  <Text style={styles.arrivedText}>Recommendation received just now</Text>
+                </View>
+              ) : null}
               <Recommendation review={c.review} />
               <Button
                 label="Referral summary"
@@ -40,7 +60,8 @@ export default function ClinicianCase() {
             <Card testID="awaiting-review">
               <Row>
                 <Pill label={STATUS_LABELS[c.status]} tone={statusTone(c.status)} />
-                <Muted>Waiting for the dermatologist. This page updates automatically.</Muted>
+                <ActivityIndicator color={colors.accent} />
+                <Muted>Sent. Waiting for the dermatologist; this page updates by itself.</Muted>
               </Row>
             </Card>
           )}
@@ -52,11 +73,17 @@ export default function ClinicianCase() {
             <Muted style={{ fontSize: 15 }}>{c.question}</Muted>
             <Muted>Submitted {formatDateTime(c.created_at)}</Muted>
           </Card>
-          {latest ? <SpectralViews capture={latest} /> : null}
-          <HistoryStrip captures={c.lesion_history} currentId={latest?.id} />
+          {latest ? <SpectralViews key={latest.id} capture={latest} /> : null}
+          <HistoryStrip captures={c.lesion_history} currentId={latest?.id} onSelect={(v) => setSelectedId(v.id)} />
+          <VisitCompare captures={c.lesion_history} selectedId={reviewed?.id} />
           <Footnote />
         </>
       ) : null}
     </Screen>
   );
 }
+
+const styles = StyleSheet.create({
+  arrived: { backgroundColor: colors.success, borderRadius: radius.md, padding: spacing.md },
+  arrivedText: { color: colors.onAccent, fontSize: 16, fontWeight: '700', textAlign: 'center' },
+});
