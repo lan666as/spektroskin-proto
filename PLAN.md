@@ -171,21 +171,43 @@ for the extended demo).
 Set-up: two Chrome windows, both on https://spektroskin.zidan.dev, already logged in (Chrome
 autofill). Left, ~390 px wide: clinician on lesion "PT-0007 · Left sole". Right: reviewer queue.
 
-**Core, ~60 s (track round):**
-1. (5 s) "This is the clinician's app. The optical module is simulated, the software is real."
-   Point to the Simulated badge on the device card.
-2. (10 s) Tap **Capture**: the bands cycle, and QC passes.
-3. (15 s) Switch Standard → Pigment → Vascular: outline, area 28 mm².
-4. (10 s) History strip: Day 01 18 mm² → Day 14 22 mm² → Day 30 28 mm².
-5. (5 s) Submit: "Pigmented macule on left sole, growing over 30 days. Biopsy or observe?"
-6. (10 s) Right window: case appears → open → Recommendation **Biopsy**, follow-up 14 days → Submit.
-7. (5 s) Left window: the recommendation appears. "The dermatologist recommends; the treating clinician decides."
+**Core, ~60 s (track round), revised 25 Oct 03:45 WIB to show the AI (iteration loop):**
+1. (5 s) "This is the clinician's app. The optical module is simulated; the software and the AI
+   are real." Point to the Simulated badge on the device card.
+2. (8 s) Tap **Capture**: the bands cycle, QC passes, and the learned quality model's second opinion
+   agrees.
+3. (12 s) The **AI assist** strip: "Pattern: Pigment-dominant · Acral: pigment along the furrows ·
+   10 mm² new since Day 01". Tap **AI evidence**, then **Change since Day 01**. Say "research mode,
+   trained on simulated data, never a diagnosis".
+4. (5 s) Submit with the first quick question.
+5. (15 s) Right window: the case arrives flagged **Growing**. Open it and point at:
+   - the triage card with "Why this suggestion";
+   - similar reviewed lesions.
+   Then:
+   - press **Insert measured findings**;
+   - choose pattern read Pigment-dominant, **Biopsy**, 14 days;
+   - press Send. The card says "model agrees".
+6. (5 s) Left window: the recommendation appears. "The dermatologist recommends; the treating
+   clinician decides."
+7. (10 s) Right window, **AI** tab: three models with held-out results per skin tone, the
+   RGB-vs-spectral ablation (the optics kill test), shadow-mode agreement, the validation funnel.
 
-**Extended, +60 s (Grand Final / Q&A):** start with the `pigmented_dark_glare` capture → QC fails with
-retake guidance → retake passes; then the validation panel: recovered maps vs ground truth by skin
-tone (simulated data only). The validation panel comes from overnight item 1; if that item doesn't land,
-the extended demo ends after the QC retake. Background cases: PT-0003 (answered, observe) in "My cases", PT-0005
-(submitted) in the queue.
+**Extended, +60 s (Grand Final / Q&A):**
+- Left: record the outcome (Biopsy taken → Result pending → Benign). The case now counts as
+  validation-eligible on the AI page, and **Download validation set** exports it without names or
+  codes.
+- Left, developer options: capture `acral_ridge_dark` on a new sole lesion. The acral card reads
+  "pigment follows the ridges" and shows the guideline line (prompt review).
+- `pigmented_dark_glare`: QC fails with retake guidance; retake passes; the validation panel
+  compares with ground truth.
+- Evidence to cite:
+  - `docs/evidence/ai_evaluation.md`: repeatability 100 %; the noise finding that added a QC check
+    and retrained the quality model;
+  - the three model cards.
+
+Background cases: PT-0003 (answered, observe) in "My cases", PT-0005 (submitted) in the queue.
+Seeded captures predate the AI outputs unless `scripts/reprocess_captures.py --apply` has been run
+on production (builder's decision); new captures always have them.
 
 ## 7. Seed data (synthetic, idempotent)
 
