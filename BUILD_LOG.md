@@ -121,6 +121,20 @@ Timestamped record of what was built during GENOHACK (Sat 24 – Sun 25 Oct 2026
   login, lesion thumbnails, submit button earlier on the results screen, wrapping chips.
 - Every step: gate green, deployed with scripts/deploy.sh, public smoke + Playwright 4/4.
 
+### 2026-10-24 23:54 WIB — Phone upload fix and deeper iteration (deployed after each batch)
+- Bug (reported by the builder from the phone): captures were always "saved offline". Cause: Expo
+  SDK 58 replaces global fetch with expo/fetch on native, which rejects React Native file parts
+  ({uri, name, type}) while building the body; the client classified any thrown fetch as a network
+  error. Fix: multipart upload via XMLHttpRequest (RN networking), real errors surfaced, upload
+  progress shown. Native path verified by Android bundle compile only; needs phone confirmation.
+- Spectral signature (measured reflectance per band, lesion vs skin) computed by the pipeline and
+  charted; quality and calibration details; case timeline with response time; clinician home
+  (overview, latest recommendation, search, richer patient rows); About page for judges;
+  pull-to-refresh; SpektroSkin icon set; body-map site picker; all-views side by side for
+  reviewers; browser-tab badge; case filters; acral-site flag; spacer guide; offline banner and
+  pending-upload strip; referral summary visit comparison.
+- E2E flake fixed (random patient codes collided after many runs; now picks an unused code).
+
 ## Decisions made alone
 - M1: Expo routes live in `mobile/src/app/` (SDK 58 template convention) instead of `mobile/app/`.
 - M1: web export uses `web.output: "single"` (SPA) so Caddy can serve deep links via `try_files`.
