@@ -270,7 +270,7 @@ export function ListItem({
 }
 
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: colors.background },
+  screen: { flex: 1, backgroundColor: colors.canvas },
   screenContent: {
     width: '100%',
     alignSelf: 'center',
@@ -288,6 +288,11 @@ const styles = StyleSheet.create({
     borderRadius: radius.lg,
     padding: spacing.lg,
     gap: spacing.md,
+    shadowColor: '#0F172A',
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 1,
   },
   button: {
     minHeight: touchTarget,
@@ -354,6 +359,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     borderBottomWidth: 1,
     borderBottomColor: colors.border,
+    backgroundColor: colors.background,
+    borderRadius: radius.md,
   },
   listTitle: { fontSize: 16, fontWeight: '600', color: colors.text },
 });

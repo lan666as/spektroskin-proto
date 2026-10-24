@@ -97,6 +97,7 @@ test('PLAN §6 demo script: 60 s core + extended', async ({ browser, request }) 
   await byId(clinician, 'capture-button').click();
   await expect(byId(clinician, 'qc-passed')).toBeVisible({ timeout: 30_000 });
   await expect(byId(clinician, 'qc-second-opinion')).toContainText('agrees with the rules');
+  await expect(byId(clinician, 'ai-glance-pattern')).toContainText('Pigment-dominant');
   await shot(clinician, '05-results');
   // 3: switch the three views; outline and area.
   for (const view of ['pigment', 'vascular', 'evidence', 'change', 'standard']) {

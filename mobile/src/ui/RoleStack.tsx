@@ -68,7 +68,7 @@ export function RoleStack({ role, links }: { role: User['role']; links: Link[] }
           headerStyle: { backgroundColor: colors.background },
           headerTintColor: colors.text,
           headerTitleStyle: { fontWeight: '600' },
-          contentStyle: { backgroundColor: colors.background },
+          contentStyle: { backgroundColor: colors.canvas },
         }}
       />
       {waitingUploads ? (

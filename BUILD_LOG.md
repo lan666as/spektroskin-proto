@@ -356,3 +356,9 @@ Timestamped record of what was built during GENOHACK (Sat 24 – Sun 25 Oct 2026
 - App: "Change since Day 01" view tab; the evolution row of the measurements card shows mm² new and
   receded. Tests: Day 01 → Day 30 shows 7–13 mm² of new area with the old outline still covered;
   two captures of the same lesion show < 1.5 mm² change. E2E cycles the change view.
+
+## 2026-10-25 02:53 WIB — Iteration loop, batch 16: AI at a glance, visual refresh (backlog item 8)
+
+- Results screen: "AI assist · research mode" strip right under the quality check (pattern, acral
+  pattern on acral sites, new area since Day 01), so the AI shows within the first screen of the demo.
+- Light-grey canvas with white, softly shadowed cards and list rows; white stat tiles on home.

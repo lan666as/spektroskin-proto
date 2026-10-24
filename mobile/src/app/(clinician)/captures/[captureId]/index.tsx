@@ -5,7 +5,7 @@ import { api } from '@/api/client';
 import { Button, Card, ErrorBanner, Heading, KeyValue, Loading, Muted, Screen } from '@/ui/components';
 import { Footnote, HistoryStrip, QCCard, SpectralViews, ValidationPanel, VisitCompare } from '@/ui/clinical';
 import { AutomatedAnalysis, MeasurementSummary, MorphologyCard } from '@/ui/analysis';
-import { AcralPattern, TriageSupport } from '@/ui/triage';
+import { AcralPattern, AiGlance, TriageSupport } from '@/ui/triage';
 import { QualityDetails, SpectralSignature } from '@/ui/measurement';
 import { formatArea, formatDateTime, patientLabel, siteLabel, visitDay } from '@/ui/labels';
 
@@ -45,6 +45,7 @@ export default function Results() {
           />
           {c.qc.passed ? (
             <>
+              <AiGlance capture={c} site={lesion.data?.body_site} />
               <MeasurementSummary capture={c} visits={lesion.data?.captures ?? []} />
               <SpectralViews capture={c} />
               <TriageSupport capture={c} />

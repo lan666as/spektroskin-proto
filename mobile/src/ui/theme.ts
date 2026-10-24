@@ -1,5 +1,6 @@
 export const colors = {
   background: '#FFFFFF',
+  canvas: '#F1F5F9',
   surface: '#F8FAFC',
   border: '#E2E8F0',
   text: '#0F172A',

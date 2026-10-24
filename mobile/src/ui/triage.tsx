@@ -155,6 +155,37 @@ export function AcralPattern({ capture, site }: { capture: Capture; site: BodySi
   );
 }
 
+/** One line of AI outputs right under the quality check: what the models suggest, at a glance. */
+export function AiGlance({ capture, site }: { capture: Capture; site?: BodySite }) {
+  const t = capture.triage_model;
+  if (!t) return null;
+  const acral = site && isAcral(site) ? capture.acral_model : null;
+  const change = capture.change_since_first;
+  return (
+    <View style={styles.glance} testID="ai-glance">
+      <Row style={{ justifyContent: 'space-between', flexWrap: 'wrap' }}>
+        <Text style={styles.glanceTitle}>AI assist · research mode</Text>
+        <SimulatedBadge label="Simulated training data" />
+      </Row>
+      <Text style={styles.glanceLine} testID="ai-glance-pattern">
+        Pattern: {patternSummary(t)}
+      </Text>
+      {acral ? (
+        <Text style={styles.glanceLine}>
+          Acral: pigment along the{' '}
+          {acral.pattern === 'ridge' ? 'ridges ⚠ prompt review' : acral.pattern === 'furrow' ? 'furrows' : '… (uncertain)'}
+        </Text>
+      ) : null}
+      {change ? (
+        <Text style={styles.glanceLine}>
+          Since Day 01: {change.new_area_mm2.toFixed(1)} mm² new area
+        </Text>
+      ) : null}
+      <Text style={styles.glanceNote}>Suggestions, not a diagnosis. Details and reasons below.</Text>
+    </View>
+  );
+}
+
 const styles = StyleSheet.create({
   research: {
     backgroundColor: colors.accentSoft,
@@ -172,6 +203,15 @@ const styles = StyleSheet.create({
   barValue: { width: 44, textAlign: 'right', fontSize: 14, fontWeight: '700', color: colors.text },
   link: { color: colors.accent, fontWeight: '600', paddingVertical: spacing.xs },
   why: { fontSize: 14, fontWeight: '700', color: colors.text },
+  glance: {
+    backgroundColor: colors.accentSoft,
+    borderRadius: radius.lg,
+    padding: spacing.md,
+    gap: 4,
+  },
+  glanceTitle: { fontSize: 13, fontWeight: '800', color: colors.accent, letterSpacing: 0.3 },
+  glanceLine: { fontSize: 16, fontWeight: '700', color: colors.text },
+  glanceNote: { fontSize: 12, color: colors.textMuted },
   acral: { fontSize: 18, fontWeight: '800', color: colors.text },
   agreement: { fontSize: 14, fontWeight: '700', color: colors.accent },
   guideline: { fontSize: 14, fontWeight: '600', color: colors.danger },

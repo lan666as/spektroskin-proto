@@ -124,6 +124,7 @@ const styles = StyleSheet.create({
   hello: { fontSize: 22, fontWeight: '700', color: colors.text },
   stat: {
     flex: 1,
+    backgroundColor: colors.background,
     borderWidth: 1,
     borderColor: colors.border,
     borderRadius: radius.lg,
