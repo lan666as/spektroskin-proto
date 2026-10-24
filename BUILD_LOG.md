@@ -92,6 +92,17 @@ Timestamped record of what was built during GENOHACK (Sat 24 – Sun 25 Oct 2026
   Playwright e2e 4/4 (clinician flow at 390 px, two-context review loop). Demo clinician sees seeded
   PT-0003 / PT-0005 / PT-0007; PT-0007 sole has Day 01 (18.4 mm²) and Day 14 (22.6 mm²) visits.
 
+### 2026-10-24 21:57–22:22 WIB — Phase B: overnight queue (branch `overnight`, not deployed)
+- Validation: `GET /api/validation/{capture_id}`, results-screen panel, skin-tone-stratified
+  `docs/evidence/validation_report.md` (90 clean captures; QC 90/90; blur and glare rejected 10/10
+  per tone; simulated data only, with the shared-model limitation stated).
+- Offline capture queue with sync on reconnect (native; Android bundle compiles; needs phone check).
+- Research-consent flag (Alembic 0003) and audit log page.
+- Printable referral summary (browser print / save as PDF).
+- Fix: automated-test records kept out of demo users' lists (Alembic 0004 `users.is_test`).
+- UI polish (bottom navigation on narrow screens), README, rehearsal twin PT-0009.
+- Every commit gated (pytest 41, smoke, Playwright 4/4). Details: OVERNIGHT_REPORT.md.
+
 ## Decisions made alone
 - M1: Expo routes live in `mobile/src/app/` (SDK 58 template convention) instead of `mobile/app/`.
 - M1: web export uses `web.output: "single"` (SPA) so Caddy can serve deep links via `try_files`.

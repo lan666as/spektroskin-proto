@@ -6,7 +6,56 @@ full gate before every commit; revert an item that isn't green after 2 attempts 
 
 ## Summary
 
-(filled in at the end)
+Finished 2026-10-24 22:22 WIB. Branch `overnight` is 14 commits ahead of `main` and fast-forwards onto it.
+Every commit passed the full gate (ruff, pytest against `spektroskin_test`, tsc, web export, API
+smoke, Playwright e2e). Nothing was deployed; the VPS, compose, Caddyfile and .env were not touched.
+
+| # | Item | Status | Commit | Verify in under 2 minutes |
+|---|---|---|---|---|
+| 1 | Validation endpoint, panel, stratified report | done | `c55d991`, `3c2aa64` | Open `docs/evidence/validation_report.md`; in the app, results screen → "Compare with ground truth" |
+| 2 | Longitudinal history | done in Phase A (moved to core) | `6b2821f` | Lesion PT-0007 → history strip Day 01 / 14 |
+| 3 | Offline capture queue (native) | done, **NEEDS PHONE CHECK** | `4fa48fc` | Airplane-mode steps under item 3 below |
+| 4 | Research consent + audit log page | done | `cecb336` | New patient asks Yes/No; dermatologist → "Audit log" |
+| 5 | Printable referral summary | done | `193e315` | Answered case → "Referral summary" → Print / Save as PDF |
+| — | **Fix: test traffic hidden from demo views** | done, **must merge before the demo** | `9a7ed51` | As demo dermatologist the queue shows only PT-0005 |
+| 6 | UI polish | done | `da9bd49` | At ~390 px wide, nav is a bottom bar; no header overlap |
+| 7 | README | done | `4576b6d` | Read README.md |
+| + | Rehearsal twin PT-0009 | done | `91960f8` | Patients list shows PT-0009 with the same Day 01/14 history |
+
+### Morning: merge and deploy (about 10 minutes)
+
+```bash
+git checkout main && git merge --ff-only overnight && scripts/deploy.sh
+```
+
+`deploy.sh` re-runs the full gate, applies Alembic 0003 and 0004 on API start (both additive),
+seeds PT-0009, and re-runs smoke + e2e against https://spektroskin.zidan.dev. Afterwards, log in
+as `dermatologist`: the queue should show PT-0005 only (the automated e2e case already in
+production becomes invisible to demo accounts; nothing is deleted).
+
+### NEEDS PHONE CHECK (Expo Go, same Wi-Fi: `cd mobile && npx expo start`)
+
+1. Login as `clinician`, open PT-0009 → Left sole → New capture → Capture: results with three
+   views and the history strip; images load (signed URLs over HTTPS).
+2. Submit for review; on the laptop, review as `dermatologist`; within ~5 s the phone shows it.
+3. Offline queue: steps under item 3 below.
+4. Kill and reopen the app: still logged in (SecureStore).
+
+### Notes for the morning
+
+- **Rehearse on PT-0009**, keep PT-0007 untouched for the pitch (its live capture becomes Day 30).
+- Demo passwords: `security find-generic-password -s spektroskin-demo-clinician -w` (and
+  `-dermatologist`). Web sessions are per browser tab (sessionStorage), so log in once in each of
+  the two windows; let Chrome save the passwords for one-click autofill.
+- Extended demo: on the capture screen tap "···" and pick `pigmented_dark_glare` for the QC
+  failure, then retake with `acral_dark_d30`; the validation panel is on the results screen.
+- Deck: fix slide 6 wording ("Working app and processing pipeline, end to end. The optical module
+  and its images are simulated."), plus the items in docs/context/chat-handoff.md §3. The
+  validation report gives slide-ready, honestly scoped numbers.
+- Commits use your global git email (`ahmad.zidan@traveloka.com`) in a public repo; change
+  `git config user.email` if that is not intended (history was not rewritten).
+- Cloudflare's Browser Integrity Check blocks the default Python-urllib agent (error 1010); the
+  smoke test sends a descriptive User-Agent. Browsers, curl and Android (okhttp) are unaffected.
 
 ## Item 1 — Validation
 
