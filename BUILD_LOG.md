@@ -477,3 +477,13 @@ Timestamped record of what was built during GENOHACK (Sat 24 – Sun 25 Oct 2026
   withdrawn). The patient page has a Yes/No consent control. Withdrawal removes the cases from the
   validation set at once, because eligibility is computed live. Smoke and e2e cover it. PLAN §6:
   set PT-0007 consent to Yes before the demo.
+
+## 2026-10-25 04:41 WIB — Iteration loop, batch 28: assumptions-tested evidence page
+
+- `docs/evidence/assumptions_tested.md`: eleven assumptions with the test, the result, the verdict
+  (including the two that failed or partly failed: the dark-skin gap and the noise QC gap) and the
+  source file; plus what was deliberately not tested. Linked from the README. Correction before
+  commit: the first draft overstated the worst-case map correlation; it now quotes the validation
+  report exactly.
+- About page evidence card: four AI rows (triage held-out, RGB-vs-spectral, repeatability, noise
+  finding).

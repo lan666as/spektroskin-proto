@@ -31,6 +31,10 @@ const EVIDENCE = [
   ['Lesion outline overlap (Dice)', '≥ 0.96'],
   ['Area error vs truth', '≤ 7.8 %'],
   ['Growth series 18 → 22 → 28 mm²', 'measured 18.4 → 22.6 → 28.7 mm²'],
+  ['AI triage, held-out simulated lesions', '98 % (Fitzpatrick V: 96 %)'],
+  ['RGB bands only vs + NIR and spectral maps', '95 % vs 98 % (the optics kill test)'],
+  ['Same lesion captured 10 times, same AI answer', '100 % (12 phantoms)'],
+  ['Heavy sensor noise caught by QC', 'failed at first; fixed tonight (noise check)'],
 ];
 
 export default function About() {
@@ -85,8 +89,8 @@ export default function About() {
           </View>
         ))}
         <Muted>
-          This checks that the processing math recovers known ground truth under noise, LED drift and
-          hand motion. The simulator and pipeline share one simplified optical model, so it is not
+          This checks that the processing math and the models behave as intended under noise, LED
+          drift and hand motion. The simulator and pipeline share one simplified optical model, so it is not
           clinical validation. Next: bench tests on physical phantoms, then ethics-approved imaging.
         </Muted>
       </Card>
