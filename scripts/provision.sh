@@ -36,5 +36,5 @@ create smoke-clinician clinician "Smoke Test Clinician" smoke-clinician --test-u
 create smoke-dermatologist dermatologist "Smoke Test Dermatologist" smoke-dermatologist --test-user
 api_exec -m scripts.seed
 # Builder-approved one-off (25 Oct 2026): remove the demo lesions the batch-25 seed attached to the
-# builder's PT-0011. Dry run on this deploy; --apply on the next; idempotent after that.
-api_exec -m scripts.remove_seed_leak
+# builder's PT-0011. Dry run ran on live-38; applied from live-39; idempotent after that.
+api_exec -m scripts.remove_seed_leak --apply
