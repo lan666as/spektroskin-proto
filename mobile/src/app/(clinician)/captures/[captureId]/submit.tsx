@@ -4,6 +4,7 @@ import { useState } from 'react';
 
 import { api } from '@/api/client';
 import { Button, Card, Chips, ErrorBanner, Field, Muted, Screen } from '@/ui/components';
+import { measuredFindings } from '@/ui/analysis';
 import { formatArea } from '@/ui/labels';
 
 const QUICK_QUESTIONS = [
@@ -18,6 +19,16 @@ export default function SubmitForReview() {
   const queryClient = useQueryClient();
   const capture = useQuery({ queryKey: ['capture', captureId], queryFn: () => api.capture(captureId) });
   const [question, setQuestion] = useState('');
+  const lesionId = capture.data?.lesion_id;
+  const lesion = useQuery({
+    queryKey: ['lesion', lesionId],
+    queryFn: () => api.lesion(lesionId!),
+    enabled: !!lesionId,
+  });
+  const draft =
+    capture.data && lesion.data
+      ? `${measuredFindings(capture.data, lesion.data.captures, lesion.data.body_site, true)} Biopsy, observe or refer?`
+      : null;
 
   const submit = useMutation({
     mutationFn: () =>
@@ -47,6 +58,14 @@ export default function SubmitForReview() {
           onChange={(i) => setQuestion(QUICK_QUESTIONS[Number(i)])}
           testIDPrefix="quick-question"
         />
+        {draft ? (
+          <Button
+            label="Draft the question from the measurements"
+            variant="secondary"
+            onPress={() => setQuestion(draft)}
+            testID="draft-question"
+          />
+        ) : null}
         <Field
           label="Question for the dermatologist"
           value={question}

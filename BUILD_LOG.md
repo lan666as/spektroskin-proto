@@ -529,3 +529,9 @@ Timestamped record of what was built during GENOHACK (Sat 24 – Sun 25 Oct 2026
 - Roadmap: Tier 2 lists the new measurements, registered change and ugly-duckling flag; Tier 3a
   shadow-mode validation and Tier 4 ablation are now marked "Research mode · simulated data"
   (both implemented tonight); Tier 3b (suspicion for biopsy) stays "Not active"; tiers in order.
+
+## 2026-10-25 05:21 WIB — Iteration loop, batch 33: draft the question from the measurements
+
+- Submit screen: "Draft the question from the measurements" fills the question with size, growth,
+  asymmetry and border and the research-mode AI suggestions (labelled), ending "Biopsy, observe or
+  refer?"; editable. Demo e2e asserts the draft.

@@ -121,6 +121,8 @@ test('PLAN §6 demo script: 60 s core + extended', async ({ browser, request }) 
   await expect(byId(clinician, 'compare-change')).toContainText('+');
   // 5: submit.
   await byId(clinician, 'submit-for-review').click();
+  await byId(clinician, 'draft-question').click();
+  await expect(byId(clinician, 'case-question')).toHaveValue(/Measured .* AI pattern suggestion \(research mode\): pigmented/);
   await byId(clinician, 'quick-question-0').click();
   await byId(clinician, 'submit-case').click();
   await expect(byId(clinician, 'awaiting-review')).toBeVisible();
