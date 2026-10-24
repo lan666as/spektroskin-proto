@@ -3,6 +3,7 @@
 import pytest
 
 from app.processing import run
+from app.processing.triage_model import predict
 from simulator.device import capture, factory_profile
 from simulator.phantoms import ground_truth, spec_by_id
 
@@ -46,3 +47,12 @@ def test_growth_series_border_becomes_less_regular() -> None:
         return run(capture(spec, ground_truth(spec)), PROFILE).morphology["border_irregularity"]
 
     assert border("acral_dark_d01") < border("acral_dark_d30")
+
+
+def test_withholds_a_suggestion_outside_the_training_range() -> None:
+    spec = spec_by_id("pigmented_light")
+    result = run(capture(spec, ground_truth(spec)), PROFILE)
+    assert result.triage_model["out_of_distribution"] is False
+    # A device that reported five times the pigment would be far from anything trained on.
+    shifted = predict(result.reflectance, result.melanin * 5, result.hemoglobin, result.mask)
+    assert shifted["out_of_distribution"] is True and shifted["pattern"] is None

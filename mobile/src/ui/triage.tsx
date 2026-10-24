@@ -18,6 +18,7 @@ export const PATTERN_LABELS = {
 } as const;
 
 export function patternSummary(t: Triage): string {
+  if (t.out_of_distribution) return 'Outside the training range: no suggestion';
   return t.pattern ? PATTERN_LABELS[t.pattern] : 'Uncertain: dermatologist decides';
 }
 
@@ -89,7 +90,8 @@ export function TriageSupport({ capture, read }: { capture: Capture; read?: stri
       ) : null}
       <Muted>
         Model confidence across the three patterns, from the pigment and blood maps. Below{' '}
-        {Math.round(t.abstain_below * 100)}% it abstains. On held-out simulated lesions it answered{' '}
+        {Math.round(t.abstain_below * 100)}% it abstains, and it gives no suggestion for captures
+        unlike anything it was trained on. On held-out simulated lesions it answered{' '}
         {Math.round(t.held_out_coverage * 100)}% of the time and was right on{' '}
         {Math.round(t.held_out_accuracy_when_answered * 100)}% of those. Trained on {t.trained_on}: it
         does not say whether a lesion is benign or malignant, and is not validated on real skin.

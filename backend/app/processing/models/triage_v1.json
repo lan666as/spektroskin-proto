@@ -82,8 +82,9 @@
   -4.83717255,
   6.69943842
  ],
- "trained_at": "2026-10-24 17:42 UTC",
- "trained_from_commit": "4465576",
+ "ood_norm": 7.2031,
+ "trained_at": "2026-10-24 19:27 UTC",
+ "trained_from_commit": "690c4ec",
  "data": "synthetic phantoms only; train and test lesions generated from disjoint seeds",
  "metrics": {
   "spectral": {
@@ -173,7 +174,8 @@
       140
      ]
     ]
-   }
+   },
+   "held_out_ood_rate": 0.009
   },
   "rgb_only": {
    "n_features": 6,

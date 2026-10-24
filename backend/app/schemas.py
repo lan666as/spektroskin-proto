@@ -172,6 +172,9 @@ class TriageOpinion(BaseModel):
     held_out_coverage: float
     trained_on: str
     drivers: list[TriageDriver] = []
+    out_of_distribution: bool = Field(
+        default=False, description="Features outside the training range: no suggestion given"
+    )
 
 
 class AcralOpinion(BaseModel):

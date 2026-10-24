@@ -329,3 +329,13 @@ Timestamped record of what was built during GENOHACK (Sat 24 – Sun 25 Oct 2026
 - `scripts/reprocess_captures.py` (dry run by default) adds the newer outputs to captures from
   before batch 2. Verified on the local dev database (195 updated, 0 skipped, idempotent). Not run
   on production: it is a backfill and needs the builder's go-ahead.
+
+## 2026-10-25 02:30 WIB — Iteration loop, batch 13: referral summary and out-of-distribution guard
+
+- Referral summary (printable) now carries the outcome and histopathology, automated measurements
+  (area, size, asymmetry, border, pigment variation), attention flags, the AI suggestions labelled
+  research mode with the dermatologist's own pattern read, and the evidence view (backlog item 9).
+- Triage model out-of-distribution guard: captures whose standardised features lie beyond the
+  99.5th percentile of training norms (> 7.20) get no suggestion ("outside the training range");
+  0.9 % of held-out simulated lesions were withheld. Same weights (deterministic retrain); the
+  model card documents the guard. Test: a 5× pigment shift is withheld.

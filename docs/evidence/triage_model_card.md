@@ -1,6 +1,6 @@
 # Model card: lesion-pattern triage model `triage_v1` (research mode)
 
-Trained 2026-10-24 17:42 UTC on top of commit `4465576` with
+Trained 2026-10-24 19:27 UTC on top of commit `690c4ec` with
 `uv run python -m scripts.train_triage_model` (deterministic).
 
 ## What it does
@@ -38,6 +38,13 @@ Confusion (rows = true, columns = predicted: pigmented, vascular, mixed):
 - pigmented: [148, 0, 0]
 - vascular: [0, 147, 0]
 - mixed: [10, 0, 140]
+
+## Out-of-distribution guard
+A capture whose standardised features lie further from the training centre than
+99.5 % of training captures (norm > 7.20) gets no suggestion: "outside
+the training range". 0.9% of held-out simulated
+lesions were withheld this way. This is what should happen first when real-module images differ
+from the simulator.
 
 ## Ablation: RGB bands only vs RGB + NIR + spectral maps (the optics kill test, on simulated data)
 | Arm | Features | Held-out accuracy | Answered | Accuracy when answered |

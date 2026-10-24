@@ -46,7 +46,7 @@ Score = judge impact (1–5) × 2 − risk (1–5) − effort (S=1, M=2, L=3). D
 | 6 | "Follow-ups due" and "needs outcome" on the clinician home | 4 | 2 | S | 5 | done (batch 4) |
 | 7 | "Data for validation" page: how consented, reviewed, histopathology-confirmed cases would feed the future validation set (counts, eligibility rules) | 4 | 2 | M | 4 | done (batch 8, AI & validation page) |
 | 8 | Visual refresh: light-gray canvas with white cards, initials avatars, compact device card | 3 | 2 | M | 2 | todo |
-| 9 | Referral summary: add measurements, automated-analysis notes and the outcome | 3 | 1 | S | 4 | todo |
+| 9 | Referral summary: add measurements, automated-analysis notes and the outcome | 3 | 1 | S | 4 | done (batch 13) |
 | 10 | Reviewer case card: change since Day 01 and diameter next to area | 3 | 1 | S | 4 | done (batch 1) |
 
 ## Audit 2 — 02:12 WIB, live site, after batches 2–11

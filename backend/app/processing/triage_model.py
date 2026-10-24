@@ -90,9 +90,12 @@ def predict(
     p = probabilities(x, w)
     best = int(np.argmax(p))
     held_out = w["metrics"]["spectral"]["held_out"]
+    z = (x - np.array(w["mean"])) / np.array(w["scale"])
+    outside = bool(np.linalg.norm(z) > w["ood_norm"])
     return {
         "model": w["version"],
-        "pattern": None if p[best] < ABSTAIN_BELOW else w["classes"][best],
+        "pattern": None if outside or p[best] < ABSTAIN_BELOW else w["classes"][best],
+        "out_of_distribution": outside,
         "probabilities": {c: round(float(v), 4) for c, v in zip(w["classes"], p, strict=True)},
         "abstain_below": ABSTAIN_BELOW,
         "held_out_accuracy_when_answered": held_out["accuracy_when_answered"],
@@ -100,7 +103,7 @@ def predict(
         "trained_on": "simulated phantoms only",
         "drivers": drivers(x, w, best),
         # Standardised features: the vector similar-case retrieval compares.
-        "embedding": [round(float(v), 4) for v in (x - np.array(w["mean"])) / np.array(w["scale"])],
+        "embedding": [round(float(v), 4) for v in z],
     }
 
 

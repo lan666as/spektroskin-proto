@@ -1307,6 +1307,12 @@ export interface components {
              * @default []
              */
             drivers: components["schemas"]["TriageDriver"][];
+            /**
+             * Out Of Distribution
+             * @description Features outside the training range: no suggestion given
+             * @default false
+             */
+            out_of_distribution: boolean;
         };
         /** UserOut */
         UserOut: {

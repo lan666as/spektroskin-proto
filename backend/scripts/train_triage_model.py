@@ -24,6 +24,7 @@ from simulator.device import capture, factory_profile
 from simulator.phantoms import TONE_FITZPATRICK, PhantomSpec, ground_truth
 
 N_TRAIN, N_TEST = 900, 450
+OOD_PERCENTILE = 99.5
 TONES = ("light", "medium", "dark")
 # Overlapping strength ranges per pattern, so weak mixed lesions look pigmented: real ambiguity.
 PIGMENT = {"pigmented": (0.3, 2.0), "mixed": (0.2, 1.4)}
@@ -126,6 +127,14 @@ def main() -> None:
             "held_out": evaluate(scaler, model, x_test, y_test, tones_test),
         }
 
+    # Out-of-distribution guard: a capture whose standardised features lie further from the
+    # training centre than 99.5 % of training captures gets no suggestion.
+    scaler = arms["spectral"][0]
+    norms_train = np.linalg.norm(scaler.transform(np.array([r[0] for r in train])), axis=1)
+    norms_test = np.linalg.norm(scaler.transform(np.array([r[0] for r in test])), axis=1)
+    ood_norm = float(np.percentile(norms_train, OOD_PERCENTILE))
+    metrics["spectral"]["held_out_ood_rate"] = round(float((norms_test > ood_norm).mean()), 4)
+
     commit = subprocess.run(
         ["git", "rev-parse", "--short", "HEAD"], capture_output=True, text=True, check=False
     ).stdout.strip()
@@ -133,6 +142,7 @@ def main() -> None:
         "version": "triage_v1",
         "classes": list(CLASSES),
         **export(*arms["spectral"]),
+        "ood_norm": round(ood_norm, 4),
         "trained_at": f"{datetime.now(UTC):%Y-%m-%d %H:%M} UTC",
         "trained_from_commit": commit,
         "data": "synthetic phantoms only; train and test lesions generated from disjoint seeds",
@@ -212,6 +222,13 @@ Accuracy **{s["accuracy"]:.2f}** on all held-out lesions. With abstention it ans
 Confusion (rows = true, columns = predicted: pigmented, vascular, mixed):
 
 {conf}
+
+## Out-of-distribution guard
+A capture whose standardised features lie further from the training centre than
+{OOD_PERCENTILE} % of training captures (norm > {w["ood_norm"]:.2f}) gets no suggestion: "outside
+the training range". {w["metrics"]["spectral"]["held_out_ood_rate"]:.1%} of held-out simulated
+lesions were withheld this way. This is what should happen first when real-module images differ
+from the simulator.
 
 ## Ablation: RGB bands only vs RGB + NIR + spectral maps (the optics kill test, on simulated data)
 | Arm | Features | Held-out accuracy | Answered | Accuracy when answered |
