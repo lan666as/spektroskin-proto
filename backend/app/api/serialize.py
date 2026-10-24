@@ -17,7 +17,9 @@ from app.schemas import (
 )
 
 
-def lesion_out(lesion: Lesion, viewer: User | None = None) -> LesionOut:
+def lesion_out(
+    lesion: Lesion, viewer: User | None = None, looks_different: bool = False
+) -> LesionOut:
     captures = lesion.captures
     processed = [c for c in captures if c.status == "processed"]
     return LesionOut(
@@ -27,6 +29,7 @@ def lesion_out(lesion: Lesion, viewer: User | None = None) -> LesionOut:
         laterality=lesion.laterality,
         created_at=lesion.created_at,
         capture_count=len(captures),
+        looks_different=looks_different,
         last_captured_at=captures[-1].captured_at if captures else None,
         latest_thumbnail_url=sign_image_url(processed[-1].id, "standard", viewer.id)
         if viewer and processed

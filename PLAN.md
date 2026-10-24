@@ -217,6 +217,7 @@ on production (builder's decision); new captures always have them.
 | PT-0005 | 29 F | IV | forearm | `vascular_medium` | submitted (queue) |
 | PT-0007 | 54 F | V | sole | `acral_dark_d01` (now − 29 d), `acral_dark_d14` (now − 16 d) | none; the live demo creates it |
 | PT-0009 | 54 F | V | sole | same as PT-0007 (rehearsal twin, added overnight) | none; rehearse on this one |
+| PT-0011 | 47 F | IV | upper back L, upper back R, chest, lower back R | `pigmented_medium`, `pigmented_light`, `pigmented_dark` (now − 40 d), `mixed_medium` (now − 3 d) | none; shows the "looks different" (ugly duckling) flag on the lower-back lesion |
 
 Users: `clinician` ("dr. Demo Clinician", role clinician), `dermatologist` ("dr. Demo Dermatologist,
 Sp.D.V.E.", role dermatologist). No real people or institutions appear in seed data.

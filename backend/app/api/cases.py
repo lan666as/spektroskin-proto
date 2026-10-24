@@ -10,7 +10,7 @@ from app import audit
 from app.api.serialize import case_detail, case_summary
 from app.auth import Clinician, CurrentUser, Dermatologist, same_group, sign_image_url
 from app.db import get_session
-from app.models import Capture, Case, Lesion, Outcome, Review, User, utcnow
+from app.models import Capture, Case, Lesion, Outcome, Patient, Review, User, utcnow
 from app.schemas import (
     CaseCreate,
     CaseDetail,
@@ -25,7 +25,10 @@ router = APIRouter(prefix="/cases", tags=["cases"])
 SessionDep = Annotated[Session, Depends(get_session)]
 
 _LOAD = (
-    selectinload(Case.lesion).selectinload(Lesion.patient),
+    selectinload(Case.lesion)
+    .selectinload(Lesion.patient)
+    .selectinload(Patient.lesions)
+    .selectinload(Lesion.captures),
     selectinload(Case.lesion).selectinload(Lesion.captures),
     selectinload(Case.captures),
     selectinload(Case.review).selectinload(Review.reviewer),

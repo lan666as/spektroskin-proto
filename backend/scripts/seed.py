@@ -45,6 +45,7 @@ class SeedPatient:
     laterality: str | None
     captures: tuple[SeedCapture, ...]
     case: SeedCase | None
+    lesion_key: str = "lesion"  # a further lesion of the same patient needs its own key
 
 
 SEED = (
@@ -78,6 +79,15 @@ SEED = (
         (SeedCapture("acral_dark_d01", 29), SeedCapture("acral_dark_d14", 16)),
         None,
     ),
+    # Several lesions on one patient: three alike and one that looks different (ugly duckling).
+    SeedPatient("PT-0011", 47, "female", "IV", "upper_back", "left",
+                (SeedCapture("pigmented_medium", 40),), None, lesion_key="lesion-upper-back-left"),
+    SeedPatient("PT-0011", 47, "female", "IV", "upper_back", "right",
+                (SeedCapture("pigmented_light", 40),), None, lesion_key="lesion-upper-back-right"),
+    SeedPatient("PT-0011", 47, "female", "IV", "chest", "midline",
+                (SeedCapture("pigmented_dark", 40),), None, lesion_key="lesion-chest"),
+    SeedPatient("PT-0011", 47, "female", "IV", "lower_back", "right",
+                (SeedCapture("mixed_medium", 3),), None, lesion_key="lesion-lower-back"),
 )  # fmt: skip
 
 
@@ -112,7 +122,7 @@ def seed_patient(session: Session, spec: SeedPatient, clinician: User, reviewer:
         session.add(patient)
         session.flush()
 
-    lesion_id = _id(spec.code, "lesion")
+    lesion_id = _id(spec.code, spec.lesion_key)
     lesion = session.get(Lesion, lesion_id)
     if lesion is None:
         lesion = Lesion(
@@ -171,7 +181,7 @@ def main() -> int:
         for spec in SEED:
             seed_patient(session, spec, clinician, reviewer)
         session.commit()
-    print(f"seeded {len(SEED)} patients (idempotent)")
+    print(f"seeded {len({s.code for s in SEED})} patients (idempotent)")
     return 0
 
 

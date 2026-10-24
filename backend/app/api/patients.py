@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session, selectinload
 
 from app import audit
 from app.api.serialize import lesion_out
+from app.attention import looks_different
 from app.auth import Clinician, CurrentUser, same_group, sign_image_url
 from app.db import get_session
 from app.models import Lesion, Patient
@@ -70,10 +71,11 @@ def get_patient(patient_id: uuid.UUID, user: CurrentUser, session: SessionDep) -
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Patient not found")
     audit.record(session, user, "read", "patient", patient.id)
     session.commit()
+    different = looks_different(patient.lesions)
     return PatientDetail(
         **PatientOut.model_validate(patient).model_dump(),
         lesions=[
-            lesion_out(lesion, user)
+            lesion_out(lesion, user, lesion.id in different)
             for lesion in sorted(patient.lesions, key=lambda x: x.created_at)
         ],
     )

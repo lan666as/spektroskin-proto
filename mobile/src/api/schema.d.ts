@@ -664,7 +664,7 @@ export interface components {
              * @description Named criteria worth the dermatologist's attention; not a score
              * @default []
              */
-            attention_flags: ("ridge_pattern" | "growing" | "border_change" | "ai_unsure")[];
+            attention_flags: ("ridge_pattern" | "growing" | "border_change" | "looks_different" | "ai_unsure")[];
             /** Captures */
             captures: components["schemas"]["CaptureOut"][];
             /** Lesion History */
@@ -720,7 +720,7 @@ export interface components {
              * @description Named criteria worth the dermatologist's attention; not a score
              * @default []
              */
-            attention_flags: ("ridge_pattern" | "growing" | "border_change" | "ai_unsure")[];
+            attention_flags: ("ridge_pattern" | "growing" | "border_change" | "looks_different" | "ai_unsure")[];
         };
         /**
          * ChangeSinceFirst
@@ -857,6 +857,12 @@ export interface components {
              * @default 0
              */
             capture_count: number;
+            /**
+             * Looks Different
+             * @description Stands out from the patient's other lesions (ugly duckling)
+             * @default false
+             */
+            looks_different: boolean;
             /** Last Captured At */
             last_captured_at?: string | null;
             /**
@@ -897,6 +903,12 @@ export interface components {
              * @default 0
              */
             capture_count: number;
+            /**
+             * Looks Different
+             * @description Stands out from the patient's other lesions (ugly duckling)
+             * @default false
+             */
+            looks_different: boolean;
             /** Last Captured At */
             last_captured_at?: string | null;
             /**

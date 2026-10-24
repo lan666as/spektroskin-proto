@@ -35,7 +35,7 @@ ReviewAction = Literal["observe", "biopsy", "refer"]
 OutcomeAction = Literal["observed", "biopsied", "excised", "referred", "declined"]
 Histopathology = Literal["pending", "benign", "malignant", "indeterminate"]
 PatternRead = Literal["pigmented", "vascular", "mixed", "unsure"]
-AttentionFlag = Literal["ridge_pattern", "growing", "border_change", "ai_unsure"]
+AttentionFlag = Literal["ridge_pattern", "growing", "border_change", "looks_different", "ai_unsure"]
 ViewName = Literal["standard", "pigment", "vascular", "evidence", "change"]
 
 PatientCode = Annotated[str, StringConstraints(pattern=r"^PT-\d{4}$")]
@@ -92,6 +92,9 @@ class LesionOut(ORM):
     laterality: Laterality | None
     created_at: datetime
     capture_count: int = 0
+    looks_different: bool = Field(
+        default=False, description="Stands out from the patient's other lesions (ugly duckling)"
+    )
     last_captured_at: datetime | None = None
     latest_thumbnail_url: str | None = Field(
         default=None, description="Signed standard view of the latest processed visit"

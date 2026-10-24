@@ -437,3 +437,17 @@ Timestamped record of what was built during GENOHACK (Sat 24 – Sun 25 Oct 2026
   - the capture ingest now stores no acral read for non-acral sites (root cause; smoke asserts it on
     a forearm lesion);
   - monitoring counts acral sites only (unit test).
+
+## 2026-10-25 04:14 WIB — Iteration loop, batch 25: ugly-duckling sign
+
+- `attention.looks_different`: with ≥ 3 measured lesions on a patient, a lesion whose mean
+  distance to the others in the triage feature space is ≥ 1.6× the median of theirs and ≥ 2.5 is
+  flagged as "looks different" (ugly duckling sign).
+  - Shown on the patient page (pill and note).
+  - Also a queue attention flag.
+  - `LesionOut.looks_different` (additive).
+- Seed: PT-0011 (47 F, IV) with three alike pigmented lesions and one mixed lesion on the lower
+  back. Additive and idempotent: the seed gained a per-lesion key; existing ids are unchanged.
+  PLAN §7 updated.
+- Tests: unit (needs 3 lesions, flags only a clear outlier); new e2e spec builds such a patient as
+  the smoke user and checks only the lower-back lesion is flagged.

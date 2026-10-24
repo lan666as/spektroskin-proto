@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
-import { Image } from 'react-native';
+import { Image, View } from 'react-native';
 
 import { absoluteUrl } from '@/api/config';
 
@@ -14,6 +14,9 @@ import {
   KeyValue,
   ListItem,
   Loading,
+  Muted,
+  Pill,
+  Row,
   Screen,
 } from '@/ui/components';
 import { formatDate, siteLabel } from '@/ui/labels';
@@ -51,16 +54,30 @@ export default function PatientScreen() {
               }
               onPress={() => router.push({ pathname: '/lesions/[lesionId]', params: { lesionId: lesion.id } })}
               right={
-                lesion.latest_thumbnail_url ? (
-                  <Image
-                    source={{ uri: absoluteUrl(lesion.latest_thumbnail_url) }}
-                    style={{ width: 56, height: 56, borderRadius: 8 }}
-                  />
-                ) : undefined
+                <Row>
+                  {lesion.looks_different ? (
+                    <View testID={`looks-different-${lesion.body_site}`}>
+                      <Pill label="Looks different" tone="danger" />
+                    </View>
+                  ) : null}
+                  {lesion.latest_thumbnail_url ? (
+                    <Image
+                      source={{ uri: absoluteUrl(lesion.latest_thumbnail_url) }}
+                      style={{ width: 56, height: 56, borderRadius: 8 }}
+                    />
+                  ) : null}
+                </Row>
               }
               testID={`lesion-${lesion.body_site}`}
             />
           ))}
+          {p.lesions.some((l) => l.looks_different) ? (
+            <Muted testID="ugly-duckling-note">
+              "Looks different": this lesion stands out from the patient's other lesions by its pigment
+              and blood statistics (the ugly duckling sign). Automated comparison, research mode; the
+              dermatologist interprets it.
+            </Muted>
+          ) : null}
           <Button
             label="Add lesion"
             variant="secondary"

@@ -3,7 +3,7 @@
 from datetime import UTC, datetime, timedelta
 from types import SimpleNamespace as NS
 
-from app.attention import attention_flags
+from app.attention import attention_flags, looks_different
 
 T0 = datetime(2026, 10, 1, tzinfo=UTC)
 
@@ -23,7 +23,9 @@ def _capture(i, day, area, border, triage="pigmented", acral=None, status="proce
 
 
 def _case(site, history):
-    return NS(captures=[history[-1]], lesion=NS(body_site=site, captures=history))
+    lesion = NS(id="lesion", body_site=site, captures=history)
+    lesion.patient = NS(lesions=[lesion])
+    return NS(captures=[history[-1]], lesion=lesion)
 
 
 def test_growing_acral_ridge_lesion_with_border_change() -> None:
@@ -40,3 +42,17 @@ def test_model_abstaining_is_flagged() -> None:
     assert attention_flags(_case("chest", [_capture(1, 0, 20.0, 1.2, triage=None)])) == [
         "ai_unsure"
     ]
+
+
+def _lesion(i, embedding):
+    capture = NS(
+        status="processed", captured_at=T0, result={"triage_model": {"embedding": embedding}}
+    )
+    return NS(id=i, captures=[capture])
+
+
+def test_ugly_duckling_needs_three_lesions_and_a_clear_outlier() -> None:
+    moles = [_lesion("a", [0, 0]), _lesion("b", [1, 0]), _lesion("c", [0, 1])]
+    assert looks_different(moles) == set()
+    assert looks_different([*moles, _lesion("odd", [6, 6])]) == {"odd"}
+    assert looks_different([moles[0], _lesion("odd", [6, 6])]) == set()

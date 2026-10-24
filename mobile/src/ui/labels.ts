@@ -114,6 +114,11 @@ export const FLAG_LABELS: Record<AttentionFlag, { label: string; why: string; to
     why: 'Border became less regular since the first visit.',
     tone: 'info',
   },
+  looks_different: {
+    label: 'Looks different',
+    why: "Stands out from this patient's other lesions by pigment and blood statistics (ugly duckling sign).",
+    tone: 'danger',
+  },
   ai_unsure: {
     label: 'AI unsure',
     why: 'The triage model abstained: no pattern suggestion for this lesion.',
