@@ -89,6 +89,9 @@ class LesionOut(ORM):
     created_at: datetime
     capture_count: int = 0
     last_captured_at: datetime | None = None
+    latest_thumbnail_url: str | None = Field(
+        default=None, description="Signed standard view of the latest processed visit"
+    )
 
 
 class PatientDetail(PatientOut):

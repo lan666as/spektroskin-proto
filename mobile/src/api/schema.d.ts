@@ -64,7 +64,7 @@ export interface paths {
         };
         /**
          * List Patients
-         * @description Clinicians see the patients they registered; dermatologists see all.
+         * @description Clinicians see the patients they registered; dermatologists see their user group's.
          */
         get: operations["list_patients_api_patients_get"];
         put?: never;
@@ -176,7 +176,8 @@ export interface paths {
         };
         /**
          * List Cases
-         * @description Dermatologists: the review queue (all cases). Clinicians: cases they submitted.
+         * @description Dermatologists: the review queue (all cases from their user group). Clinicians: cases they
+         *     submitted.
          */
         get: operations["list_cases_api_cases_get"];
         put?: never;
@@ -548,6 +549,11 @@ export interface components {
             capture_count: number;
             /** Last Captured At */
             last_captured_at?: string | null;
+            /**
+             * Latest Thumbnail Url
+             * @description Signed standard view of the latest processed visit
+             */
+            latest_thumbnail_url?: string | null;
             patient: components["schemas"]["PatientOut"];
             /** Captures */
             captures: components["schemas"]["CaptureOut"][];
@@ -583,6 +589,11 @@ export interface components {
             capture_count: number;
             /** Last Captured At */
             last_captured_at?: string | null;
+            /**
+             * Latest Thumbnail Url
+             * @description Signed standard view of the latest processed visit
+             */
+            latest_thumbnail_url?: string | null;
         };
         /** PatientCreate */
         PatientCreate: {

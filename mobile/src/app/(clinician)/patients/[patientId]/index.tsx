@@ -1,5 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
+import { Image } from 'react-native';
+
+import { absoluteUrl } from '@/api/config';
 
 import { api } from '@/api/client';
 import {
@@ -47,6 +50,14 @@ export default function PatientScreen() {
                   : 'No captures yet'
               }
               onPress={() => router.push({ pathname: '/lesions/[lesionId]', params: { lesionId: lesion.id } })}
+              right={
+                lesion.latest_thumbnail_url ? (
+                  <Image
+                    source={{ uri: absoluteUrl(lesion.latest_thumbnail_url) }}
+                    style={{ width: 56, height: 56, borderRadius: 8 }}
+                  />
+                ) : undefined
+              }
               testID={`lesion-${lesion.body_site}`}
             />
           ))}

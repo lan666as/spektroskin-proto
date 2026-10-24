@@ -3,8 +3,14 @@ import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { useState } from 'react';
 
 import { api } from '@/api/client';
-import { Button, Card, ErrorBanner, Field, Muted, Screen } from '@/ui/components';
+import { Button, Card, Chips, ErrorBanner, Field, Muted, Screen } from '@/ui/components';
 import { formatArea } from '@/ui/labels';
+
+const QUICK_QUESTIONS = [
+  'Pigmented lesion that has grown since the first visit. Biopsy or observe?',
+  'Please advise: observe, biopsy or refer?',
+  'Changed in size and colour. Is referral needed?',
+] as const;
 
 export default function SubmitForReview() {
   const { captureId } = useLocalSearchParams<{ captureId: string }>();
@@ -34,6 +40,13 @@ export default function SubmitForReview() {
           Sends this capture ({formatArea(capture.data?.area_mm2)}) and the lesion history to a
           dermatologist for a second look.
         </Muted>
+        <Chips
+          label="Quick question (tap to use, then edit if needed)"
+          options={QUICK_QUESTIONS.map((q, i) => ({ value: String(i), label: q }))}
+          value={null}
+          onChange={(i) => setQuestion(QUICK_QUESTIONS[Number(i)])}
+          testIDPrefix="quick-question"
+        />
         <Field
           label="Question for the dermatologist"
           value={question}

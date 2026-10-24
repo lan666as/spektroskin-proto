@@ -300,6 +300,8 @@ const styles = StyleSheet.create({
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
   chip: {
     minHeight: 40,
+    maxWidth: '100%',
+    paddingVertical: spacing.xs,
     paddingHorizontal: spacing.md,
     borderRadius: radius.md,
     borderWidth: 1,
@@ -308,7 +310,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
   },
   chipSelected: { backgroundColor: colors.accent, borderColor: colors.accent },
-  chipText: { fontSize: 15, color: colors.text },
+  chipText: { fontSize: 15, color: colors.text, flexShrink: 1 },
   chipTextSelected: { color: colors.onAccent, fontWeight: '600' },
   pill: { borderRadius: 999, paddingHorizontal: spacing.sm, paddingVertical: 3, alignSelf: 'flex-start' },
   pillText: { fontSize: 12, fontWeight: '700' },

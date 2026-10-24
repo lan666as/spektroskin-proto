@@ -4,7 +4,7 @@ import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { api } from '@/api/client';
 import { Button, Card, ErrorBanner, Heading, KeyValue, Loading, Muted, Screen } from '@/ui/components';
 import { Footnote, HistoryStrip, QCCard, SpectralViews, ValidationPanel, VisitCompare } from '@/ui/clinical';
-import { formatArea, formatDateTime, patientLabel, siteLabel } from '@/ui/labels';
+import { formatArea, formatDateTime, patientLabel, siteLabel, visitDay } from '@/ui/labels';
 
 export default function Results() {
   const { captureId } = useLocalSearchParams<{ captureId: string }>();
@@ -17,10 +17,14 @@ export default function Results() {
     enabled: !!lesionId,
   });
   const c = capture.data;
+  const firstVisit = lesion.data?.captures.find((v) => v.status === 'processed');
+  const day = c && firstVisit && c.qc.passed ? visitDay(c.captured_at, firstVisit.captured_at) : null;
+  const submit = () =>
+    c && router.push({ pathname: '/captures/[captureId]/submit', params: { captureId: c.id } });
 
   return (
     <Screen testID="results-screen">
-      <Stack.Screen options={{ title: 'Results' }} />
+      <Stack.Screen options={{ title: day ? `Results · Day ${String(day).padStart(2, '0')}` : 'Results' }} />
       <ErrorBanner error={capture.error ?? lesion.error} />
       {capture.isPending ? <Loading /> : null}
       {c ? (
@@ -44,6 +48,7 @@ export default function Results() {
                 <KeyValue label="Lesion area (outline)" value={<Muted testID="lesion-area">{formatArea(c.area_mm2)}</Muted>} />
               </Card>
               {lesion.data ? <VisitCompare captures={lesion.data.captures} selectedId={c.id} /> : null}
+              <Button label="Submit for dermatologist review" onPress={submit} testID="submit-for-review" />
               {lesion.data ? (
                 <HistoryStrip
                   captures={lesion.data.captures}
@@ -55,13 +60,6 @@ export default function Results() {
                 />
               ) : null}
               <ValidationPanel capture={c} />
-              <Button
-                label="Submit for dermatologist review"
-                onPress={() =>
-                  router.push({ pathname: '/captures/[captureId]/submit', params: { captureId: c.id } })
-                }
-                testID="submit-for-review"
-              />
             </>
           ) : (
             <SpectralViews capture={c} />

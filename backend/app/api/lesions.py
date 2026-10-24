@@ -38,7 +38,7 @@ def get_lesion(lesion_id: uuid.UUID, user: CurrentUser, session: SessionDep) -> 
     audit.record(session, user, "read", "lesion", lesion.id)
     session.commit()
     return LesionDetail(
-        **lesion_out(lesion).model_dump(),
+        **lesion_out(lesion, user).model_dump(),
         patient=PatientOut.model_validate(lesion.patient),
         captures=[capture_out(c, user) for c in lesion.captures],
     )

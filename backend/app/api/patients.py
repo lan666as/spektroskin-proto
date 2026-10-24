@@ -61,6 +61,7 @@ def get_patient(patient_id: uuid.UUID, user: CurrentUser, session: SessionDep) -
     return PatientDetail(
         **PatientOut.model_validate(patient).model_dump(),
         lesions=[
-            lesion_out(lesion) for lesion in sorted(patient.lesions, key=lambda x: x.created_at)
+            lesion_out(lesion, user)
+            for lesion in sorted(patient.lesions, key=lambda x: x.created_at)
         ],
     )

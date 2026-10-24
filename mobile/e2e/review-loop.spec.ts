@@ -42,6 +42,7 @@ test('review loop: clinician submits → dermatologist reviews → clinician see
   await byId(reviewer, 'follow-up-14').click();
   await byId(reviewer, 'send-review').click();
   await expect(byId(reviewer, 'recommendation')).toBeVisible();
+  await expect(byId(reviewer, 'review-sent')).toContainText('Smoke Test Clinician');
 
   // The clinician's case page polls every 5 s.
   await expect(byId(clinician, 'recommendation-action')).toContainText('Biopsy', { timeout: 15_000 });

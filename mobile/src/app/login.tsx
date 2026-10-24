@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 import { useSession } from '@/api/session';
-import { Button, Card, ErrorBanner, Field, Muted, Screen, Title } from '@/ui/components';
+import { Button, Card, Chips, ErrorBanner, Field, Muted, Screen, Title } from '@/ui/components';
 import { SimulatedBadge } from '@/ui/SimulatedBadge';
 import { colors, spacing } from '@/ui/theme';
 
@@ -38,6 +38,16 @@ export default function Login() {
         <SimulatedBadge label="Research prototype · optical module simulated" />
       </View>
       <Card>
+        <Chips
+          label="Sign in as"
+          options={[
+            { value: 'clinician', label: 'Clinician' },
+            { value: 'dermatologist', label: 'Dermatologist' },
+          ]}
+          value={username === 'clinician' || username === 'dermatologist' ? username : null}
+          onChange={setUsername}
+          testIDPrefix="role"
+        />
         <Field
           label="Username"
           value={username}

@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Stack, useLocalSearchParams } from 'expo-router';
+import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { useState } from 'react';
-import { useWindowDimensions, View } from 'react-native';
+import { Text, useWindowDimensions, View } from 'react-native';
 
 import { api, type CaseDetail, type ReviewAction } from '@/api/client';
 import {
@@ -20,7 +20,7 @@ import {
 } from '@/ui/components';
 import { Footnote, HistoryStrip, Recommendation, SpectralViews, VisitCompare } from '@/ui/clinical';
 import { formatArea, formatDateTime, siteLabel, STATUS_LABELS, statusTone } from '@/ui/labels';
-import { spacing } from '@/ui/theme';
+import { colors, radius, spacing } from '@/ui/theme';
 
 const ACTIONS = [
   { value: 'observe', label: 'Observe' },
@@ -34,8 +34,16 @@ const FOLLOW_UP = [
   { value: 'none', label: 'None' },
 ] as const;
 type FollowUp = (typeof FOLLOW_UP)[number]['value'];
+// Phrases the dermatologist can tap to start the impression, then edit. Typed by the human
+// reviewer's choice; nothing here is generated from the images.
+const PHRASES = [
+  'Irregular pigment with growth between visits.',
+  'Acral site; change in size over 30 days.',
+  'Stable appearance compared with earlier visits.',
+  'Vascular pattern visible on the hemoglobin map.',
+] as const;
 
-function ReviewForm({ caseId }: { caseId: string }) {
+function ReviewForm({ caseId, onSent }: { caseId: string; onSent: () => void }) {
   const queryClient = useQueryClient();
   const [impression, setImpression] = useState('');
   const [action, setAction] = useState<ReviewAction | null>(null);
@@ -51,6 +59,7 @@ function ReviewForm({ caseId }: { caseId: string }) {
       }),
     onSuccess: (updated) => {
       queryClient.setQueryData(['review-case', caseId], updated);
+      onSent();
       queryClient.invalidateQueries({ queryKey: ['queue'] });
       queryClient.invalidateQueries({ queryKey: ['answered'] });
     },
@@ -66,6 +75,15 @@ function ReviewForm({ caseId }: { caseId: string }) {
         maxLength={2000}
         placeholder="What you see and why"
         testID="review-impression"
+      />
+      <Chips
+        label="Add a phrase"
+        options={PHRASES.map((phrase, i) => ({ value: String(i), label: phrase }))}
+        value={null}
+        onChange={(i) =>
+          setImpression((current) => (current.trim() ? `${current.trim()} ` : '') + PHRASES[Number(i)])
+        }
+        testIDPrefix="phrase"
       />
       <Chips label="Recommended action" options={ACTIONS} value={action} onChange={setAction} testIDPrefix="action" />
       <Chips label="Follow-up" options={FOLLOW_UP} value={followUp} onChange={setFollowUp} testIDPrefix="follow-up" />
@@ -115,6 +133,8 @@ export default function ReviewCase() {
   const reviewed = c?.captures[c.captures.length - 1];
   const latest = c?.lesion_history.find((v) => v.id === selectedId) ?? reviewed;
   const twoColumns = width >= 960;
+  const router = useRouter();
+  const [justSent, setJustSent] = useState(false);
 
   return (
     <Screen wide testID="review-case-screen">
@@ -135,7 +155,24 @@ export default function ReviewCase() {
           </View>
           <View style={{ flex: twoColumns ? 2 : undefined, width: twoColumns ? undefined : '100%', gap: spacing.lg }}>
             <CaseInfo c={c} />
-            {c.review ? <Recommendation review={c.review} /> : <ReviewForm caseId={c.id} />}
+            {c.review ? (
+              <>
+                {justSent ? (
+                  <View
+                    style={{ backgroundColor: colors.success, borderRadius: radius.md, padding: spacing.md }}
+                    testID="review-sent"
+                  >
+                    <Text style={{ color: colors.onAccent, fontWeight: '700', fontSize: 16 }}>
+                      Sent to {c.requested_by}. It appears on their screen within seconds.
+                    </Text>
+                  </View>
+                ) : null}
+                <Recommendation review={c.review} />
+                <Button label="Back to queue" variant="secondary" onPress={() => router.navigate('/review')} />
+              </>
+            ) : (
+              <ReviewForm caseId={c.id} onSent={() => setJustSent(true)} />
+            )}
           </View>
         </View>
       ) : null}
