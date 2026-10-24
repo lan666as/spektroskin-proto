@@ -549,3 +549,12 @@ Timestamped record of what was built during GENOHACK (Sat 24 – Sun 25 Oct 2026
   AI page, AI roadmap). The triage and acral card badges were still clipped at 390 px (the batch-12
   fix wrapped inside a row without a width); they now sit on their own wrapping line. Checked by a
   screenshot of the card at 390 px.
+
+## 2026-10-25 05:45 WIB — Iteration loop: summary written
+
+- ITERATION_BACKLOG.md summary covers:
+  - how to test (web, phone);
+  - decisions needed from the builder (run AI on seeded visits, PT-0007 consent, the PT-0011 seed
+    mistake, the Dependabot advisories);
+  - what changed, with screenshot folders;
+  - phone checks, the updated demo script, deck and Q&A lines on the AI, and known limits.
