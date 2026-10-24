@@ -132,6 +132,8 @@ export const api = {
   review: (caseId: string, body: ReviewCreate) => post<CaseDetail>(`/cases/${caseId}/review`, body),
   similarCases: (caseId: string) => get<Schemas['SimilarCase'][]>(`/cases/${caseId}/similar`),
   validationSet: () => get<Schemas['ValidationSet']>('/ai/validation-set'),
+  setConsent: (patientId: string, research_consent: boolean) =>
+    put<Patient>(`/patients/${patientId}/consent`, { research_consent }),
   aiSummary: () => get<Schemas['AISummary']>('/ai/summary'),
   simulateCapture: (body: Schemas['SimulatedCaptureIn']) => post<SimulatedCapture>('/simulator/captures', body),
   recordOutcome: (caseId: string, body: OutcomeIn) => put<CaseDetail>(`/cases/${caseId}/outcome`, body),

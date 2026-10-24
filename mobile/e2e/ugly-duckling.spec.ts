@@ -56,4 +56,10 @@ test('ugly duckling: the lesion unlike the others is flagged', async ({ page, re
   await expect(byId(page, 'looks-different-lower_back')).toBeVisible();
   await expect(byId(page, 'looks-different-chest')).toHaveCount(0);
   await expect(byId(page, 'ugly-duckling-note')).toContainText('ugly duckling');
+
+  // Consent given later, from the patient page.
+  await byId(page, 'patient-consent-yes').click();
+  await expect
+    .poll(async () => (await (await request.get(`/api/patients/${patient.id}`, { headers })).json()).research_consent)
+    .toBe(true);
 });

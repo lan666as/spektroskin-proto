@@ -457,3 +457,23 @@ Timestamped record of what was built during GENOHACK (Sat 24 – Sun 25 Oct 2026
 - `GET /patients` items carry `lesion_flags` (growing ≥ 20 % since the first visit; looks different
   from the patient's other lesions). Clinician home lists up to five with the reason and links to
   the lesion. Unit test; the ugly-duckling e2e checks the card.
+
+## 2026-10-25 04:33 WIB — Iteration loop, batch 27: seed collision fixed forward; consent can change
+
+- **Mistake (batch 25), reported, not reverted:** production already had a patient PT-0011 (the
+  builder's own test patient, 31 F, VI). The seed looked patients up by code, so the deploy
+  attached four seeded lesions with one capture each to that patient. Nothing was deleted or
+  overwritten.
+  - Lesions: b8b27005-f046-5d95-be70-a42f8dda3d00, 1a5ae85a-0f71-5384-aa7d-47d41a4c105b,
+    b7b42ec0-1206-5bdd-b132-5fddfe49328a, 08375ce7-c6fc-540d-8b52-a7e1b036c2f0.
+  - Captures: 9979d285-be2f-5d79-84d5-9f0a1fc113f0, 9101ba4e-76d2-50cb-8108-3e697358dcdb,
+    e18c0e31-be4a-563f-9669-08d373b5aaa3, 85996485-5f4f-546f-b13e-f14241a0a5e9.
+  - Removing them is a production delete, so it is left for the builder.
+- Fix forward:
+  - the multi-lesion demo patient moves to PT-0091;
+  - the seed now skips any code held by a patient with different age, sex or Fitzpatrick type
+    (DB test added).
+- `PUT /api/patients/{id}/consent` (registering clinician, idempotent, audited as given or
+  withdrawn). The patient page has a Yes/No consent control. Withdrawal removes the cases from the
+  validation set at once, because eligibility is computed live. Smoke and e2e cover it. PLAN §6:
+  set PT-0007 consent to Yes before the demo.

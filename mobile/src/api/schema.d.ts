@@ -94,6 +94,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/patients/{patient_id}/consent": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Update Consent
+         * @description Research consent given later or withdrawn, by the clinician who registered the patient.
+         *     Idempotent. Withdrawal removes the patient's cases from the validation set and its export.
+         */
+        put: operations["update_consent_api_patients__patient_id__consent_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/lesions": {
         parameters: {
             query?: never;
@@ -750,6 +771,11 @@ export interface components {
             lesion: number;
             /** Skin */
             skin: number;
+        };
+        /** ConsentUpdate */
+        ConsentUpdate: {
+            /** Research Consent */
+            research_consent: boolean;
         };
         /** DataFlywheel */
         DataFlywheel: {
@@ -1746,6 +1772,41 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["PatientDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    update_consent_api_patients__patient_id__consent_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                patient_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ConsentUpdate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PatientOut"];
                 };
             };
             /** @description Validation Error */

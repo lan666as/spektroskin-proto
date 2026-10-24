@@ -162,6 +162,13 @@ def run(base: str) -> None:
         body={"code": "bad", "age": 50, "sex": "female", "fitzpatrick": "V"},
     )
     expect(status == 422, f"POST /patients validates code: {status}")
+    status, consented = c.request(
+        "PUT", f"/api/patients/{patient['id']}/consent", body={"research_consent": True}
+    )
+    expect(
+        status == 200 and consented["research_consent"] is True,
+        f"PUT /patients/{{id}}/consent: {status}",
+    )
     status, patients = c.request("GET", "/api/patients")
     expect(status == 200 and any(p["id"] == patient["id"] for p in patients), "GET /patients")
 

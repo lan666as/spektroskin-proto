@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { Image, View } from 'react-native';
 
@@ -8,6 +8,7 @@ import { api } from '@/api/client';
 import {
   Button,
   Card,
+  Chips,
   Empty,
   ErrorBanner,
   Heading,
@@ -26,6 +27,14 @@ export default function PatientScreen() {
   const router = useRouter();
   const patient = useQuery({ queryKey: ['patient', patientId], queryFn: () => api.patient(patientId) });
   const p = patient.data;
+  const queryClient = useQueryClient();
+  const consent = useMutation({
+    mutationFn: (value: boolean) => api.setConsent(patientId, value),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['patient', patientId] });
+      queryClient.invalidateQueries({ queryKey: ['patients'] });
+    },
+  });
 
   return (
     <Screen testID="patient-screen">
@@ -39,7 +48,17 @@ export default function PatientScreen() {
             <KeyValue label="Age" value={`${p.age} years`} />
             <KeyValue label="Sex" value={p.sex === 'female' ? 'Female' : 'Male'} />
             <KeyValue label="Fitzpatrick" value={p.fitzpatrick} />
-            <KeyValue label="Research consent" value={p.research_consent ? 'Yes' : 'No'} />
+            <Chips
+              label="Research consent (use of this patient's reviewed cases for validation)"
+              options={[
+                { value: 'yes', label: 'Yes' },
+                { value: 'no', label: 'No' },
+              ]}
+              value={p.research_consent ? 'yes' : 'no'}
+              onChange={(v) => consent.mutate(v === 'yes')}
+              testIDPrefix="patient-consent"
+            />
+            <ErrorBanner error={consent.error} />
           </Card>
           <Heading>Lesions</Heading>
           {p.lesions.length === 0 ? <Empty>No lesions recorded yet.</Empty> : null}

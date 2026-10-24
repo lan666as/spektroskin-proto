@@ -80,13 +80,13 @@ SEED = (
         None,
     ),
     # Several lesions on one patient: three alike and one that looks different (ugly duckling).
-    SeedPatient("PT-0011", 47, "female", "IV", "upper_back", "left",
+    SeedPatient("PT-0091", 47, "female", "IV", "upper_back", "left",
                 (SeedCapture("pigmented_medium", 40),), None, lesion_key="lesion-upper-back-left"),
-    SeedPatient("PT-0011", 47, "female", "IV", "upper_back", "right",
+    SeedPatient("PT-0091", 47, "female", "IV", "upper_back", "right",
                 (SeedCapture("pigmented_light", 40),), None, lesion_key="lesion-upper-back-right"),
-    SeedPatient("PT-0011", 47, "female", "IV", "chest", "midline",
+    SeedPatient("PT-0091", 47, "female", "IV", "chest", "midline",
                 (SeedCapture("pigmented_dark", 40),), None, lesion_key="lesion-chest"),
-    SeedPatient("PT-0011", 47, "female", "IV", "lower_back", "right",
+    SeedPatient("PT-0091", 47, "female", "IV", "lower_back", "right",
                 (SeedCapture("mixed_medium", 3),), None, lesion_key="lesion-lower-back"),
 )  # fmt: skip
 
@@ -111,6 +111,14 @@ def _frames(phantom_id: str) -> dict[str, bytes]:
 
 def seed_patient(session: Session, spec: SeedPatient, clinician: User, reviewer: User) -> None:
     patient = session.scalar(select(Patient).where(Patient.code == spec.code))
+    if patient is not None and (patient.age, patient.sex, patient.fitzpatrick) != (
+        spec.age,
+        spec.sex,
+        spec.fitzpatrick,
+    ):
+        # Someone else's patient already holds this code: never attach seed data to it.
+        print(f"skip {spec.code} ({spec.lesion_key}): code taken by a different patient")
+        return
     if patient is None:
         patient = Patient(
             code=spec.code,

@@ -108,6 +108,10 @@ class LesionFlag(BaseModel):
     flag: Literal["growing", "looks_different"]
 
 
+class ConsentUpdate(BaseModel):
+    research_consent: bool
+
+
 class PatientListItem(PatientOut):
     lesion_count: int = 0
     lesion_flags: list[LesionFlag] = Field(

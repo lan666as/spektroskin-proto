@@ -12,7 +12,14 @@ from app.attention import lesion_flags, looks_different
 from app.auth import Clinician, CurrentUser, same_group, sign_image_url
 from app.db import get_session
 from app.models import Lesion, Patient
-from app.schemas import LesionFlag, PatientCreate, PatientDetail, PatientListItem, PatientOut
+from app.schemas import (
+    ConsentUpdate,
+    LesionFlag,
+    PatientCreate,
+    PatientDetail,
+    PatientListItem,
+    PatientOut,
+)
 
 router = APIRouter(prefix="/patients", tags=["patients"])
 SessionDep = Annotated[Session, Depends(get_session)]
@@ -90,3 +97,19 @@ def get_patient(patient_id: uuid.UUID, user: CurrentUser, session: SessionDep) -
             for lesion in sorted(patient.lesions, key=lambda x: x.created_at)
         ],
     )
+
+
+@router.put("/{patient_id}/consent", response_model=PatientOut)
+def update_consent(
+    patient_id: uuid.UUID, body: ConsentUpdate, user: Clinician, session: SessionDep
+) -> Patient:
+    """Research consent given later or withdrawn, by the clinician who registered the patient.
+    Idempotent. Withdrawal removes the patient's cases from the validation set and its export."""
+    patient = session.get(Patient, patient_id)
+    if patient is None or patient.created_by != user.id:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Patient not found")
+    patient.research_consent = body.research_consent
+    audit.record(session, user, "consent_given" if body.research_consent else "consent_withdrawn",
+                 "patient", patient.id)  # fmt: skip
+    session.commit()
+    return patient
