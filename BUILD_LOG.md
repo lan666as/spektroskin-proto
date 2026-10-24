@@ -242,3 +242,21 @@ Timestamped record of what was built during GENOHACK (Sat 24 – Sun 25 Oct 2026
   with change since Day 01; values are shown individually and never summed into a score.
 - Tests: drivers name the expected chromophores; border irregularity rises across the acral growth
   series. E2E asserts the card, the drivers, and that no numeric score appears.
+
+## 2026-10-25 01:20 WIB — Iteration loop, batch 6: every capture is a new simulated capture (builder request)
+
+- `POST /api/simulator/captures` (server-side virtual module): returns a fresh frame set for a
+  lesion. Each lesion keeps a stable simulated identity seeded from its id (pattern, size, shape,
+  growth rate), tone from the patient's Fitzpatrick type, acral from the body site; growing lesions
+  get larger with days since the first capture. Every call draws new noise and hand motion. About
+  1 in 10 captures of a generated lesion is blurred or has glare (never twice in a row, never for
+  automated test accounts, whose checks must stay deterministic). Lesions on a catalogue growth
+  series continue the series (Day 01 → 14 → 30).
+- Phantom ids `gen-<hash>-<tone><acral>-d<day>[-variant]` rebuild their ground truth, so
+  `GET /validation` works on generated captures.
+- App: VirtualCaptureDevice defaults to "auto" (asks the server simulator, then uploads through the
+  normal capture path); offline it falls back to the bundled frame sets and the upload queue; the
+  developer picker still selects a fixed phantom.
+- Smoke: simulate → download frames → upload → processed with triage → validation.
+- Phone: frames are attached by URL (React Native downloads them when sending the multipart
+  request). NEEDS PHONE CHECK.

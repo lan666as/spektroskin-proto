@@ -7,7 +7,7 @@ import { api, ApiError } from '@/api/client';
 import { uploadCapture } from '@/api/uploadCapture';
 import type { FrameName } from '@/device/CaptureDevice';
 import { PHANTOMS } from '@/device/phantoms.generated';
-import { captureDevice } from '@/device/VirtualCaptureDevice';
+import { AUTO, captureDevice } from '@/device/VirtualCaptureDevice';
 import { useSync } from '@/sync/SyncProvider';
 import { Button, Card, Chips, ErrorBanner, Heading, Muted, Row, Screen } from '@/ui/components';
 import { patientLabel, siteLabel } from '@/ui/labels';
@@ -40,6 +40,7 @@ export default function CaptureScreen() {
     setFrames({});
     let frameSet;
     try {
+      captureDevice.aimAt(lesionId);
       frameSet = await captureDevice.capture((progress) => {
         setPhase({ kind: 'capturing', index: progress.index, total: progress.total });
         if (progress.state === 'firing') {
@@ -89,7 +90,8 @@ export default function CaptureScreen() {
           <SimulatedBadge />
         </Row>
         <Muted>
-          Device {status.deviceId}. Frames come from synthetic phantoms, not a real optical module.
+          Device {status.deviceId}. Each capture is a new synthetic frame set of this lesion (fresh
+          noise and hand motion), not a real optical module.
         </Muted>
       </Card>
 
@@ -118,7 +120,10 @@ export default function CaptureScreen() {
         <Card>
           <Muted>Developer: phantom returned by the virtual module</Muted>
           <Chips
-            options={PHANTOMS.map((p) => ({ value: p.id, label: p.id }))}
+            options={[
+              { value: AUTO, label: 'auto: new simulated capture of this lesion' },
+              ...PHANTOMS.map((p) => ({ value: p.id, label: p.id })),
+            ]}
             value={phantom}
             onChange={(id) => {
               captureDevice.selectPhantom(id);

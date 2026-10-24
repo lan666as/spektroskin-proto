@@ -7,6 +7,7 @@ sets (never ground truth) into the app bundle and writes the TypeScript asset in
 """
 
 import argparse
+import io
 import json
 import shutil
 from pathlib import Path
@@ -69,20 +70,25 @@ PREVIEW_SIZE = 128
 DARK_DISPLAY_FULL_SCALE = 8000.0
 
 
+def preview_png(name: str, raw: np.ndarray, dark: np.ndarray) -> bytes:
+    """Small colourised 8-bit preview of one raw frame for the capture animation."""
+    raw, dark = raw.astype(np.float64), dark.astype(np.float64)
+    if name == "dark":
+        level = np.clip(raw / DARK_DISPLAY_FULL_SCALE, 0, 1)  # LEDs off: stays near black
+    else:
+        signal = np.clip(raw - dark, 0, None)
+        level = np.clip(signal / max(np.percentile(signal, 99.5), 1.0), 0, 1) ** 0.8
+    image = (level[..., None] * np.array(PREVIEW_RGB[name])).astype(np.uint8)
+    out = io.BytesIO()
+    Image.fromarray(image).resize((PREVIEW_SIZE, PREVIEW_SIZE), Image.LANCZOS).save(out, "PNG")
+    return out.getvalue()
+
+
 def write_previews(phantom_dir: Path) -> None:
-    """Small colourised 8-bit previews of each raw frame for the capture animation."""
-    dark = decode_png16((phantom_dir / "dark.png").read_bytes()).astype(np.float64)
-    for name, rgb in PREVIEW_RGB.items():
-        raw = decode_png16((phantom_dir / f"{name}.png").read_bytes()).astype(np.float64)
-        if name == "dark":
-            level = np.clip(raw / DARK_DISPLAY_FULL_SCALE, 0, 1)  # LEDs off: stays near black
-        else:
-            signal = np.clip(raw - dark, 0, None)
-            level = np.clip(signal / max(np.percentile(signal, 99.5), 1.0), 0, 1) ** 0.8
-        image = (level[..., None] * np.array(rgb)).astype(np.uint8)
-        Image.fromarray(image).resize((PREVIEW_SIZE, PREVIEW_SIZE), Image.LANCZOS).save(
-            phantom_dir / f"preview_{name}.png"
-        )
+    dark = decode_png16((phantom_dir / "dark.png").read_bytes())
+    for name in PREVIEW_RGB:
+        raw = decode_png16((phantom_dir / f"{name}.png").read_bytes())
+        (phantom_dir / f"preview_{name}.png").write_bytes(preview_png(name, raw, dark))
 
 
 def export_to_mobile(mobile: Path, out: Path = OUT) -> None:

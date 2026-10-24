@@ -9,3 +9,8 @@ export async function loadFrame(module: number, name: FrameName): Promise<FrameP
   const uri = asset.localUri ?? asset.uri;
   return { uri, name: `${name}.png`, type: 'image/png' };
 }
+
+/** Native: React Native downloads the URL itself when it sends the multipart request. */
+export async function loadRemoteFrame(url: string, name: FrameName): Promise<FramePart> {
+  return { uri: url, name: `${name}.png`, type: 'image/png' };
+}

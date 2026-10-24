@@ -4,7 +4,7 @@ from fastapi.responses import JSONResponse
 from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
 
-from app.api import audit, auth, captures, cases, images, lesions, patients, validation
+from app.api import audit, auth, captures, cases, images, lesions, patients, simulator, validation
 from app.config import get_settings
 from app.db import get_engine
 
@@ -36,6 +36,6 @@ def health():
     return {"status": "ok", "database": "ok"}
 
 
-for module in (auth, patients, lesions, captures, cases, images, validation, audit):
+for module in (auth, patients, lesions, captures, cases, images, validation, audit, simulator):
     api.include_router(module.router)
 app.include_router(api)

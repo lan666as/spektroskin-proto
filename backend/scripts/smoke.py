@@ -193,6 +193,38 @@ def run(base: str) -> None:
         f"POST /captures (glare) fails QC with guidance: {status}",
     )
 
+    status, arm = c.request(
+        "POST", "/api/lesions", body={"patient_id": patient["id"], "body_site": "forearm"}
+    )
+    expect(status == 201, f"POST /lesions (second lesion): {status}")
+    status, sim = c.request("POST", "/api/simulator/captures", body={"lesion_id": arm["id"]})
+    expect(
+        status == 200 and sim["phantom_id"].startswith("gen-"),
+        f"POST /simulator/captures: {status}",
+    )
+    sim_frames = {}
+    for name, url in sim["frames"].items():
+        status, png = c.request("GET", url, raw=True)
+        expect(status == 200 and png[:4] == b"\x89PNG", f"GET simulated frame {name}: {status}")
+        sim_frames[name] = png
+    form = {
+        "id": str(uuid.uuid4()),
+        "lesion_id": arm["id"],
+        "captured_at": datetime.now(UTC).isoformat(),
+        "device_id": "virtual-001",
+        "phantom_id": sim["phantom_id"],
+    }
+    status, generated = c.request("POST", "/api/captures", form=form, files=sim_frames)
+    expect(
+        status == 201 and generated["status"] == "processed" and generated["triage_model"],
+        f"simulated capture uploads and processes: {status}",
+    )
+    status, check = c.request("GET", f"/api/validation/{generated['id']}")
+    expect(
+        status == 200 and check["metrics"]["mask_dice"] > 0.8,
+        f"GET /validation for a generated lesion: {status}",
+    )
+
     status, got = c.request("GET", f"/api/captures/{capture_id}")
     expect(status == 200 and got["area_mm2"] > 0, f"GET /captures/{{id}}: {status}")
     status, png = c.request("GET", got["views"]["pigment"], raw=True)

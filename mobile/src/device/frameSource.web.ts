@@ -8,3 +8,9 @@ export async function loadFrame(module: number, name: FrameName): Promise<FrameP
   if (!response.ok) throw new Error(`Could not read simulated frame ${name}`);
   return response.blob();
 }
+
+export async function loadRemoteFrame(url: string, name: FrameName): Promise<FramePart> {
+  const response = await fetch(url);
+  if (!response.ok) throw new Error(`Could not read simulated frame ${name}`);
+  return response.blob();
+}

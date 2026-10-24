@@ -24,11 +24,13 @@ from app.processing.optics import BANDS, FRAME_SIZE
 from app.processing.validation import compare
 from app.schemas import ValidationOut
 from app.storage import ObjectNotFound, get_storage, raw_frame_key
+from simulator.lesions import spec_from_id
+from simulator.phantoms import ground_truth
 
 router = APIRouter(prefix="/validation", tags=["validation"])
 
 # phantom_id arrives from the client at upload time: only ids of this shape may name a file.
-_PHANTOM_ID = re.compile(r"^[a-z0-9_]{1,64}$")
+_PHANTOM_ID = re.compile(r"^[a-z0-9_-]{1,64}$")
 SCOPE = (
     "Compares recovered maps with the known ground truth of a synthetic phantom. Validates the "
     "processing math on simulated data only; it is not clinical validation."
@@ -38,6 +40,15 @@ SCOPE = (
 def _ground_truth(phantom_id: str | None) -> dict[str, np.ndarray] | None:
     if not phantom_id or not _PHANTOM_ID.match(phantom_id):
         return None
+    generated = spec_from_id(phantom_id)
+    if generated is not None:
+        gt = ground_truth(generated)
+        return {
+            "melanin": gt.melanin,
+            "hemoglobin": gt.hemoglobin,
+            "mask": gt.mask,
+            "area_mm2": np.float64(gt.area_mm2),
+        }
     path = get_settings().simulator_dir / "ground_truth" / f"{phantom_id}.npz"
     if not path.is_file():
         return None

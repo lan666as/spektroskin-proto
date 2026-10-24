@@ -299,6 +299,49 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/simulator/captures": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Simulate Capture
+         * @description Same lesion, new capture: the lesion keeps its simulated identity (pattern, shape, growth),
+         *     each capture draws new noise and hand motion, and now and then a blurred or glare capture
+         *     (never for automated test accounts, whose checks must be deterministic).
+         */
+        post: operations["simulate_capture_api_simulator_captures_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/simulator/frames/{token}/{file}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Simulated Frame
+         * @description Unauthenticated on purpose: React Native attaches a multipart file part by downloading its
+         *     URL without our auth header. The frames are synthetic and the token is a random 128-bit id.
+         */
+        get: operations["simulated_frame_api_simulator_frames__token___file__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -934,6 +977,36 @@ export interface components {
              * Format: date-time
              */
             created_at: string;
+        };
+        /** SimulatedCaptureIn */
+        SimulatedCaptureIn: {
+            /**
+             * Lesion Id
+             * Format: uuid
+             */
+            lesion_id: string;
+            /** Phantom Id */
+            phantom_id?: string | null;
+        };
+        /** SimulatedCaptureOut */
+        SimulatedCaptureOut: {
+            /** Phantom Id */
+            phantom_id: string;
+            /** Description */
+            description: string;
+            /**
+             * Simulated
+             * @default true
+             */
+            simulated: boolean;
+            /** Frames */
+            frames: {
+                [key: string]: string;
+            };
+            /** Previews */
+            previews: {
+                [key: string]: string;
+            };
         };
         /** SpectralSignature */
         SpectralSignature: {
@@ -1622,6 +1695,69 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["AuditEventOut"][];
                 };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    simulate_capture_api_simulator_captures_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SimulatedCaptureIn"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SimulatedCaptureOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    simulated_frame_api_simulator_frames__token___file__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                token: string;
+                file: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Validation Error */
             422: {
