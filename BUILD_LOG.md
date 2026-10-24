@@ -377,3 +377,11 @@ Timestamped record of what was built during GENOHACK (Sat 24 – Sun 25 Oct 2026
   the quality details panel shows the metric. The learned quality model still misses noise:
   documented as the next retraining target.
 - Simulator `capture()` gained `noise_scale` (default 1.0: existing phantoms unchanged).
+
+## 2026-10-25 03:11 WIB — Iteration loop, batch 18: quality model v2 learns noise
+
+- `quality_v2` replaces v1: adds the noisy class (sensor noise ×2.5–10) and a patch-noise feature
+  (13 features). Held-out (mixed lesions, 96 captures): accuracy 0.96 vs 0.88 for the rules; noisy
+  recall 24/24. In the stress test it now calls ×4 and ×8 captures noisy and flags some ×2 captures
+  the rules accept (shown in the app as a disagreement). Model card, AI roadmap and evaluation
+  report updated; test added.

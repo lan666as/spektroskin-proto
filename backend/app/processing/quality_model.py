@@ -15,10 +15,11 @@ from scipy import ndimage
 
 from app.processing.calibration import flat_field, patch_means, patch_uniformity
 from app.processing.optics import BANDS, FULL_SCALE, REFERENCE_BAND, spacer_mask
+from app.processing.qc import patch_noise
 from app.processing.types import DeviceProfile, FrameSet
 
-MODEL_PATH = Path(__file__).resolve().parent / "models" / "quality_v1.json"
-CLASSES = ("good", "blurry", "glare")
+MODEL_PATH = Path(__file__).resolve().parent / "models" / "quality_v2.json"
+CLASSES = ("good", "blurry", "glare", "noisy")
 FEATURE_NAMES = (
     "log_laplacian_var_s1",
     "log_laplacian_var_s2",
@@ -32,6 +33,7 @@ FEATURE_NAMES = (
     "patch_cv",
     "log_laplacian_var_blue",
     "mean_reflectance_green",
+    "log_patch_noise",
 )
 
 
@@ -75,6 +77,7 @@ def features(frame_set: FrameSet, profile: DeviceProfile) -> np.ndarray:
             patch_uniformity(green),
             _log_lap_var(refl["blue"], 1.0, valid),
             float(green[valid].mean()),
+            np.log10(patch_noise(green) + 1e-6),
         ]
     )
 

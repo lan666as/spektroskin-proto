@@ -2,7 +2,7 @@
 
     uv run python -m scripts.train_quality_model
 
-Writes app/processing/models/quality_v1.json (weights for numpy inference) and
+Writes app/processing/models/quality_v2.json (weights for numpy inference) and
 docs/evidence/quality_model_card.md. Deterministic (fixed seeds). Synthetic data only.
 """
 
@@ -24,6 +24,7 @@ from simulator.device import capture, factory_profile
 from simulator.phantoms import TONE_FITZPATRICK, catalogue, ground_truth
 
 REPEATS = 8
+RULE_LABEL = {"no_glare": "glare", "low_noise": "noisy", "sharp": "blurry"}
 HELD_OUT_LESION = "mixed"  # every capture of this lesion type is kept out of training
 CARD = Path(__file__).resolve().parents[2] / "docs" / "evidence" / "quality_model_card.md"
 
@@ -45,11 +46,13 @@ def dataset():
                     replace(spec, variant="glare"),
                     {"glare_amplitude": rng.uniform(0.4, 3.0), "glare_radius": rng.uniform(8, 22)},
                 ),
+                ("noisy", spec, {"noise_scale": rng.uniform(2.5, 10.0)}),
             ]
             for label, variant_spec, params in variants:
                 frame_set = capture(variant_spec, gt, repeat=k, **params)
                 qc = run_qc(frame_set, profile)
-                rule = "good" if qc.passed else ("glare" if not qc.checks["no_glare"] else "blurry")
+                failed = [k for k, ok in qc.checks.items() if not ok]
+                rule = RULE_LABEL.get(failed[0], "blurry") if failed else "good"
                 rows.append((features(frame_set, profile), label, spec.lesion, spec.tone, rule))
     return rows
 
@@ -102,7 +105,7 @@ def main() -> None:
         ["git", "rev-parse", "--short", "HEAD"], capture_output=True, text=True, check=False
     ).stdout.strip()
     weights = {
-        "version": "quality_v1",
+        "version": "quality_v2",
         "classes": list(CLASSES),
         "feature_names": list(FEATURE_NAMES),
         "mean": scaler.mean_.round(8).tolist(),
@@ -125,7 +128,7 @@ def _table(m: dict) -> str:
     lines = ["| Class | Precision | Recall | n |", "|---|---|---|---|"]
     for c, v in m["per_class"].items():
         lines.append(f"| {c} | {v['precision']:.2f} | {v['recall']:.2f} | {v['n']} |")
-    conf = ["", "Confusion (rows = true, columns = predicted: good, blurry, glare):", ""]
+    conf = ["", "Confusion (rows = true, columns = predicted: good, blurry, glare, noisy):", ""]
     conf += [f"- {c}: {row}" for c, row in zip(CLASSES, m["confusion"], strict=True)]
     return "\n".join(lines + conf)
 
@@ -133,15 +136,17 @@ def _table(m: dict) -> str:
 def card(w: dict, n_train: int, n_test: int) -> str:
     m = w["metrics"]
     tones = ", ".join(f"{t}: {a:.2f}" for t, a in m["held_out_by_tone"].items())
-    return f"""# Model card: image-quality classifier `quality_v1`
+    return f"""# Model card: image-quality classifier `quality_v2`
 
 Trained {w["trained_at"]} on top of commit `{w["trained_from_commit"]}` with
 `uv run python -m scripts.train_quality_model` (deterministic).
 
 ## What it does
-Classifies a raw multispectral capture as **good**, **blurry** or **glare** from 12 interpretable
-image statistics (multi-scale sharpness, high-frequency energy, saturation, hotspot ratios,
-reference-patch consistency). It is shown in the app as an **advisory second opinion** beside the
+Classifies a raw multispectral capture as **good**, **blurry**, **glare** or **noisy** from 13
+interpretable image statistics (multi-scale sharpness, high-frequency energy, saturation, hotspot
+ratios, reference-patch consistency, pixel noise on the gray patches). v2 added the noisy class
+after `ai_evaluation.md` showed v1 called heavily noisy captures good. It is shown in the app as
+an **advisory second opinion** beside the
 rule-based quality check; the rules still decide whether a capture is accepted. It looks at image
 quality only and says nothing about the lesion.
 
@@ -151,10 +156,10 @@ plain JSON weights; the server runs inference with numpy only.
 
 ## Data (synthetic only)
 Simulated captures of 12 phantoms (pigmented, vascular and mixed lesions on light / medium / dark
-skin = Fitzpatrick III / IV / V, plus the acral growth series), {REPEATS} noise draws each, in three
-versions: good, blurry (Gaussian blur, sigma 1.0–5.0 px) and glare (specular hotspot, amplitude
-0.4–3.0, radius 8–22 px). Mild blur and weak glare are included on purpose, so the task is not
-trivial. No real or public images.
+skin = Fitzpatrick III / IV / V, plus the acral growth series), {REPEATS} noise draws each, in four
+versions: good, blurry (Gaussian blur, sigma 1.0–5.0 px), glare (specular hotspot, amplitude
+0.4–3.0, radius 8–22 px) and noisy (sensor noise ×2.5–10). Mild blur, weak glare and moderate
+noise are included on purpose, so the task is not trivial. No real or public images.
 
 **Split:** every capture of the *{w["data"].split(": ")[-1]}* lesion type is held out
 ({n_test} captures, never seen in training); training uses the rest ({n_train} captures).
@@ -173,7 +178,7 @@ Training-set accuracy: {m["train"]["accuracy"]:.2f}.
   bench captures from the real module.
 - Small held-out set ({n_test} captures): one error moves accuracy by
   about {100 / n_test:.1f} points.
-- Three classes only; other failures (lesion out of frame, hair, gel bubbles) are not modelled.
+- Four classes only; other failures (lesion out of frame, hair, gel bubbles) are not modelled.
 - Not a medical device; never used to assess the lesion.
 """
 

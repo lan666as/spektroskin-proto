@@ -77,7 +77,7 @@ function StepRow({ step }: { step: Step }) {
   );
 }
 
-const QUALITY_LABEL = { good: 'good image', blurry: 'blurry', glare: 'glare' } as const;
+const QUALITY_LABEL = { good: 'good image', blurry: 'blurry', glare: 'glare', noisy: 'noisy' } as const;
 
 export function qualityStep(q: NonNullable<Capture['quality_model']>, rulesPassed: boolean): Step {
   const agrees = (q.label === 'good') === rulesPassed;
@@ -114,7 +114,7 @@ export function AutomatedAnalysis({
       result: capture.qc.passed
         ? `Passed: sharp, ${((m.saturated_fraction ?? 0) * 100).toFixed(1)}% glare, reference patches found`
         : `Failed: ${capture.qc.guidance[0] ?? 'retake needed'}`,
-      how: 'Rule-based: focus, saturated pixels, gray patch ratio. Cannot judge clinical relevance.',
+      how: 'Rule-based: focus, saturated pixels, sensor noise, gray patch ratio. Cannot judge clinical relevance.',
       active: true,
     },
     ...(capture.quality_model ? [qualityStep(capture.quality_model, capture.qc.passed)] : []),

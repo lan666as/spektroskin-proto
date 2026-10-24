@@ -55,7 +55,8 @@ captures passed QC); only the triage model's abstention and out-of-distribution 
 A noise check on the gray reference patches was added to the quality gate (rejects above 0.02
 relative pixel noise, about 3× the simulated module), which is what the QC column now shows:
 noisy captures get retake guidance and never reach the triage model. The learned quality model
-still says "good": it was never trained on noise, which is the next thing to retrain it on.
+was then retrained with a noisy class (`quality_v2`): it now calls ×4 and ×8 captures noisy, and
+flags some ×2 captures that the rules still accept (borderline, shown as a disagreement in the app).
 """
 PHANTOMS = [s.id for s in catalogue() if s.variant is None and s.id != "acral_dark_d14"]
 

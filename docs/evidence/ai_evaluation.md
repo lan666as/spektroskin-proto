@@ -1,7 +1,7 @@
 # AI evaluation: repeatability and stress (simulated data only)
 
-Generated 2026-10-24 20:00 UTC on top of commit `965d7d9` with
-`uv run python -m scripts.ai_evaluation` (deterministic). Models: quality_v1, triage_v1, acral_v1. Held-out accuracy
+Generated 2026-10-24 20:09 UTC on top of commit `c1e8032` with
+`uv run python -m scripts.ai_evaluation` (deterministic). Models: quality_v2, triage_v1, acral_v1. Held-out accuracy
 per model is in the model cards next to this file.
 
 Everything here is measured on the simulator, which shares its optical model with the pipeline:
@@ -39,9 +39,9 @@ and what it still answers stays right.
 | Sensor noise | QC pass | Quality model says good | Triage answered | Triage right when answered | Out of range |
 |---|---|---|---|---|---|
 | ×1 | 100% | 100% | 100% | 100% | 0% |
-| ×2 | 100% | 100% | 100% | 100% | 0% |
-| ×4 | 0% | 100% | 0% | – | 0% |
-| ×8 | 0% | 100% | 0% | – | 0% |
+| ×2 | 100% | 73% | 100% | 100% | 0% |
+| ×4 | 0% | 0% | 0% | – | 0% |
+| ×8 | 0% | 0% | 0% | – | 0% |
 
 **Finding, and the fix it led to:** the first run of this report showed that neither the
 rule-based quality check nor the learned quality model flagged heavy sensor noise (100 % of ×8
@@ -49,4 +49,5 @@ captures passed QC); only the triage model's abstention and out-of-distribution 
 A noise check on the gray reference patches was added to the quality gate (rejects above 0.02
 relative pixel noise, about 3× the simulated module), which is what the QC column now shows:
 noisy captures get retake guidance and never reach the triage model. The learned quality model
-still says "good": it was never trained on noise, which is the next thing to retrain it on.
+was then retrained with a noisy class (`quality_v2`): it now calls ×4 and ×8 captures noisy, and
+flags some ×2 captures that the rules still accept (borderline, shown as a disagreement in the app).

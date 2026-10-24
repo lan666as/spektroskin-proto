@@ -144,7 +144,7 @@ class QualityOpinion(BaseModel):
     """Advisory output of the learned image-quality model; the rule-based QC decides."""
 
     model: str
-    label: Literal["good", "blurry", "glare"]
+    label: Literal["good", "blurry", "glare", "noisy"]
     probabilities: dict[str, float]
     held_out_accuracy: float = Field(
         description="Accuracy on held-out synthetic phantoms (docs/evidence/quality_model_card.md)"

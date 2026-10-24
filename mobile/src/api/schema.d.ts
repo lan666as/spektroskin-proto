@@ -1113,7 +1113,7 @@ export interface components {
              * Label
              * @enum {string}
              */
-            label: "good" | "blurry" | "glare";
+            label: "good" | "blurry" | "glare" | "noisy";
             /** Probabilities */
             probabilities: {
                 [key: string]: number;

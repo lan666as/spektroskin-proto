@@ -32,3 +32,11 @@ def test_predicts_capture_condition(phantom_id: str, expected: str) -> None:
     opinion = predict(capture(spec, ground_truth(spec)), PROFILE)
     assert opinion["label"] == expected
     assert abs(sum(opinion["probabilities"].values()) - 1) < 1e-3
+
+
+def test_recognises_heavy_sensor_noise() -> None:
+    spec = spec_by_id("pigmented_medium")
+    assert (
+        predict(capture(spec, ground_truth(spec), repeat=2, noise_scale=8.0), PROFILE)["label"]
+        == "noisy"
+    )

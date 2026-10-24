@@ -18,7 +18,7 @@ const TIERS: { tier: string; title: string; status: Status; what: string; gate: 
     title: 'Image quality',
     status: 'active',
     what:
-      'Rule-based checks of focus, glare and the reference patches decide whether a capture is accepted, with retake guidance. A small learned classifier (logistic regression on 12 image statistics, trained on simulated captures only) gives an advisory second opinion: 97% accurate on held-out simulated captures, against 90% for the rules on the same set.',
+      'Rule-based checks of focus, glare, sensor noise and the reference patches decide whether a capture is accepted, with retake guidance. A small learned classifier (logistic regression on 13 image statistics, trained on simulated captures only) gives an advisory second opinion on good, blurry, glare or noisy: 96% accurate on held-out simulated captures, against 88% for the rules on the same set.',
     gate: 'Next: retrain and re-measure on bench images from the real optical module.',
   },
   {
