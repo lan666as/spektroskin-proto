@@ -310,6 +310,11 @@ def run(base: str) -> None:
     expect(status == 409, f"second review is 409: {status}")
     status, similar = c.request("GET", f"/api/cases/{case['id']}/similar")
     expect(status == 200 and isinstance(similar, list), f"GET /cases/{{id}}/similar: {status}")
+    status, export = c.request("GET", "/api/ai/validation-set")
+    expect(
+        status == 200 and isinstance(export["records"], list),
+        f"GET /ai/validation-set: {status}",
+    )
     status, ai = c.request("GET", "/api/ai/summary")
     expect(
         status == 200 and ai["shadow"]["reads"] >= 1 and len(ai["models"]) == 3,

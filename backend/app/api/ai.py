@@ -25,6 +25,8 @@ from app.schemas import (
     ModelSummary,
     Monitoring,
     ShadowAgreement,
+    ValidationRecord,
+    ValidationSet,
 )
 
 router = APIRouter(prefix="/ai", tags=["ai"])
@@ -214,3 +216,64 @@ def ai_summary(user: Dermatologist, session: Annotated[Session, Depends(get_sess
         data=_data(cases),
         monitoring=_monitoring(recent),
     )
+
+
+PURPOSE = (
+    "Validation of SpektroSkin assistance models on consented, dermatologist-reviewed, "
+    "histopathology-confirmed cases. Research use only, under the consent each patient gave."
+)
+
+
+def _age_band(age: int) -> str:
+    low = age // 10 * 10
+    return f"{low}-{low + 9}"
+
+
+def validation_records(cases: list[Case]) -> list[ValidationRecord]:
+    records = []
+    for case in cases:
+        outcome, review, patient = case.outcome, case.review, case.lesion.patient
+        if not (patient.research_consent and review and outcome and case.captures):
+            continue
+        if outcome.histopathology not in ("benign", "malignant", "indeterminate"):
+            continue
+        triage = (case.captures[-1].result or {}).get("triage_model") or {}
+        records.append(
+            ValidationRecord(
+                case_id=case.id,
+                capture_ids=[c.id for c in case.captures],
+                simulated=all(c.device_type == "virtual" for c in case.captures),
+                age_band=_age_band(patient.age),
+                sex=patient.sex,
+                fitzpatrick=patient.fitzpatrick,
+                body_site=case.lesion.body_site,
+                dermatologist_action=review.action,
+                dermatologist_pattern_read=review.pattern_read,
+                histopathology=outcome.histopathology,
+                model_pattern=triage.get("pattern"),
+            )
+        )
+    return records
+
+
+@router.get("/validation-set", response_model=ValidationSet)
+def validation_set(
+    user: Dermatologist, session: Annotated[Session, Depends(get_session)]
+) -> ValidationSet:
+    """Export for model validation: eligible cases only, minimum fields, audited."""
+    cases = list(
+        session.scalars(
+            select(Case)
+            .where(Case.created_by.in_(same_group(user)))
+            .options(
+                selectinload(Case.review),
+                selectinload(Case.outcome),
+                selectinload(Case.captures),
+                selectinload(Case.lesion).selectinload(Lesion.patient),
+            )
+        )
+    )
+    records = validation_records(cases)
+    audit.record(session, user, "export_validation_set", "case", f"{len(records)} records")
+    session.commit()
+    return ValidationSet(generated_at=utcnow(), purpose=PURPOSE, records=records)

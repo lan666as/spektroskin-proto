@@ -173,6 +173,15 @@ test('PLAN §6 demo script: 60 s core + extended', async ({ browser, request }) 
   await expect(byId(reviewer, 'fairness-triage_v1')).toContainText('Fitzpatrick dark (V)');
   await expect(byId(reviewer, 'validation-eligible')).toBeVisible();
   await expect(byId(reviewer, 'monitoring')).toContainText('outside the training range');
+  const [download] = await Promise.all([
+    reviewer.waitForEvent('download'),
+    byId(reviewer, 'download-validation-set').click(),
+  ]);
+  expect(download.suggestedFilename()).toMatch(/^spektroskin-validation-set-.*\.json$/);
+  const exported = JSON.parse(readFileSync(await download.path(), 'utf8'));
+  // The demo case is consented, reviewed and histopathology-confirmed (benign), so it is eligible.
+  expect(exported.records.some((r: { histopathology: string }) => r.histopathology === 'benign')).toBe(true);
+  expect(JSON.stringify(exported)).not.toContain(code);
   await shot(reviewer, '10c-ai-overview');
 
   // Extended: glare capture fails QC with retake guidance; validation panel on a retake.

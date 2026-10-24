@@ -1,9 +1,9 @@
 import { useQuery } from '@tanstack/react-query';
 import { Stack, useRouter } from 'expo-router';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { api, type Schemas } from '@/api/client';
-import { Card, ErrorBanner, Heading, Loading, Muted, Row, Screen, Title } from '@/ui/components';
+import { Button, Card, ErrorBanner, Heading, Loading, Muted, Row, Screen, Title } from '@/ui/components';
 import { formatDateTime } from '@/ui/labels';
 import { SimulatedBadge } from '@/ui/SimulatedBadge';
 import { colors, radius, spacing } from '@/ui/theme';
@@ -88,6 +88,16 @@ function ModelCard({ m }: { m: Schemas['ModelSummary'] }) {
       </Muted>
     </Card>
   );
+}
+
+async function downloadValidationSet() {
+  const set = await api.validationSet();
+  const url = URL.createObjectURL(new Blob([JSON.stringify(set, null, 2)], { type: 'application/json' }));
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = `spektroskin-validation-set-${set.generated_at.slice(0, 10)}.json`;
+  link.click();
+  URL.revokeObjectURL(url);
 }
 
 function Tile({ value, label, warn }: { value: string; label: string; warn?: boolean }) {
@@ -207,6 +217,18 @@ export default function AiOverview() {
               max={d!.cases}
               testID="validation-eligible"
             />
+            {Platform.OS === 'web' ? (
+              <Button
+                label="Download validation set (JSON)"
+                variant="secondary"
+                onPress={downloadValidationSet}
+                testID="download-validation-set"
+              />
+            ) : null}
+            <Muted>
+              The export holds eligible cases only, with minimum fields: no names, patient codes, free
+              text or exact ages. Every export is written to the audit log.
+            </Muted>
           </Card>
           <Muted>
             {s.scope} Computed {formatDateTime(s.computed_at)}.

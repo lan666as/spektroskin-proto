@@ -380,6 +380,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/ai/validation-set": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Validation Set
+         * @description Export for model validation: eligible cases only, minimum fields, audited.
+         */
+        get: operations["validation_set_api_ai_validation_set_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1439,6 +1459,62 @@ export interface components {
             /** Scope */
             scope: string;
         };
+        /**
+         * ValidationRecord
+         * @description One consented, histopathology-confirmed case. Minimum fields: no names, patient codes,
+         *     free text or exact age.
+         */
+        ValidationRecord: {
+            /**
+             * Case Id
+             * Format: uuid
+             */
+            case_id: string;
+            /** Capture Ids */
+            capture_ids: string[];
+            /** Simulated */
+            simulated: boolean;
+            /**
+             * Age Band
+             * @description 10-year band, e.g. 50-59
+             */
+            age_band: string;
+            /** Sex */
+            sex: string;
+            /** Fitzpatrick */
+            fitzpatrick: string;
+            /** Body Site */
+            body_site: string;
+            /**
+             * Dermatologist Action
+             * @enum {string}
+             */
+            dermatologist_action: "observe" | "biopsy" | "refer";
+            /** Dermatologist Pattern Read */
+            dermatologist_pattern_read: ("pigmented" | "vascular" | "mixed" | "unsure") | null;
+            /**
+             * Histopathology
+             * @enum {string}
+             */
+            histopathology: "pending" | "benign" | "malignant" | "indeterminate";
+            /**
+             * Model Pattern
+             * @description Triage model suggestion at review time
+             */
+            model_pattern: string | null;
+        };
+        /** ValidationSet */
+        ValidationSet: {
+            /**
+             * Generated At
+             * Format: date-time
+             */
+            generated_at: string;
+            /** Purpose */
+            purpose: string;
+            /** Records */
+            records: components["schemas"]["ValidationRecord"][];
+        };
     };
     responses: never;
     parameters: never;
@@ -2119,6 +2195,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["AISummary"];
+                };
+            };
+        };
+    };
+    validation_set_api_ai_validation_set_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ValidationSet"];
                 };
             };
         };

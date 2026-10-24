@@ -68,3 +68,35 @@ def test_monitoring_counts_disagreements_abstentions_and_out_of_range() -> None:
     assert (m.captures, m.qc_passed, m.quality_disagreements) == (3, 2, 1)
     assert (m.triage_abstained, m.triage_out_of_range, m.acral_ridge) == (2, 1, 1)
     assert m.patterns == {"pigmented": 1}
+
+
+def test_validation_export_keeps_only_eligible_cases_and_minimum_fields() -> None:
+    import uuid
+
+    from app.api.ai import validation_records
+
+    def case(consent, histo, age=57):
+        return NS(
+            id=uuid.uuid4(),
+            outcome=NS(histopathology=histo),
+            review=NS(action="biopsy", pattern_read="pigmented"),
+            lesion=NS(
+                body_site="sole",
+                patient=NS(research_consent=consent, age=age, sex="female", fitzpatrick="V"),
+            ),
+            captures=[
+                NS(
+                    id=uuid.uuid4(),
+                    device_type="virtual",
+                    result={"triage_model": {"pattern": "pigmented"}},
+                )
+            ],
+        )
+
+    records = validation_records(
+        [case(True, "benign"), case(False, "malignant"), case(True, "pending")]
+    )
+    assert len(records) == 1
+    record = records[0].model_dump()
+    assert record["age_band"] == "50-59" and record["simulated"] is True
+    assert not {"code", "patient_code", "age", "notes", "impression"} & set(record)

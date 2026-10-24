@@ -419,3 +419,26 @@ class SimilarCase(BaseModel):
     pattern_read: PatternRead | None
     outcome_action: OutcomeAction | None
     histopathology: Histopathology | None
+
+
+class ValidationRecord(BaseModel):
+    """One consented, histopathology-confirmed case. Minimum fields: no names, patient codes,
+    free text or exact age."""
+
+    case_id: uuid.UUID
+    capture_ids: list[uuid.UUID]
+    simulated: bool
+    age_band: str = Field(description="10-year band, e.g. 50-59")
+    sex: str
+    fitzpatrick: str
+    body_site: str
+    dermatologist_action: ReviewAction
+    dermatologist_pattern_read: PatternRead | None
+    histopathology: Histopathology
+    model_pattern: str | None = Field(description="Triage model suggestion at review time")
+
+
+class ValidationSet(BaseModel):
+    generated_at: datetime
+    purpose: str
+    records: list[ValidationRecord]

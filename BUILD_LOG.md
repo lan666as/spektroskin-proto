@@ -394,3 +394,15 @@ Timestamped record of what was built during GENOHACK (Sat 24 – Sun 25 Oct 2026
 - `/api/ai/summary` `monitoring` over the group's captures in the last 30 days: QC pass, quality
   model vs rules disagreement, triage abstentions, out-of-range rate, suggested patterns, acral
   ridge reads. AI page "Monitoring" card with an out-of-range warning above 5 %. Test added.
+
+## 2026-10-25 03:29 WIB — Iteration loop, batch 20: privacy-minimised validation-set export
+
+- `GET /api/ai/validation-set` (dermatologists, group-scoped, audited with the record count):
+  consented, reviewed, histopathology-confirmed cases only.
+  - Kept: case and capture ids, a simulated flag, a 10-year age band, sex, Fitzpatrick type, body
+    site, the dermatologist's action and pattern read, the histopathology category, and the model's
+    suggestion.
+  - Left out: names, patient codes, free text and exact age.
+- AI page: "Download validation set (JSON)" on web. Tests: eligibility and minimum fields (unit);
+  smoke covers the endpoint; demo e2e downloads it, finds the benign demo case and checks the
+  patient code is absent.
