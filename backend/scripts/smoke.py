@@ -23,6 +23,8 @@ from pathlib import Path
 PHANTOMS = Path(__file__).resolve().parent.parent / "simulator" / "out" / "phantoms"
 FRAMES = ("blue", "green", "red", "nir", "dark")
 TIMEOUT = 30
+# Cloudflare bans the default "Python-urllib" agent (error 1010); identify honestly instead.
+USER_AGENT = "spektroskin-smoke/1.0 (+https://github.com/lan666as/spektroskin-proto)"
 
 
 class SmokeFailure(AssertionError):
@@ -48,7 +50,7 @@ class Client:
         self.token: str | None = None
 
     def request(self, method: str, path: str, *, body=None, form=None, files=None, raw=False):
-        headers = {"Accept": "application/json"}
+        headers = {"Accept": "application/json", "User-Agent": USER_AGENT}
         data = None
         if self.token:
             headers["Authorization"] = f"Bearer {self.token}"

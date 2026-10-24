@@ -106,6 +106,10 @@ Timestamped record of what was built during GENOHACK (Sat 24 – Sun 25 Oct 2026
   bundled phantom frames; `typedRoutes` experiment disabled to keep `tsc` independent of codegen.
 - M4: seed visit d14 at now − 16 d so the strip reads Day 01 / 14 / 30 (local dev DB keeps its
   earlier row; prod is seeded fresh).
+- M6: first deploy reached production, but the public smoke failed with Cloudflare error 1010
+  (Browser Integrity Check bans the default `Python-urllib` User-Agent). Browsers, curl and okhttp
+  (Android) get 200. Fix: the smoke script sends `spektroskin-smoke/1.0 (+repo URL)`; no Cloudflare
+  setting changed.
 
 ## Deviations
 - M2: pipeline order is QC → calibration → registration (spec says registration before calibration),
