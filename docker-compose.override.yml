@@ -1,0 +1,14 @@
+# Local development on the Mac only. The VPS runs `docker compose -f docker-compose.yml`
+# (scripts/deploy.sh), so this file never applies there.
+services:
+  db:
+    ports:
+      - "127.0.0.1:5432:5432"
+
+  api:
+    volumes:
+      - storage:/data/storage
+      - ./backend/app:/app/app
+    command: >
+      sh -c "alembic upgrade head &&
+             exec uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload --reload-dir /app/app"

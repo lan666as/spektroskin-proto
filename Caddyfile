@@ -1,0 +1,14 @@
+# Plain HTTP: TLS terminates at Cloudflare (tunnel → 127.0.0.1:8480). See PLAN.md D2/D3.
+:80 {
+	encode gzip
+
+	handle /api/* {
+		reverse_proxy api:8000
+	}
+
+	handle {
+		root * /srv
+		try_files {path} {path}.html /index.html
+		file_server
+	}
+}

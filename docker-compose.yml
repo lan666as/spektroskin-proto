@@ -1,0 +1,48 @@
+name: spektroskin
+
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: spektroskin
+      POSTGRES_DB: spektroskin
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U spektroskin -d spektroskin"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+
+  api:
+    build: ./backend
+    environment:
+      DATABASE_URL: postgresql+psycopg://spektroskin:${POSTGRES_PASSWORD}@db:5432/spektroskin
+      JWT_SECRET: ${JWT_SECRET:?set JWT_SECRET in .env}
+      STORAGE_DIR: /data/storage
+    volumes:
+      - storage:/data/storage
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+  caddy:
+    image: caddy:2
+    ports:
+      - "127.0.0.1:8480:80"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./web-dist:/srv:ro
+      - caddy_data:/data
+    depends_on:
+      api:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  pgdata:
+  storage:
+  caddy_data:

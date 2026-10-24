@@ -22,6 +22,26 @@ Timestamped record of what was built during GENOHACK (Sat 24 – Sun 25 Oct 2026
   deploy ssh fallback, extended-demo dependency, README target-vs-prototype section, pre-flight table.
 - Overnight-stall risks checked: Keychain reads without prompts; SSH needs no expiring token.
 
+### 2026-10-24 21:30 WIB — M1: skeleton (gate green)
+- Compose stack (postgres:16, FastAPI api, caddy:2 on 127.0.0.1:8480), local override (db port,
+  hot reload), Caddyfile (SPA + /api proxy), uv backend, `/api/health` with DB check, Alembic 0001 (users),
+  Expo SDK 58 app shell (Expo Router, TanStack Query, SimulatedBadge, theme), Playwright shell test,
+  `scripts/gate.sh`.
+- Verified: `docker compose up` healthy; `/api/health` 200 via Caddy; `alembic current` = 0001 (head);
+  `npx expo export -p web` OK; Playwright 2/2; pytest 2/2 against `spektroskin_test`.
+- Dependencies added (all pinned via lockfiles): backend fastapi, uvicorn[standard], pydantic-settings,
+  sqlalchemy, psycopg[binary], alembic, pyjwt, bcrypt, numpy, scipy, scikit-image, pillow,
+  python-multipart; dev pytest, ruff (uv.lock). Mobile (create-expo-app 5.0.0, template default@sdk-58):
+  @tanstack/react-query 5.104.5, expo-secure-store, @react-native-async-storage/async-storage,
+  @react-native-community/netinfo (versions via `npx expo install`), dev @playwright/test 1.64.1
+  (package-lock.json).
+
 ## Decisions made alone
+- M1: Expo routes live in `mobile/src/app/` (SDK 58 template convention) instead of `mobile/app/`.
+- M1: web export uses `web.output: "single"` (SPA) so Caddy can serve deep links via `try_files`.
+- M1: `python-multipart` added: FastAPI needs it for the multipart `POST /captures` and OAuth2 form.
+- M1: Alembic reads `DATABASE_URL` directly so migrations run without app secrets.
 
 ## Deviations
+- M1: `openapi-typescript@7.13.0` declares a TypeScript 5 peer, but SDK 58 ships TypeScript 6. It runs
+  pinned via `npx -y openapi-typescript@7.13.0` (npm script `gen:api`) instead of as a devDependency.
