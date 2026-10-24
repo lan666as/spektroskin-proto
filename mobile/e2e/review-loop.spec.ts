@@ -58,6 +58,8 @@ test('review loop: clinician submits → dermatologist reviews → clinician see
 
   await byId(clinician, 'open-summary').click();
   await expect(byId(clinician, 'summary-action')).toContainText('Biopsy');
+  await expect(byId(clinician, 'summary-screen')).toContainText('AI suggestions (research mode');
+  await expect(byId(clinician, 'summary-screen')).toContainText('Not a diagnosis');
   await expect(byId(clinician, 'summary-screen')).toContainText(code);
   await clinician.emulateMedia({ media: 'print' });
   await expect(clinician.getByTestId('print')).toBeHidden();

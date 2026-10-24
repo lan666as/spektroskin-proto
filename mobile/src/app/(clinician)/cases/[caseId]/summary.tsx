@@ -7,19 +7,24 @@ import { api } from '@/api/client';
 import { absoluteUrl } from '@/api/config';
 import { Button, ErrorBanner, Loading, Muted, Row, Screen } from '@/ui/components';
 import { SIMULATION_FOOTNOTE } from '@/ui/clinical';
+import { formatSize } from '@/ui/analysis';
 import {
   ACTION_LABELS,
+  FLAG_LABELS,
   formatArea,
   formatDate,
   formatDateTime,
+  isAcral,
   siteLabel,
   visitDay,
 } from '@/ui/labels';
+import { HISTO_LABELS, OUTCOME_LABELS } from '@/ui/outcome';
+import { patternSummary } from '@/ui/triage';
 import { usePrintStyles } from '@/ui/printStyles';
 import { SimulatedBadge } from '@/ui/SimulatedBadge';
 import { colors, spacing } from '@/ui/theme';
 
-const VIEWS = ['standard', 'pigment', 'vascular'] as const;
+const VIEWS = ['standard', 'pigment', 'vascular', 'evidence'] as const;
 
 export default function ReferralSummary() {
   usePrintStyles();
@@ -80,6 +85,56 @@ export default function ReferralSummary() {
             </Muted>
             <Text style={styles.bold}>The dermatologist recommends; the treating clinician decides.</Text>
           </Section>
+
+          {c.outcome ? (
+            <Section title="Outcome">
+              <Line label="Action taken" value={OUTCOME_LABELS[c.outcome.action_taken]} />
+              {c.outcome.procedure_date ? <Line label="Date" value={formatDate(c.outcome.procedure_date)} /> : null}
+              {c.outcome.histopathology ? (
+                <Line label="Histopathology" value={HISTO_LABELS[c.outcome.histopathology]} />
+              ) : null}
+              {c.outcome.histopathology_notes ? (
+                <Text style={styles.body}>Report: {c.outcome.histopathology_notes}</Text>
+              ) : null}
+            </Section>
+          ) : null}
+
+          <Section title="Automated measurements (reviewed capture)">
+            <Line label="Area · size" value={`${formatArea(reviewed.area_mm2)}${formatSize(reviewed) ? ` · ${formatSize(reviewed)}` : ''}`} />
+            {reviewed.morphology ? (
+              <>
+                <Line label="Asymmetry (0 = symmetric)" value={reviewed.morphology.asymmetry.toFixed(2)} />
+                <Line label="Border irregularity (1 = circle)" value={reviewed.morphology.border_irregularity.toFixed(2)} />
+                <Line
+                  label="Pigment variation"
+                  value={reviewed.morphology.pigment_variation != null ? reviewed.morphology.pigment_variation.toFixed(2) : 'Not pigmented'}
+                />
+              </>
+            ) : null}
+            {c.attention_flags.length ? (
+              <Line label="Attention flags" value={c.attention_flags.map((f) => FLAG_LABELS[f].label).join(', ')} />
+            ) : null}
+          </Section>
+
+          {reviewed.triage_model || reviewed.acral_model ? (
+            <Section title="AI suggestions (research mode, simulated training data)">
+              {reviewed.triage_model ? (
+                <Line label="Lesion pattern" value={patternSummary(reviewed.triage_model)} />
+              ) : null}
+              {reviewed.acral_model && isAcral(c.lesion.body_site) ? (
+                <Line
+                  label="Acral pattern"
+                  value={
+                    reviewed.acral_model.pattern
+                      ? `Pigment along the ${reviewed.acral_model.pattern === 'ridge' ? 'ridges' : 'furrows'}`
+                      : 'Uncertain'
+                  }
+                />
+              ) : null}
+              {c.review.pattern_read ? <Line label="Dermatologist's pattern read" value={c.review.pattern_read} /> : null}
+              <Muted>Not a diagnosis. Models trained and tested on simulated data only.</Muted>
+            </Section>
+          ) : null}
 
           {first && first.id !== reviewed.id ? (
             <Section title="First visit vs reviewed visit">
