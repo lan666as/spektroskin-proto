@@ -21,3 +21,6 @@ test-results/
 .DS_Store
 .idea/
 .vscode/
+
+# Simulator build output (regenerated deterministically; the app bundles its own copy)
+backend/simulator/out/

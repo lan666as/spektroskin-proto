@@ -9,20 +9,20 @@ Timestamped record of what was built during GENOHACK (Sat 24 – Sun 25 Oct 2026
 
 ## Log
 
-### 2026-10-24 20:30–21:30 WIB — Phase 0: planning
+### 2026-10-24 20:30–21:00 WIB — Phase 0: planning
 - Planning interview with the builder; decisions recorded in PLAN.md.
 - Pre-flight: local toolchain verified; Playwright Chromium 1.64.1 installed; public GitHub repo
   `lan666as/spektroskin-proto` created; Cloudflare Tunnel DNS route `spektroskin.zidan.dev` added
   (VPS ports 80/443 belong to an existing Nginx Proxy Manager).
 - No application code written.
 
-### 2026-10-24 21:15 WIB — Phase 0: pre-flight closed
+### 2026-10-24 21:12 WIB — Phase 0: pre-flight closed
 - Tunnel ingress for spektroskin.zidan.dev applied by the builder; verified (502 = no origin yet).
 - Added docs/context/chat-handoff.md (context from the claude.ai planning chat); PLAN.md updated:
   deploy ssh fallback, extended-demo dependency, README target-vs-prototype section, pre-flight table.
 - Overnight-stall risks checked: Keychain reads without prompts; SSH needs no expiring token.
 
-### 2026-10-24 21:30 WIB — M1: skeleton (gate green)
+### 2026-10-24 21:22 WIB — M1: skeleton (gate green)
 - Compose stack (postgres:16, FastAPI api, caddy:2 on 127.0.0.1:8480), local override (db port,
   hot reload), Caddyfile (SPA + /api proxy), uv backend, `/api/health` with DB check, Alembic 0001 (users),
   Expo SDK 58 app shell (Expo Router, TanStack Query, SimulatedBadge, theme), Playwright shell test,
@@ -36,7 +36,7 @@ Timestamped record of what was built during GENOHACK (Sat 24 – Sun 25 Oct 2026
   @react-native-community/netinfo (versions via `npx expo install`), dev @playwright/test 1.64.1
   (package-lock.json).
 
-### 2026-10-24 22:05 WIB — M2: simulator + processing pipeline (gate green)
+### 2026-10-24 21:30 WIB — M2: simulator + processing pipeline (gate green)
 - `backend/simulator`: 14 deterministic phantoms (9 base: pigmented/vascular/mixed × light/medium/dark
   = Fitzpatrick III/IV/V; blur and glare bad captures; acral sole growth series d01/d14/d30 with
   18/22/28 mm² true area). Realism layers: skin-line furrows, acral dermatoglyphic ridges, irregular
