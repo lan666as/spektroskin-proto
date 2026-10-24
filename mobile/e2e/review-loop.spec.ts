@@ -11,7 +11,7 @@ test('review loop: clinician submits → dermatologist reviews → clinician see
   const reviewer = await reviewerContext.newPage();
 
   await login(clinician, 'smoke-clinician');
-  const code = uniquePatientCode();
+  const code = await uniquePatientCode(clinician.request);
   await byId(clinician, 'new-patient').click();
   await byId(clinician, 'patient-code').fill(code);
   await byId(clinician, 'patient-age').fill('54');

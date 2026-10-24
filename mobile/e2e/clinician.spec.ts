@@ -17,7 +17,7 @@ test('clinician: login → patient → lesion → capture → results with histo
 }) => {
   await login(page, 'smoke-clinician');
 
-  const code = uniquePatientCode();
+  const code = await uniquePatientCode(request);
   await byId(page, 'new-patient').click();
   await byId(page, 'patient-code').fill(code);
   await byId(page, 'patient-age').fill('54');
