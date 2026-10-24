@@ -200,6 +200,31 @@ export default function AiOverview() {
             </Row>
           </Card>
 
+          <Card testID="learning-queue">
+            <Heading>Learn from these first</Heading>
+            <Muted>
+              Reviewed cases where the dermatologist's read and the model differ, or the model
+              abstained. They go first into the next training and validation round.
+            </Muted>
+            {s.learning_queue.length === 0 ? <Muted>None yet: record pattern reads when reviewing.</Muted> : null}
+            {s.learning_queue.map((q) => (
+              <Pressable
+                key={q.case_id}
+                onPress={() => router.push({ pathname: '/review/[caseId]', params: { caseId: q.case_id } })}
+                style={styles.queueRow}
+                testID={`learn-${q.case_id}`}
+              >
+                <Text style={styles.sub}>
+                  {q.patient_code} · Fitzpatrick {q.fitzpatrick}
+                </Text>
+                <Muted>
+                  Dermatologist: {q.dermatologist_read} · model:{' '}
+                  {q.reason === 'model_abstained' ? 'abstained' : q.model_pattern}
+                </Muted>
+              </Pressable>
+            ))}
+          </Card>
+
           <Card testID="data-funnel">
             <Heading>From reviews to validation data</Heading>
             <Muted>
@@ -256,5 +281,6 @@ const styles = StyleSheet.create({
   toneLow: { borderColor: colors.danger },
   toneValue: { fontSize: 18, fontWeight: '800', color: colors.text },
   gap: { fontSize: 14, fontWeight: '600', color: colors.danger },
+  queueRow: { borderTopWidth: 1, borderTopColor: colors.border, paddingTop: spacing.sm, gap: 2 },
   link: { color: colors.accent, fontWeight: '600', paddingVertical: spacing.xs },
 });

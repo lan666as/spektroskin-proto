@@ -100,3 +100,31 @@ def test_validation_export_keeps_only_eligible_cases_and_minimum_fields() -> Non
     record = records[0].model_dump()
     assert record["age_band"] == "50-59" and record["simulated"] is True
     assert not {"code", "patient_code", "age", "notes", "impression"} & set(record)
+
+
+def test_learning_queue_lists_disagreements_and_abstentions_newest_first() -> None:
+    import uuid
+    from datetime import UTC, datetime, timedelta
+
+    from app.api.ai import learning_queue
+
+    t0 = datetime(2026, 10, 1, tzinfo=UTC)
+
+    def case(read, model, day):
+        c = _case(read, model)
+        c.id, c.created_at = uuid.UUID(int=day), t0 + timedelta(days=day)
+        c.lesion.patient.code, c.lesion.patient.fitzpatrick = f"PT-{day:04d}", "V"
+        return c
+
+    queue = learning_queue(
+        [
+            case("pigmented", "pigmented", 1),
+            case("pigmented", "mixed", 2),
+            case("vascular", None, 3),
+            case("unsure", "mixed", 4),
+        ]
+    )
+    assert [(q.patient_code, q.reason) for q in queue] == [
+        ("PT-0003", "model_abstained"),
+        ("PT-0002", "disagreement"),
+    ]

@@ -406,3 +406,9 @@ Timestamped record of what was built during GENOHACK (Sat 24 – Sun 25 Oct 2026
 - AI page: "Download validation set (JSON)" on web. Tests: eligibility and minimum fields (unit);
   smoke covers the endpoint; demo e2e downloads it, finds the benign demo case and checks the
   patient code is absent.
+
+## 2026-10-25 03:37 WIB — Iteration loop, batch 21: learning queue (active learning)
+
+- `/api/ai/summary` `learning_queue`: newest reviewed cases where the dermatologist's pattern read
+  differs from the model or the model abstained (an "unsure" read is skipped). AI page "Learn from
+  these first" card, each case linking to its review. Unit test; demo e2e asserts the card.

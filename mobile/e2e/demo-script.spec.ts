@@ -173,6 +173,7 @@ test('PLAN §6 demo script: 60 s core + extended', async ({ browser, request }) 
   await expect(byId(reviewer, 'fairness-triage_v1')).toContainText('Fitzpatrick dark (V)');
   await expect(byId(reviewer, 'validation-eligible')).toBeVisible();
   await expect(byId(reviewer, 'monitoring')).toContainText('outside the training range');
+  await expect(byId(reviewer, 'learning-queue')).toContainText('Learn from these first');
   const [download] = await Promise.all([
     reviewer.waitForEvent('download'),
     byId(reviewer, 'download-validation-set').click(),

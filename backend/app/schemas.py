@@ -399,6 +399,18 @@ class Monitoring(BaseModel):
     acral_ridge: int
 
 
+class LearningCase(BaseModel):
+    """A reviewed case worth learning from first: model and dermatologist disagree, or the model
+    abstained where the dermatologist could read the pattern."""
+
+    case_id: uuid.UUID
+    patient_code: str
+    fitzpatrick: str
+    reason: Literal["disagreement", "model_abstained"]
+    dermatologist_read: PatternRead
+    model_pattern: str | None
+
+
 class AISummary(BaseModel):
     computed_at: datetime
     scope: str
@@ -406,6 +418,7 @@ class AISummary(BaseModel):
     shadow: ShadowAgreement
     data: DataFlywheel
     monitoring: Monitoring | None = None
+    learning_queue: list[LearningCase] = []
 
 
 class SimilarCase(BaseModel):

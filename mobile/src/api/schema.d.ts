@@ -418,6 +418,11 @@ export interface components {
             shadow: components["schemas"]["ShadowAgreement"];
             data: components["schemas"]["DataFlywheel"];
             monitoring?: components["schemas"]["Monitoring"] | null;
+            /**
+             * Learning Queue
+             * @default []
+             */
+            learning_queue: components["schemas"]["LearningCase"][];
         };
         /**
          * AcralOpinion
@@ -779,6 +784,34 @@ export interface components {
             accuracy_when_answered?: number | null;
             /** N */
             n: number;
+        };
+        /**
+         * LearningCase
+         * @description A reviewed case worth learning from first: model and dermatologist disagree, or the model
+         *     abstained where the dermatologist could read the pattern.
+         */
+        LearningCase: {
+            /**
+             * Case Id
+             * Format: uuid
+             */
+            case_id: string;
+            /** Patient Code */
+            patient_code: string;
+            /** Fitzpatrick */
+            fitzpatrick: string;
+            /**
+             * Reason
+             * @enum {string}
+             */
+            reason: "disagreement" | "model_abstained";
+            /**
+             * Dermatologist Read
+             * @enum {string}
+             */
+            dermatologist_read: "pigmented" | "vascular" | "mixed" | "unsure";
+            /** Model Pattern */
+            model_pattern: string | null;
         };
         /** LesionCreate */
         LesionCreate: {

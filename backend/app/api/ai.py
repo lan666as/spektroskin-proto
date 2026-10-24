@@ -22,6 +22,7 @@ from app.schemas import (
     AISummary,
     DataFlywheel,
     HeldOut,
+    LearningCase,
     ModelSummary,
     Monitoring,
     ShadowAgreement,
@@ -182,6 +183,31 @@ def _monitoring(captures: list[Capture]) -> Monitoring:
     )
 
 
+def learning_queue(cases: list[Case], limit: int = 10) -> list[LearningCase]:
+    queue = []
+    for case in sorted(cases, key=lambda c: c.created_at, reverse=True):
+        review = case.review
+        if review is None or review.pattern_read in (None, "unsure") or not case.captures:
+            continue
+        triage = (case.captures[-1].result or {}).get("triage_model")
+        if triage is None:
+            continue
+        model = triage.get("pattern")
+        if model == review.pattern_read:
+            continue
+        queue.append(
+            LearningCase(
+                case_id=case.id,
+                patient_code=case.lesion.patient.code,
+                fitzpatrick=case.lesion.patient.fitzpatrick,
+                reason="model_abstained" if model is None else "disagreement",
+                dermatologist_read=review.pattern_read,
+                model_pattern=model,
+            )
+        )
+    return queue[:limit]
+
+
 @router.get("/summary", response_model=AISummary)
 def ai_summary(user: Dermatologist, session: Annotated[Session, Depends(get_session)]) -> AISummary:
     # ponytail: loads every case of the group per call; fine at demo scale, aggregate in SQL
@@ -215,6 +241,7 @@ def ai_summary(user: Dermatologist, session: Annotated[Session, Depends(get_sess
         shadow=_shadow(cases),
         data=_data(cases),
         monitoring=_monitoring(recent),
+        learning_queue=learning_queue(cases),
     )
 
 
