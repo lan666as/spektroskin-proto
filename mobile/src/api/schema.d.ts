@@ -565,6 +565,7 @@ export interface components {
              */
             width_mm?: number | null;
             quality_model?: components["schemas"]["QualityOpinion"] | null;
+            change_since_first?: components["schemas"]["ChangeSinceFirst"] | null;
             triage_model?: components["schemas"]["TriageOpinion"] | null;
             acral_model?: components["schemas"]["AcralOpinion"] | null;
             morphology?: components["schemas"]["Morphology"] | null;
@@ -694,6 +695,28 @@ export interface components {
              * @default []
              */
             attention_flags: ("ridge_pattern" | "growing" | "border_change" | "ai_unsure")[];
+        };
+        /**
+         * ChangeSinceFirst
+         * @description Outline comparison with the lesion's first visit after registering the two captures.
+         */
+        ChangeSinceFirst: {
+            /**
+             * First Capture Id
+             * Format: uuid
+             */
+            first_capture_id: string;
+            /** New Area Mm2 */
+            new_area_mm2: number;
+            /** No Longer Covered Mm2 */
+            no_longer_covered_mm2: number;
+            /**
+             * Overlap Fraction
+             * @description Share of the first outline still covered
+             */
+            overlap_fraction: number;
+            /** Registration Shift Px */
+            registration_shift_px: number[];
         };
         /** ChromophoreContrast */
         ChromophoreContrast: {
@@ -1896,7 +1919,7 @@ export interface operations {
             header?: never;
             path: {
                 capture_id: string;
-                name: "standard" | "pigment" | "vascular" | "evidence";
+                name: "standard" | "pigment" | "vascular" | "evidence" | "change";
             };
             cookie?: never;
         };

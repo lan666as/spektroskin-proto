@@ -346,3 +346,13 @@ Timestamped record of what was built during GENOHACK (Sat 24 – Sun 25 Oct 2026
   ablation arms of the triage model. The AI page shows a tone strip per model with the lowest tone
   outlined, and states the finding plainly: both pattern models are least accurate on Fitzpatrick V
   (triage 0.96, acral 0.97); the quality model is lowest on light skin (0.92).
+
+## 2026-10-25 02:45 WIB — Iteration loop, batch 15: change since Day 01 (registered outlines)
+
+- `app/processing/change.py`: registers the lesion's first processed visit onto the new capture by
+  skin texture (phase correlation), then compares outlines: new area, receded area, overlap. At
+  ingest the new capture stores a "change" view (blue = Day 01 outline, teal = now, amber = new
+  area) and `change_since_first` numbers (additive field).
+- App: "Change since Day 01" view tab; the evolution row of the measurements card shows mm² new and
+  receded. Tests: Day 01 → Day 30 shows 7–13 mm² of new area with the old outline still covered;
+  two captures of the same lesion show < 1.5 mm² change. E2E cycles the change view.

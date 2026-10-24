@@ -265,7 +265,10 @@ export function MorphologyCard({ capture, visits }: { capture: Capture; visits: 
     {
       label: 'Evolution',
       value: change ? `${change.percent >= 0 ? '+' : ''}${change.percent.toFixed(0)}% area in ${change.days} days` : 'First visit',
-      how: 'Area change across visits of the same lesion.',
+      change: capture.change_since_first
+        ? `${capture.change_since_first.new_area_mm2.toFixed(1)} mm² new · ${capture.change_since_first.no_longer_covered_mm2.toFixed(1)} mm² receded`
+        : undefined,
+      how: 'Area change across visits; new and receded area from the registered outlines (see the Change view).',
       testID: 'morph-evolution',
     },
   ];

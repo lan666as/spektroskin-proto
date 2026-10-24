@@ -99,7 +99,7 @@ test('PLAN §6 demo script: 60 s core + extended', async ({ browser, request }) 
   await expect(byId(clinician, 'qc-second-opinion')).toContainText('agrees with the rules');
   await shot(clinician, '05-results');
   // 3: switch the three views; outline and area.
-  for (const view of ['pigment', 'vascular', 'evidence', 'standard']) {
+  for (const view of ['pigment', 'vascular', 'evidence', 'change', 'standard']) {
     await byId(clinician, `view-${view}`).click();
     await expect(byId(clinician, `view-image-${view}`)).toBeVisible();
   }
@@ -109,6 +109,7 @@ test('PLAN §6 demo script: 60 s core + extended', async ({ browser, request }) 
   await expect(byId(clinician, 'triage-drivers')).toContainText('melanin excess');
   await expect(byId(clinician, 'acral-pattern-result')).toContainText('furrows');
   await expect(byId(clinician, 'morph-border')).toContainText('since Day 01');
+  await expect(byId(clinician, 'morph-evolution')).toContainText('mm² new');
   await expect(byId(clinician, 'morphology')).not.toContainText(/score\s*[:=]?\s*\d/i);
   await expect(byId(clinician, 'triage-support')).not.toContainText(/malignan(cy|t) (probability|risk)|risk score/i);
   // 4: history Day 01 → Day 14 → Day 30 with area change.

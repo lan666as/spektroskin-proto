@@ -36,7 +36,7 @@ OutcomeAction = Literal["observed", "biopsied", "excised", "referred", "declined
 Histopathology = Literal["pending", "benign", "malignant", "indeterminate"]
 PatternRead = Literal["pigmented", "vascular", "mixed", "unsure"]
 AttentionFlag = Literal["ridge_pattern", "growing", "border_change", "ai_unsure"]
-ViewName = Literal["standard", "pigment", "vascular", "evidence"]
+ViewName = Literal["standard", "pigment", "vascular", "evidence", "change"]
 
 PatientCode = Annotated[str, StringConstraints(pattern=r"^PT-\d{4}$")]
 Text2000 = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=2000)]
@@ -130,6 +130,16 @@ class SpectralSignature(BaseModel):
     hemoglobin: ChromophoreContrast
 
 
+class ChangeSinceFirst(BaseModel):
+    """Outline comparison with the lesion's first visit after registering the two captures."""
+
+    first_capture_id: uuid.UUID
+    new_area_mm2: float
+    no_longer_covered_mm2: float
+    overlap_fraction: float = Field(description="Share of the first outline still covered")
+    registration_shift_px: list[float]
+
+
 class QualityOpinion(BaseModel):
     """Advisory output of the learned image-quality model; the rule-based QC decides."""
 
@@ -208,6 +218,7 @@ class CaptureOut(BaseModel):
     diameter_mm: float | None = Field(default=None, description="Longest diameter of the outline")
     width_mm: float | None = Field(default=None, description="Width (ellipse minor axis)")
     quality_model: QualityOpinion | None = None
+    change_since_first: ChangeSinceFirst | None = None
     triage_model: TriageOpinion | None = None
     acral_model: AcralOpinion | None = None
     morphology: Morphology | None = None
