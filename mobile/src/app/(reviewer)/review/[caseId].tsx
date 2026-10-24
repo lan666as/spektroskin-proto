@@ -210,6 +210,9 @@ export default function ReviewCase() {
         <View style={{ flexDirection: twoColumns ? 'row' : 'column', gap: spacing.lg, alignItems: 'flex-start' }}>
           <View style={{ flex: twoColumns ? 3 : undefined, width: twoColumns ? undefined : '100%', gap: spacing.lg }}>
             {latest ? <SpectralViews key={latest.id} capture={latest} allowAll={twoColumns} /> : null}
+            {latest && !hideAI ? <TriageSupport capture={latest} read={c.review?.pattern_read} /> : null}
+            {latest && !hideAI ? <AcralPattern capture={latest} site={c.lesion.body_site} /> : null}
+            {latest && !hideAI ? <ChecklistCard capture={latest} site={c.lesion.body_site} /> : null}
             <HistoryStrip
               captures={c.lesion_history}
               currentId={latest?.id}
@@ -241,11 +244,6 @@ export default function ReviewCase() {
                 <Muted>Blind reads avoid anchoring on the model and make the shadow-mode comparison fair.</Muted>
               </Card>
             ) : null}
-            {latest && !hideAI ? <TriageSupport capture={latest} read={c.review?.pattern_read} /> : null}
-            {latest && !hideAI ? <AcralPattern capture={latest} site={c.lesion.body_site} /> : null}
-            {latest && !hideAI ? <ChecklistCard capture={latest} site={c.lesion.body_site} /> : null}
-            {!hideAI ? <SimilarCases caseId={c.id} /> : null}
-            <CaseTimeline c={c} />
             {c.review ? (
               <>
                 {justSent ? (
@@ -270,6 +268,8 @@ export default function ReviewCase() {
                 onSent={() => setJustSent(true)}
               />
             )}
+            {!hideAI ? <SimilarCases caseId={c.id} /> : null}
+            <CaseTimeline c={c} />
           </View>
         </View>
       ) : null}

@@ -27,7 +27,14 @@ export default function Results() {
     c && router.push({ pathname: '/captures/[captureId]/submit', params: { captureId: c.id } });
 
   return (
-    <Screen testID="results-screen">
+    <Screen
+      testID="results-screen"
+      footer={
+        c?.qc.passed ? (
+          <Button label="Submit for dermatologist review" onPress={submit} testID="submit-for-review" />
+        ) : undefined
+      }
+    >
       <Stack.Screen options={{ title: day ? `Results · Day ${String(day).padStart(2, '0')}` : 'Results' }} />
       <ErrorBanner error={capture.error ?? lesion.error} />
       {capture.isPending ? <Loading /> : null}
@@ -54,7 +61,6 @@ export default function Results() {
               {lesion.data ? <AcralPattern capture={c} site={lesion.data.body_site} /> : null}
               {lesion.data ? <ChecklistCard capture={c} site={lesion.data.body_site} /> : null}
               {lesion.data ? <VisitCompare captures={lesion.data.captures} selectedId={c.id} /> : null}
-              <Button label="Submit for dermatologist review" onPress={submit} testID="submit-for-review" />
               <MorphologyCard capture={c} visits={lesion.data?.captures ?? []} />
               <AutomatedAnalysis capture={c} visits={lesion.data?.captures ?? []} site={lesion.data?.body_site} />
               {lesion.data ? (

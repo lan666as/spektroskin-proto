@@ -19,12 +19,15 @@ export function Screen({
   wide = false,
   testID,
   onRefresh,
+  footer,
 }: {
   children: ReactNode;
   wide?: boolean;
   testID?: string;
   /** Enables pull-to-refresh. */
   onRefresh?: () => Promise<unknown>;
+  /** Pinned below the scrolling content, e.g. the screen's main action. */
+  footer?: ReactNode;
 }) {
   const [refreshing, setRefreshing] = useState(false);
   const refresh = onRefresh
@@ -37,7 +40,7 @@ export function Screen({
         }
       }
     : undefined;
-  return (
+  const scroll = (
     <ScrollView
       refreshControl={refresh ? <RefreshControl refreshing={refreshing} onRefresh={refresh} /> : undefined}
       style={styles.screen}
@@ -47,6 +50,15 @@ export function Screen({
     >
       {children}
     </ScrollView>
+  );
+  if (!footer) return scroll;
+  return (
+    <View style={{ flex: 1 }}>
+      {scroll}
+      <View style={styles.footer}>
+        <View style={{ width: '100%', maxWidth: wide ? 1200 : 640, alignSelf: 'center' }}>{footer}</View>
+      </View>
+    </View>
   );
 }
 
@@ -271,6 +283,13 @@ export function ListItem({
 
 const styles = StyleSheet.create({
   screen: { flex: 1, backgroundColor: colors.canvas },
+  footer: {
+    backgroundColor: colors.background,
+    borderTopWidth: 1,
+    borderTopColor: colors.border,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.sm,
+  },
   screenContent: {
     width: '100%',
     alignSelf: 'center',

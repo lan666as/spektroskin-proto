@@ -584,3 +584,11 @@ Timestamped record of what was built during GENOHACK (Sat 24 – Sun 25 Oct 2026
   these published scores. Tests: formula, applicability, BRAAFF on the ridge phantom; e2e asserts
   the cards. Item thresholds were set on simulated phantoms; item detection is not clinically
   validated, and the card says so.
+
+## 2026-10-25 06:30 WIB — UX batch 1: pinned submit, reviewer layout
+
+- `Screen` gained a pinned `footer`. The results screen pins "Submit for dermatologist review" above
+  the tab bar (it used to sit under about 10 cards).
+- Reviewer case: triage, acral and checklist cards moved to the left column under the images. The
+  right column is case info → blind-read toggle → review form (now on the first screen at
+  1440 px) → similar lesions and timeline.
