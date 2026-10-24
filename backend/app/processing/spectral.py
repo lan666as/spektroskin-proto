@@ -13,11 +13,20 @@ def unmix(reflectance: dict[str, np.ndarray]) -> tuple[np.ndarray, np.ndarray]:
 
     Returns estimated (melanin, hemoglobin) maps in the model's arbitrary concentration units.
     """
+    coeffs = _coefficients(reflectance)
+    return coeffs[0].astype(np.float32), coeffs[1].astype(np.float32)
+
+
+def shading(reflectance: dict[str, np.ndarray]) -> np.ndarray:
+    """The band-independent term of the unmixing: skin-line and ridge shading."""
+    return _coefficients(reflectance)[2].astype(np.float32)
+
+
+def _coefficients(reflectance: dict[str, np.ndarray]) -> np.ndarray:
     absorbance = np.stack(
         [
             ndimage.gaussian_filter(-np.log(np.clip(reflectance[b], 1e-4, None) / R0[i]), 0.8)
             for i, b in enumerate(BANDS)
         ]
     )
-    coeffs = np.tensordot(_UNMIX, absorbance, axes=1)
-    return coeffs[0].astype(np.float32), coeffs[1].astype(np.float32)
+    return np.tensordot(_UNMIX, absorbance, axes=1)

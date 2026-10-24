@@ -58,6 +58,8 @@ test('clinician: login → patient → lesion → capture → results with histo
   await expect(history.getByText(/mm²/)).toHaveCount(4); // 3 visit areas + change line
   await expect(byId(page, 'area-change')).toContainText('+');
   await expect(byId(page, 'compare-change')).toContainText('+');
+  await expect(byId(page, 'acral-pattern-result')).toContainText('furrows');
+  await expect(byId(page, 'acral-guideline')).toHaveCount(0);
   await byId(page, 'show-validation').click();
   await expect(byId(page, 'validation-scope')).toContainText('simulated data only');
 
@@ -71,4 +73,14 @@ test('clinician: login → patient → lesion → capture → results with histo
   await byId(page, 'nav-cases').click();
   await expect(byId(page, 'my-cases-screen')).toContainText(code);
   await closeCase(request, caseId);
+
+  // A second sole lesion whose pigment follows the ridges is flagged for prompt review.
+  await byId(page, 'nav-patients').click();
+  await byId(page, `patient-${code}`).click();
+  await byId(page, 'add-lesion').click();
+  await byId(page, 'acral-sole-right').click();
+  await byId(page, 'create-lesion').click();
+  await captureWith(page, 'acral_ridge_dark');
+  await expect(byId(page, 'acral-pattern-result')).toContainText('ridges');
+  await expect(byId(page, 'acral-guideline')).toContainText('prompt dermatologist review');
 });

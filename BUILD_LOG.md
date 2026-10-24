@@ -260,3 +260,17 @@ Timestamped record of what was built during GENOHACK (Sat 24 – Sun 25 Oct 2026
 - Smoke: simulate → download frames → upload → processed with triage → validation.
 - Phone: frames are attached by URL (React Native downloads them when sending the multipart
   request). NEEDS PHONE CHECK.
+
+## 2026-10-25 01:33 WIB — Iteration loop, batch 7: acral pattern model (research mode)
+
+- Simulator: acral lesions carry `acral_pattern` (furrow / ridge) and `acral_modulation`; new
+  catalogue phantom `acral_ridge_dark` (bundled; existing phantoms byte-identical); generated acral
+  lesions are ridge-patterned 35 % of the time.
+- `app/processing/acral_model.py`: correlates the band-passed melanin map with the band-independent
+  shading term of the unmixing (the ridges); logistic regression on 5 features, abstains below 75 %.
+  Trained on 400 / held out 240 simulated acral lesions with pattern strength 0.005–0.35: held-out
+  accuracy 0.99; answers 91 %, 1.00 correct when answering; on faint patterns (< 0.05) it answers
+  only 54 %. Model card `docs/evidence/acral_model_card.md`.
+- App: "Acral pattern" card (results, reviewer) only for palm, sole and nail sites; a ridge pattern
+  shows the guideline line (Saida 2004: prompt dermatologist review). Analysis row and AI roadmap
+  entry. E2E: demo lesion reads furrows; a ridge lesion is flagged.

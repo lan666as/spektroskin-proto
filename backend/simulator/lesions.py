@@ -45,6 +45,8 @@ def spec_from_id(phantom_id: str) -> PhantomSpec | None:
     pigment = {"pigmented": rng.uniform(0.9, 1.8), "mixed": rng.uniform(0.7, 1.2)}.get(pattern)
     vascular = {"vascular": rng.uniform(0.45, 0.85), "mixed": rng.uniform(0.35, 0.6)}.get(pattern)
     tone = _TONES[tone_key]
+    acral_pattern = "ridge" if rng.random() < 0.35 else "furrow"
+    acral_modulation = rng.uniform(0.1, 0.35)
     return PhantomSpec(
         id=phantom_id,
         lesion=pattern,
@@ -56,6 +58,8 @@ def spec_from_id(phantom_id: str) -> PhantomSpec | None:
         description=f"Simulated {pattern} lesion, {tone} skin, day {int(day)}",
         pigment_amplitude=pigment,
         vascular_amplitude=vascular,
+        acral_pattern=acral_pattern,
+        acral_modulation=acral_modulation,
     )
 
 

@@ -30,6 +30,9 @@ class PhantomSpec:
     # Lesion chromophore strength; None keeps the per-type default (training sets vary these).
     pigment_amplitude: float | None = None
     vascular_amplitude: float | None = None
+    # Acral only: pigment along the furrows (parallel furrow) or along the ridges (parallel ridge).
+    acral_pattern: str = "furrow"
+    acral_modulation: float = 0.3  # how strongly pigment follows the pattern
 
     @property
     def fitzpatrick(self) -> str:
@@ -80,6 +83,17 @@ def catalogue() -> list[PhantomSpec]:
         )
         for day, area in ((1, 18.0), (14, 22.0), (30, 28.0))
     ]
+    specs.append(
+        PhantomSpec(
+            "acral_ridge_dark",
+            "pigmented",
+            "dark",
+            acral=True,
+            area_mm2=22.0,
+            acral_pattern="ridge",
+            description="Acral (sole) pigmented lesion, dark skin tone, pigment along the ridges",
+        )
+    )
     return specs
 
 
@@ -194,7 +208,8 @@ def ground_truth(spec: PhantomSpec) -> GroundTruth:
         lesion_mel = amplitude * profile * modulation
         if spec.acral:
             ridge_phase = (1.0 - shading) / 0.05  # 0 on ridges' crests, 1 in furrows
-            lesion_mel *= 0.8 + 0.3 * ridge_phase
+            along = ridge_phase if spec.acral_pattern == "furrow" else 1.0 - ridge_phase
+            lesion_mel *= 0.8 + spec.acral_modulation * along
         melanin = melanin + lesion_mel
         hemoglobin = hemoglobin + 0.08 * profile
     if spec.lesion in ("vascular", "mixed"):

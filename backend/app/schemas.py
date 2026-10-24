@@ -172,6 +172,21 @@ class TriageOpinion(BaseModel):
     drivers: list[TriageDriver] = []
 
 
+class AcralOpinion(BaseModel):
+    """Research-mode acral pattern read (pigment along furrows or ridges) from a model trained on
+    simulated acral lesions only. Meaningful only for palm, sole and nail sites."""
+
+    model: str
+    pattern: Literal["furrow", "ridge"] | None = Field(
+        description="null = uncertain, the dermatologist decides"
+    )
+    probabilities: dict[str, float]
+    abstain_below: float
+    held_out_accuracy_when_answered: float
+    held_out_coverage: float
+    trained_on: str
+
+
 class CaptureOut(BaseModel):
     id: uuid.UUID
     lesion_id: uuid.UUID
@@ -189,6 +204,7 @@ class CaptureOut(BaseModel):
     width_mm: float | None = Field(default=None, description="Width (ellipse minor axis)")
     quality_model: QualityOpinion | None = None
     triage_model: TriageOpinion | None = None
+    acral_model: AcralOpinion | None = None
     morphology: Morphology | None = None
     registration_shift_px: dict[str, list[float]] | None = None
     gain_correction: dict[str, float] | None = None

@@ -1,6 +1,7 @@
 from dataclasses import replace
 
 from app.processing import render
+from app.processing.acral_model import predict as acral_opinion
 from app.processing.calibration import calibrate
 from app.processing.qc import run_qc
 from app.processing.quality_model import predict as quality_opinion
@@ -13,17 +14,22 @@ from app.processing.types import DeviceProfile, FrameSet, ProcessingResult
 
 
 def run(frame_set: FrameSet, device_profile: DeviceProfile) -> ProcessingResult:
-    """measure(), then the learned models' advisory opinions. Neither gates nor changes a
-    measurement: the quality model sits beside the rule-based QC, the triage model (research
-    mode) suggests a pattern for the dermatologist."""
+    """measure(), then the learned models' advisory opinions. None gates or changes a
+    measurement: the quality model sits beside the rule-based QC; the triage and acral pattern
+    models (research mode) suggest patterns for the dermatologist."""
     result = measure(frame_set, device_profile)
-    triage = (
-        triage_opinion(result.reflectance, result.melanin, result.hemoglobin, result.mask)
-        if result.mask is not None
-        else None
-    )
+    measured = result.mask is not None
     return replace(
-        result, quality_model=quality_opinion(frame_set, device_profile), triage_model=triage
+        result,
+        quality_model=quality_opinion(frame_set, device_profile),
+        triage_model=triage_opinion(
+            result.reflectance, result.melanin, result.hemoglobin, result.mask
+        )
+        if measured
+        else None,
+        acral_model=acral_opinion(result.reflectance, result.melanin, result.mask)
+        if measured
+        else None,
     )
 
 

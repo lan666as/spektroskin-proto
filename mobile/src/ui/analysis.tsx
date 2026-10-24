@@ -1,10 +1,10 @@
 import { useRouter } from 'expo-router';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
-import type { Capture } from '@/api/client';
+import type { BodySite, Capture } from '@/api/client';
 
 import { Card, Heading, Muted, Row } from './components';
-import { formatArea, visitDay } from './labels';
+import { formatArea, isAcral, visitDay } from './labels';
 import { patternSummary } from './triage';
 import { colors, radius, spacing } from './theme';
 
@@ -95,7 +95,15 @@ export function qualityStep(q: NonNullable<Capture['quality_model']>, rulesPasse
  * What the software did automatically for this capture, each step with how it works and its
  * limits. Assistance only: it measures and checks images; people interpret them.
  */
-export function AutomatedAnalysis({ capture, visits }: { capture: Capture; visits: Capture[] }) {
+export function AutomatedAnalysis({
+  capture,
+  visits,
+  site,
+}: {
+  capture: Capture;
+  visits: Capture[];
+  site?: BodySite;
+}) {
   const router = useRouter();
   const first = visits.find((v) => v.status === 'processed');
   const change = areaChange(first, capture);
@@ -142,6 +150,18 @@ export function AutomatedAnalysis({ capture, visits }: { capture: Capture; visit
             how: 'Small model trained on simulated lesions only. Describes the dominant pigment or blood pattern; not validated on real skin.',
             active: true,
             testID: 'triage-row',
+          },
+        ]
+      : []),
+    ...(capture.acral_model && site && isAcral(site)
+      ? [
+          {
+            title: 'Acral pattern (research mode)',
+            result: capture.acral_model.pattern
+              ? `Pigment along the ${capture.acral_model.pattern === 'ridge' ? 'ridges' : 'furrows'}`
+              : 'Uncertain: pattern too faint',
+            how: 'Pigment map compared with the skin ridges. Trained on simulated acral lesions only.',
+            active: true,
           },
         ]
       : []),

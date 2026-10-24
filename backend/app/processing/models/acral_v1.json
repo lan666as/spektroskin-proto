@@ -1,0 +1,129 @@
+{
+ "version": "acral_v1",
+ "classes": [
+  "furrow",
+  "ridge"
+ ],
+ "mean": [
+  -0.03366945,
+  -0.02230621,
+  0.09405767,
+  0.01389266,
+  0.85202177
+ ],
+ "scale": [
+  0.53418854,
+  0.07818626,
+  0.01927969,
+  0.00102179,
+  0.24868266
+ ],
+ "coef": [
+  -5.18042164,
+  -0.16467191,
+  -0.3496604,
+  -0.38435575,
+  -0.24143916
+ ],
+ "intercept": -0.4508477,
+ "metrics": {
+  "train": {
+   "n": 379,
+   "accuracy": 0.9921,
+   "coverage": 0.9446,
+   "accuracy_when_answered": 1.0,
+   "by_tone": {
+    "light (III)": {
+     "n": 114,
+     "accuracy": 1.0,
+     "coverage": 0.9474,
+     "accuracy_when_answered": 1.0
+    },
+    "medium (IV)": {
+     "n": 137,
+     "accuracy": 1.0,
+     "coverage": 0.9635,
+     "accuracy_when_answered": 1.0
+    },
+    "dark (V)": {
+     "n": 128,
+     "accuracy": 0.9766,
+     "coverage": 0.9219,
+     "accuracy_when_answered": 1.0
+    }
+   },
+   "faint_pattern": {
+    "n": 55,
+    "accuracy": 0.9455,
+    "coverage": 0.6182,
+    "accuracy_when_answered": 1.0
+   },
+   "clear_pattern": {
+    "n": 324,
+    "accuracy": 1.0,
+    "coverage": 1.0,
+    "accuracy_when_answered": 1.0
+   },
+   "confusion": [
+    [
+     193,
+     2
+    ],
+    [
+     1,
+     183
+    ]
+   ]
+  },
+  "held_out": {
+   "n": 230,
+   "accuracy": 0.9913,
+   "coverage": 0.913,
+   "accuracy_when_answered": 0.9952,
+   "by_tone": {
+    "light (III)": {
+     "n": 76,
+     "accuracy": 1.0,
+     "coverage": 0.9211,
+     "accuracy_when_answered": 1.0
+    },
+    "medium (IV)": {
+     "n": 80,
+     "accuracy": 1.0,
+     "coverage": 0.925,
+     "accuracy_when_answered": 1.0
+    },
+    "dark (V)": {
+     "n": 74,
+     "accuracy": 0.973,
+     "coverage": 0.8919,
+     "accuracy_when_answered": 0.9848
+    }
+   },
+   "faint_pattern": {
+    "n": 39,
+    "accuracy": 0.9487,
+    "coverage": 0.5385,
+    "accuracy_when_answered": 0.9524
+   },
+   "clear_pattern": {
+    "n": 191,
+    "accuracy": 1.0,
+    "coverage": 0.9895,
+    "accuracy_when_answered": 1.0
+   },
+   "confusion": [
+    [
+     117,
+     1
+    ],
+    [
+     1,
+     111
+    ]
+   ]
+  }
+ },
+ "trained_at": "2026-10-24 18:27 UTC",
+ "trained_from_commit": "9896864"
+}

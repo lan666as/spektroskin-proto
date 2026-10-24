@@ -1,0 +1,38 @@
+{
+  "phantom_id": "acral_ridge_dark",
+  "device_id": "virtual-001",
+  "device_type": "virtual",
+  "bands": [
+    "blue",
+    "green",
+    "red",
+    "nir"
+  ],
+  "wavelengths_nm": {
+    "blue": 470,
+    "green": 550,
+    "red": 660,
+    "nir": 850
+  },
+  "simulated": true,
+  "description": "Acral (sole) pigmented lesion, dark skin tone, pigment along the ridges",
+  "lesion": "pigmented",
+  "tone": "dark",
+  "fitzpatrick": "V",
+  "acral": true,
+  "variant": null,
+  "true_shift_px": {
+    "blue": [
+      -1.0003868579554964,
+      0.2237632221693957
+    ],
+    "red": [
+      -0.44172476350339784,
+      -2.3459423136270803
+    ],
+    "nir": [
+      0.8519054797252064,
+      2.725908654429671
+    ]
+  }
+}

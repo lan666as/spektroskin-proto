@@ -346,6 +346,32 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /**
+         * AcralOpinion
+         * @description Research-mode acral pattern read (pigment along furrows or ridges) from a model trained on
+         *     simulated acral lesions only. Meaningful only for palm, sole and nail sites.
+         */
+        AcralOpinion: {
+            /** Model */
+            model: string;
+            /**
+             * Pattern
+             * @description null = uncertain, the dermatologist decides
+             */
+            pattern: ("furrow" | "ridge") | null;
+            /** Probabilities */
+            probabilities: {
+                [key: string]: number;
+            };
+            /** Abstain Below */
+            abstain_below: number;
+            /** Held Out Accuracy When Answered */
+            held_out_accuracy_when_answered: number;
+            /** Held Out Coverage */
+            held_out_coverage: number;
+            /** Trained On */
+            trained_on: string;
+        };
         /** AuditEventOut */
         AuditEventOut: {
             /**
@@ -488,6 +514,7 @@ export interface components {
             width_mm?: number | null;
             quality_model?: components["schemas"]["QualityOpinion"] | null;
             triage_model?: components["schemas"]["TriageOpinion"] | null;
+            acral_model?: components["schemas"]["AcralOpinion"] | null;
             morphology?: components["schemas"]["Morphology"] | null;
             /** Registration Shift Px */
             registration_shift_px?: {

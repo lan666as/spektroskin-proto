@@ -20,7 +20,7 @@ import {
 } from '@/ui/components';
 import { CaseTimeline, Footnote, HistoryStrip, Recommendation, SpectralViews, VisitCompare } from '@/ui/clinical';
 import { areaChange, AutomatedAnalysis, formatSize, MorphologyCard } from '@/ui/analysis';
-import { TriageSupport } from '@/ui/triage';
+import { AcralPattern, TriageSupport } from '@/ui/triage';
 import { OutcomeCard } from '@/ui/outcome';
 import { SpectralSignature } from '@/ui/measurement';
 import { isAcral } from '@/ui/labels';
@@ -166,13 +166,14 @@ export default function ReviewCase() {
             />
             <VisitCompare captures={c.lesion_history} selectedId={reviewed?.id} />
             {latest ? <MorphologyCard capture={latest} visits={c.lesion_history} /> : null}
-            {latest ? <AutomatedAnalysis capture={latest} visits={c.lesion_history} /> : null}
+            {latest ? <AutomatedAnalysis capture={latest} visits={c.lesion_history} site={c.lesion.body_site} /> : null}
             {latest ? <SpectralSignature capture={latest} /> : null}
             <Footnote />
           </View>
           <View style={{ flex: twoColumns ? 2 : undefined, width: twoColumns ? undefined : '100%', gap: spacing.lg }}>
             <CaseInfo c={c} />
             {latest ? <TriageSupport capture={latest} /> : null}
+            {latest ? <AcralPattern capture={latest} site={c.lesion.body_site} /> : null}
             <CaseTimeline c={c} />
             {c.review ? (
               <>

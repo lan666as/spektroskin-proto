@@ -38,6 +38,14 @@ const TIERS: { tier: string; title: string; status: Status; what: string; gate: 
     gate: 'Next: retrain on real, consented captures; add a medical image encoder and patient metadata.',
   },
   {
+    tier: 'Tier 3',
+    title: 'Triage support: acral pattern',
+    status: 'researchActive',
+    what:
+      'Running now in research mode for palms, soles and nails: reads whether pigment follows the skin furrows or the ridges, by comparing the pigment map with the ridges the unmixing finds. A parallel ridge pattern is a guideline reason for prompt review (Saida 2004); acral melanoma is the most common subtype reported in Asian patients. On held-out simulated acral lesions it was right 99% of the time and abstained on half of the faintest patterns.',
+    gate: 'Next: real, consented acral captures from Indonesian clinics, read by dermatologists.',
+  },
+  {
     tier: 'Tier 3b',
     title: 'Triage support: suspicion for biopsy',
     status: 'research',

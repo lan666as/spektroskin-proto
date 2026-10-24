@@ -1,9 +1,10 @@
 import { useRouter } from 'expo-router';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
-import type { Capture } from '@/api/client';
+import type { BodySite, Capture } from '@/api/client';
 
 import { Card, Heading, Muted, Row } from './components';
+import { isAcral } from './labels';
 import { SimulatedBadge } from './SimulatedBadge';
 import { colors, radius, spacing } from './theme';
 
@@ -89,6 +90,58 @@ export function TriageSupport({ capture }: { capture: Capture }) {
   );
 }
 
+const ACRAL_LABELS = {
+  furrow: 'Pigment follows the furrows (parallel furrow pattern)',
+  ridge: 'Pigment follows the ridges (parallel ridge pattern)',
+} as const;
+
+/**
+ * Research-mode acral pattern read, shown only for palm, sole and nail sites. The ridge pattern is
+ * a guideline reason for prompt specialist review; the card says so, and nothing more.
+ */
+export function AcralPattern({ capture, site }: { capture: Capture; site: BodySite }) {
+  const a = capture.acral_model;
+  if (!a || !isAcral(site)) return null;
+  const ridge = a.pattern === 'ridge';
+  return (
+    <Card testID="acral-pattern" style={{ borderColor: ridge ? colors.danger : colors.accent }}>
+      <Row style={{ justifyContent: 'space-between', flexWrap: 'wrap' }}>
+        <Heading>Acral pattern</Heading>
+        <Row style={{ gap: spacing.xs }}>
+          <View style={styles.research}>
+            <Text style={styles.researchText}>Research mode · not a diagnosis</Text>
+          </View>
+          <SimulatedBadge label="Simulated training data" />
+        </Row>
+      </Row>
+      <Text style={styles.acral} testID="acral-pattern-result">
+        {a.pattern ? ACRAL_LABELS[a.pattern] : 'Uncertain: pattern too faint to call'}
+      </Text>
+      {(['furrow', 'ridge'] as const).map((p) => (
+        <View key={p} style={styles.barRow}>
+          <Text style={styles.barLabel}>{p === 'furrow' ? 'Along furrows' : 'Along ridges'}</Text>
+          <View style={styles.track}>
+            <View style={[styles.fill, { width: `${Math.round((a.probabilities[p] ?? 0) * 100)}%` }]} />
+          </View>
+          <Text style={styles.barValue}>{Math.round((a.probabilities[p] ?? 0) * 100)}%</Text>
+        </View>
+      ))}
+      {ridge ? (
+        <Text style={styles.guideline} testID="acral-guideline">
+          On palms and soles, a parallel ridge pattern is a recognised reason for prompt dermatologist
+          review (Saida et al., 2004). Consider asking for a review.
+        </Text>
+      ) : null}
+      <Muted>
+        Compares the pigment map with the skin ridges found by the unmixing. On held-out simulated
+        acral lesions it answered {Math.round(a.held_out_coverage * 100)}% of the time and was right
+        on {Math.round(a.held_out_accuracy_when_answered * 100)}% of those; it abstains on faint
+        patterns. Trained on {a.trained_on}; not validated on real skin.
+      </Muted>
+    </Card>
+  );
+}
+
 const styles = StyleSheet.create({
   research: {
     backgroundColor: colors.accentSoft,
@@ -106,6 +159,8 @@ const styles = StyleSheet.create({
   barValue: { width: 44, textAlign: 'right', fontSize: 14, fontWeight: '700', color: colors.text },
   link: { color: colors.accent, fontWeight: '600', paddingVertical: spacing.xs },
   why: { fontSize: 14, fontWeight: '700', color: colors.text },
+  acral: { fontSize: 18, fontWeight: '800', color: colors.text },
+  guideline: { fontSize: 14, fontWeight: '600', color: colors.danger },
   driver: { fontSize: 14, color: colors.text, flex: 1 },
   driverEffect: { fontSize: 13, fontWeight: '700' },
 });
