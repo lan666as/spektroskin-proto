@@ -40,9 +40,15 @@ export function MultispectralCapture({ frames, firing, processing }: CaptureView
         ) : shown ? (
           <View style={[styles.fill, styles.glow, { backgroundColor: BAND_INFO[shown].color }]} />
         ) : (
-          <View style={[styles.fill, styles.idle]}>
-            <Text style={styles.idleText}>Ready</Text>
-            <Text style={styles.idleSub}>Place the spacer flat on the lesion</Text>
+          <View style={[styles.fill, styles.idle]} testID="capture-ready">
+            <View style={styles.spacerRing}>
+              <Text style={styles.idleText}>Ready</Text>
+              <Text style={styles.idleSub}>Lesion inside the ring</Text>
+            </View>
+            {(['tl', 'tr', 'bl', 'br'] as const).map((corner) => (
+              <View key={corner} style={[styles.patch, PATCH_POSITION[corner]]} />
+            ))}
+            <Text style={styles.guideText}>Press the spacer flat; gray patches stay in view</Text>
           </View>
         )}
         {shown && !processing ? (
@@ -81,7 +87,27 @@ export function MultispectralCapture({ frames, firing, processing }: CaptureView
   );
 }
 
+const PATCH_POSITION = {
+  tl: { top: 14, left: 14 },
+  tr: { top: 14, right: 14 },
+  bl: { bottom: 40, left: 14 },
+  br: { bottom: 40, right: 14 },
+} as const;
+
 const styles = StyleSheet.create({
+  spacerRing: {
+    width: '62%',
+    aspectRatio: 1,
+    borderRadius: 999,
+    borderWidth: 3,
+    borderColor: '#94A3B8',
+    borderStyle: 'dashed',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 2,
+  },
+  patch: { position: 'absolute', width: 26, height: 26, borderRadius: 4, backgroundColor: '#64748B' },
+  guideText: { position: 'absolute', bottom: 12, color: '#94A3B8', fontSize: 12 },
   viewer: {
     width: '100%',
     maxWidth: 360,

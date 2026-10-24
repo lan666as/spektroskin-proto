@@ -6,7 +6,7 @@ import { Image, Platform, StyleSheet, View } from 'react-native';
 import { api, type CaseSummary } from '@/api/client';
 import { absoluteUrl } from '@/api/config';
 import { Empty, ErrorBanner, Heading, ListItem, Loading, Muted, Pill, Row, Screen } from '@/ui/components';
-import { ACTION_LABELS, duration, formatDateTime, siteLabel, STATUS_LABELS, statusTone } from '@/ui/labels';
+import { ACTION_LABELS, duration, formatDateTime, isAcral, siteLabel, STATUS_LABELS, statusTone } from '@/ui/labels';
 import { radius } from '@/ui/theme';
 
 const POLL_MS = 2_000;
@@ -25,6 +25,7 @@ function CaseRow({ item, onOpen, fresh }: { item: CaseSummary; onOpen: () => voi
       right={
         <Row>
           {fresh ? <Pill label="New" tone="danger" /> : null}
+          {isAcral(item.lesion.body_site) ? <Pill label="Acral site" tone="info" /> : null}
           {item.thumbnail_url ? (
             <Image source={{ uri: absoluteUrl(item.thumbnail_url) }} style={styles.thumb} />
           ) : null}

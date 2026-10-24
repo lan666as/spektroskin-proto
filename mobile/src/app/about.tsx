@@ -1,5 +1,5 @@
 import { Stack } from 'expo-router';
-import { Linking, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Image, Linking, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { Card, Heading, Muted, Screen, Title } from '@/ui/components';
 import { SimulatedBadge } from '@/ui/SimulatedBadge';
@@ -36,6 +36,7 @@ export default function About() {
     <Screen testID="about-screen">
       <Stack.Screen options={{ title: 'About this prototype' }} />
       <View style={{ gap: spacing.xs }}>
+        <Image source={require('@/assets/images/icon.png')} style={{ width: 64, height: 64, borderRadius: 14 }} />
         <Title>SpektroSkin</Title>
         <Text style={styles.lead}>A second look shouldn't require a second hospital.</Text>
         <Muted>

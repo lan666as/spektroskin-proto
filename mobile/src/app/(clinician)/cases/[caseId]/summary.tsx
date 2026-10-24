@@ -81,6 +81,29 @@ export default function ReferralSummary() {
             <Text style={styles.bold}>The dermatologist recommends; the treating clinician decides.</Text>
           </Section>
 
+          {first && first.id !== reviewed.id ? (
+            <Section title="First visit vs reviewed visit">
+              <View style={styles.views}>
+                {[first, reviewed].map((v) => (
+                  <View key={v.id} style={styles.viewCell}>
+                    <Image source={{ uri: absoluteUrl(v.views.standard) }} style={styles.image} />
+                    <Muted>
+                      Day {String(visitDay(v.captured_at, first.captured_at)).padStart(2, '0')} ·{' '}
+                      {formatArea(v.area_mm2)}
+                    </Muted>
+                  </View>
+                ))}
+              </View>
+              {first.area_mm2 && reviewed.area_mm2 ? (
+                <Text style={styles.bold}>
+                  Area change: {reviewed.area_mm2 >= first.area_mm2 ? '+' : ''}
+                  {(((reviewed.area_mm2 - first.area_mm2) / first.area_mm2) * 100).toFixed(0)}% (
+                  {formatArea(first.area_mm2)} → {formatArea(reviewed.area_mm2)})
+                </Text>
+              ) : null}
+            </Section>
+          ) : null}
+
           <Section title="Visits (automated area measurement)">
             {visits.map((v) => (
               <Line

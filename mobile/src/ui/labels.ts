@@ -89,3 +89,8 @@ export function duration(fromIso: string, toIso?: string | null): string {
   const days = Math.floor(hours / 24);
   return `${days} day${days === 1 ? '' : 's'}`;
 }
+
+/** Palms, soles and nails: flagged so reviewers notice the site (metadata, not a diagnosis). */
+export function isAcral(site: BodySite): boolean {
+  return BODY_SITES.some((s) => s.value === site && s.acral);
+}

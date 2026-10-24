@@ -1,9 +1,11 @@
+import { useNetInfo } from '@react-native-community/netinfo';
 import { Redirect, Stack, useRouter } from 'expo-router';
 import { Pressable, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import type { User } from '@/api/client';
 import { useSession } from '@/api/session';
+import { useSync } from '@/sync/SyncProvider';
 
 import { Loading } from './components';
 import { colors, spacing } from './theme';
@@ -20,6 +22,9 @@ export function RoleStack({ role, links }: { role: User['role']; links: Link[] }
   const router = useRouter();
   const { width } = useWindowDimensions();
   const insets = useSafeAreaInsets();
+  const net = useNetInfo();
+  const { pending, syncNow } = useSync();
+  const waitingUploads = pending.filter((p) => !p.failedReason).length;
   if (!ready) return <Loading />;
   if (!user) return <Redirect href="/login" />;
   if (user.role !== role) return <Redirect href="/" />;
@@ -50,6 +55,13 @@ export function RoleStack({ role, links }: { role: User['role']; links: Link[] }
 
   return (
     <View style={styles.fill}>
+      {net.isConnected === false ? (
+        <View style={styles.offline} testID="offline-banner">
+          <Text style={styles.offlineText}>
+            Offline. Captures are saved on this device and upload when the connection is back.
+          </Text>
+        </View>
+      ) : null}
       <Stack
         screenOptions={{
           headerRight: wide ? headerRight : undefined,
@@ -59,6 +71,13 @@ export function RoleStack({ role, links }: { role: User['role']; links: Link[] }
           contentStyle: { backgroundColor: colors.background },
         }}
       />
+      {waitingUploads ? (
+        <Pressable style={styles.pending} onPress={() => void syncNow()} testID="pending-strip">
+          <Text style={styles.pendingText}>
+            {waitingUploads} capture{waitingUploads === 1 ? '' : 's'} waiting to upload · tap to retry now
+          </Text>
+        </Pressable>
+      ) : null}
       {wide ? null : (
         <View style={[styles.bottomBar, { paddingBottom: insets.bottom }]}>
           {items.map((item) => (
@@ -80,6 +99,10 @@ export function RoleStack({ role, links }: { role: User['role']; links: Link[] }
 
 const styles = StyleSheet.create({
   fill: { flex: 1 },
+  offline: { backgroundColor: '#1E293B', paddingHorizontal: spacing.md, paddingVertical: spacing.sm },
+  offlineText: { color: '#F8FAFC', fontSize: 13, textAlign: 'center' },
+  pending: { backgroundColor: colors.simulatedBg, paddingHorizontal: spacing.md, paddingVertical: spacing.sm },
+  pendingText: { color: colors.simulatedText, fontSize: 13, fontWeight: '600', textAlign: 'center' },
   headerActions: { flexDirection: 'row', gap: spacing.xs, marginRight: spacing.sm },
   headerAction: { minHeight: 44, paddingHorizontal: spacing.sm, justifyContent: 'center' },
   actionText: { color: colors.accent, fontWeight: '600', fontSize: 15 },

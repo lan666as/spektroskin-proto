@@ -20,6 +20,7 @@ import {
 } from '@/ui/components';
 import { CaseTimeline, Footnote, HistoryStrip, Recommendation, SpectralViews, VisitCompare } from '@/ui/clinical';
 import { SpectralSignature } from '@/ui/measurement';
+import { isAcral } from '@/ui/labels';
 import { formatArea, formatDateTime, siteLabel, STATUS_LABELS, statusTone } from '@/ui/labels';
 import { colors, radius, spacing } from '@/ui/theme';
 
@@ -113,7 +114,7 @@ function CaseInfo({ c }: { c: CaseDetail }) {
       <KeyValue label="Age / sex" value={`${c.patient.age} · ${c.patient.sex === 'female' ? 'Female' : 'Male'}`} />
       <KeyValue label="Fitzpatrick" value={c.patient.fitzpatrick} />
       <KeyValue label="Research consent" value={c.patient.research_consent ? 'Yes' : 'No'} />
-      <KeyValue label="Site" value={siteLabel(c.lesion)} />
+      <KeyValue label="Site" value={`${siteLabel(c.lesion)}${isAcral(c.lesion.body_site) ? ' (acral)' : ''}`} />
       <KeyValue label="Area (latest)" value={formatArea(latest?.area_mm2)} />
       <KeyValue label="Requested by" value={c.requested_by} />
       <KeyValue label="Submitted" value={formatDateTime(c.created_at)} />

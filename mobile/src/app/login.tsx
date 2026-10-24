@@ -1,6 +1,6 @@
 import { Redirect, useRouter } from 'expo-router';
 import { useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { Image, StyleSheet, Text, View } from 'react-native';
 
 import { useSession } from '@/api/session';
 import { Button, Card, Chips, ErrorBanner, Field, Muted, Screen, Title } from '@/ui/components';
@@ -33,6 +33,7 @@ export default function Login() {
   return (
     <Screen>
       <View style={styles.brand}>
+        <Image source={require('@/assets/images/icon.png')} style={{ width: 64, height: 64, borderRadius: 14 }} />
         <Title>SpektroSkin</Title>
         <Text style={styles.tagline}>A second look shouldn't require a second hospital.</Text>
         <SimulatedBadge label="Research prototype · optical module simulated" />
