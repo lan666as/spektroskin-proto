@@ -1,0 +1,38 @@
+{
+  "phantom_id": "pigmented_light",
+  "device_id": "virtual-001",
+  "device_type": "virtual",
+  "bands": [
+    "blue",
+    "green",
+    "red",
+    "nir"
+  ],
+  "wavelengths_nm": {
+    "blue": 470,
+    "green": 550,
+    "red": 660,
+    "nir": 850
+  },
+  "simulated": true,
+  "description": "Pigmented lesion, light skin tone",
+  "lesion": "pigmented",
+  "tone": "light",
+  "fitzpatrick": "III",
+  "acral": false,
+  "variant": null,
+  "true_shift_px": {
+    "blue": [
+      -0.42776713631452257,
+      -2.6422377109924158
+    ],
+    "red": [
+      2.303654282705707,
+      -0.47942846291211305
+    ],
+    "nir": [
+      -1.2961317003620005,
+      -0.12227932389313922
+    ]
+  }
+}

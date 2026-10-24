@@ -1,0 +1,548 @@
+[
+  {
+    "phantom_id": "pigmented_light",
+    "device_id": "virtual-001",
+    "device_type": "virtual",
+    "bands": [
+      "blue",
+      "green",
+      "red",
+      "nir"
+    ],
+    "wavelengths_nm": {
+      "blue": 470,
+      "green": 550,
+      "red": 660,
+      "nir": 850
+    },
+    "simulated": true,
+    "description": "Pigmented lesion, light skin tone",
+    "lesion": "pigmented",
+    "tone": "light",
+    "fitzpatrick": "III",
+    "acral": false,
+    "variant": null,
+    "true_shift_px": {
+      "blue": [
+        -0.42776713631452257,
+        -2.6422377109924158
+      ],
+      "red": [
+        2.303654282705707,
+        -0.47942846291211305
+      ],
+      "nir": [
+        -1.2961317003620005,
+        -0.12227932389313922
+      ]
+    },
+    "true_area_mm2": 24.0
+  },
+  {
+    "phantom_id": "pigmented_medium",
+    "device_id": "virtual-001",
+    "device_type": "virtual",
+    "bands": [
+      "blue",
+      "green",
+      "red",
+      "nir"
+    ],
+    "wavelengths_nm": {
+      "blue": 470,
+      "green": 550,
+      "red": 660,
+      "nir": 850
+    },
+    "simulated": true,
+    "description": "Pigmented lesion, medium skin tone",
+    "lesion": "pigmented",
+    "tone": "medium",
+    "fitzpatrick": "IV",
+    "acral": false,
+    "variant": null,
+    "true_shift_px": {
+      "blue": [
+        1.2684506117341698,
+        -1.5466412980054756
+      ],
+      "red": [
+        -1.1906479810030055,
+        -2.4575867842112027
+      ],
+      "nir": [
+        -2.9856320006315613,
+        -0.08882811136336399
+      ]
+    },
+    "true_area_mm2": 24.0
+  },
+  {
+    "phantom_id": "pigmented_dark",
+    "device_id": "virtual-001",
+    "device_type": "virtual",
+    "bands": [
+      "blue",
+      "green",
+      "red",
+      "nir"
+    ],
+    "wavelengths_nm": {
+      "blue": 470,
+      "green": 550,
+      "red": 660,
+      "nir": 850
+    },
+    "simulated": true,
+    "description": "Pigmented lesion, dark skin tone",
+    "lesion": "pigmented",
+    "tone": "dark",
+    "fitzpatrick": "V",
+    "acral": false,
+    "variant": null,
+    "true_shift_px": {
+      "blue": [
+        0.774610765773091,
+        0.04484856691951111
+      ],
+      "red": [
+        -0.33534576773070635,
+        1.493272317837627
+      ],
+      "nir": [
+        0.7014313599086972,
+        1.4558837776950395
+      ]
+    },
+    "true_area_mm2": 24.0
+  },
+  {
+    "phantom_id": "vascular_light",
+    "device_id": "virtual-001",
+    "device_type": "virtual",
+    "bands": [
+      "blue",
+      "green",
+      "red",
+      "nir"
+    ],
+    "wavelengths_nm": {
+      "blue": 470,
+      "green": 550,
+      "red": 660,
+      "nir": 850
+    },
+    "simulated": true,
+    "description": "Vascular lesion, light skin tone",
+    "lesion": "vascular",
+    "tone": "light",
+    "fitzpatrick": "III",
+    "acral": false,
+    "variant": null,
+    "true_shift_px": {
+      "blue": [
+        1.5074802093700903,
+        0.3956115098811013
+      ],
+      "red": [
+        -1.6480975265069853,
+        0.5592344258949811
+      ],
+      "nir": [
+        -0.17836392698555947,
+        1.6984689423644168
+      ]
+    },
+    "true_area_mm2": 20.0
+  },
+  {
+    "phantom_id": "vascular_medium",
+    "device_id": "virtual-001",
+    "device_type": "virtual",
+    "bands": [
+      "blue",
+      "green",
+      "red",
+      "nir"
+    ],
+    "wavelengths_nm": {
+      "blue": 470,
+      "green": 550,
+      "red": 660,
+      "nir": 850
+    },
+    "simulated": true,
+    "description": "Vascular lesion, medium skin tone",
+    "lesion": "vascular",
+    "tone": "medium",
+    "fitzpatrick": "IV",
+    "acral": false,
+    "variant": null,
+    "true_shift_px": {
+      "blue": [
+        -2.4779316557674207,
+        0.05421779840480667
+      ],
+      "red": [
+        -2.622169468655573,
+        -2.796822739915268
+      ],
+      "nir": [
+        0.3958627638997052,
+        2.5040987763507974
+      ]
+    },
+    "true_area_mm2": 20.0
+  },
+  {
+    "phantom_id": "vascular_dark",
+    "device_id": "virtual-001",
+    "device_type": "virtual",
+    "bands": [
+      "blue",
+      "green",
+      "red",
+      "nir"
+    ],
+    "wavelengths_nm": {
+      "blue": 470,
+      "green": 550,
+      "red": 660,
+      "nir": 850
+    },
+    "simulated": true,
+    "description": "Vascular lesion, dark skin tone",
+    "lesion": "vascular",
+    "tone": "dark",
+    "fitzpatrick": "V",
+    "acral": false,
+    "variant": null,
+    "true_shift_px": {
+      "blue": [
+        1.4068651749111003,
+        1.9922267316566253
+      ],
+      "red": [
+        -2.049911372045882,
+        0.12829257541828776
+      ],
+      "nir": [
+        -0.9696413717891437,
+        -1.128468479787618
+      ]
+    },
+    "true_area_mm2": 20.0
+  },
+  {
+    "phantom_id": "mixed_light",
+    "device_id": "virtual-001",
+    "device_type": "virtual",
+    "bands": [
+      "blue",
+      "green",
+      "red",
+      "nir"
+    ],
+    "wavelengths_nm": {
+      "blue": 470,
+      "green": 550,
+      "red": 660,
+      "nir": 850
+    },
+    "simulated": true,
+    "description": "Mixed lesion, light skin tone",
+    "lesion": "mixed",
+    "tone": "light",
+    "fitzpatrick": "III",
+    "acral": false,
+    "variant": null,
+    "true_shift_px": {
+      "blue": [
+        0.48411644719969016,
+        1.3593540883024364
+      ],
+      "red": [
+        -0.6704263150412222,
+        -0.3141849460486612
+      ],
+      "nir": [
+        -0.31811190618252416,
+        -1.365978803054101
+      ]
+    },
+    "true_area_mm2": 26.0
+  },
+  {
+    "phantom_id": "mixed_medium",
+    "device_id": "virtual-001",
+    "device_type": "virtual",
+    "bands": [
+      "blue",
+      "green",
+      "red",
+      "nir"
+    ],
+    "wavelengths_nm": {
+      "blue": 470,
+      "green": 550,
+      "red": 660,
+      "nir": 850
+    },
+    "simulated": true,
+    "description": "Mixed lesion, medium skin tone",
+    "lesion": "mixed",
+    "tone": "medium",
+    "fitzpatrick": "IV",
+    "acral": false,
+    "variant": null,
+    "true_shift_px": {
+      "blue": [
+        2.9989539343597107,
+        1.7936892830695832
+      ],
+      "red": [
+        0.12056035347788208,
+        -1.9289255095361095
+      ],
+      "nir": [
+        -0.6685931961840663,
+        -0.1713128063622804
+      ]
+    },
+    "true_area_mm2": 25.99
+  },
+  {
+    "phantom_id": "mixed_dark",
+    "device_id": "virtual-001",
+    "device_type": "virtual",
+    "bands": [
+      "blue",
+      "green",
+      "red",
+      "nir"
+    ],
+    "wavelengths_nm": {
+      "blue": 470,
+      "green": 550,
+      "red": 660,
+      "nir": 850
+    },
+    "simulated": true,
+    "description": "Mixed lesion, dark skin tone",
+    "lesion": "mixed",
+    "tone": "dark",
+    "fitzpatrick": "V",
+    "acral": false,
+    "variant": null,
+    "true_shift_px": {
+      "blue": [
+        -0.5176384573665089,
+        -0.382532391375499
+      ],
+      "red": [
+        -1.2255378337945468,
+        0.8382643299338788
+      ],
+      "nir": [
+        1.4451100832047459,
+        -0.682670050449711
+      ]
+    },
+    "true_area_mm2": 26.0
+  },
+  {
+    "phantom_id": "pigmented_dark_blur",
+    "device_id": "virtual-001",
+    "device_type": "virtual",
+    "bands": [
+      "blue",
+      "green",
+      "red",
+      "nir"
+    ],
+    "wavelengths_nm": {
+      "blue": 470,
+      "green": 550,
+      "red": 660,
+      "nir": 850
+    },
+    "simulated": true,
+    "description": "Bad capture: motion/focus blur",
+    "lesion": "pigmented",
+    "tone": "dark",
+    "fitzpatrick": "V",
+    "acral": false,
+    "variant": "blur",
+    "true_shift_px": {
+      "blue": [
+        -1.0135102085897698,
+        1.14350301958091
+      ],
+      "red": [
+        -0.06619393906127113,
+        0.8937613634212185
+      ],
+      "nir": [
+        -2.1793924979601567,
+        -2.5301249644301977
+      ]
+    },
+    "true_area_mm2": 24.0
+  },
+  {
+    "phantom_id": "pigmented_dark_glare",
+    "device_id": "virtual-001",
+    "device_type": "virtual",
+    "bands": [
+      "blue",
+      "green",
+      "red",
+      "nir"
+    ],
+    "wavelengths_nm": {
+      "blue": 470,
+      "green": 550,
+      "red": 660,
+      "nir": 850
+    },
+    "simulated": true,
+    "description": "Bad capture: specular glare from an air gap",
+    "lesion": "pigmented",
+    "tone": "dark",
+    "fitzpatrick": "V",
+    "acral": false,
+    "variant": "glare",
+    "true_shift_px": {
+      "blue": [
+        -0.3494643289265711,
+        0.7366675539045544
+      ],
+      "red": [
+        -0.3181603368870023,
+        -1.8243877572524512
+      ],
+      "nir": [
+        0.2411768064454305,
+        -0.3710006234330183
+      ]
+    },
+    "true_area_mm2": 24.0
+  },
+  {
+    "phantom_id": "acral_dark_d01",
+    "device_id": "virtual-001",
+    "device_type": "virtual",
+    "bands": [
+      "blue",
+      "green",
+      "red",
+      "nir"
+    ],
+    "wavelengths_nm": {
+      "blue": 470,
+      "green": 550,
+      "red": 660,
+      "nir": 850
+    },
+    "simulated": true,
+    "description": "Acral (sole) pigmented lesion, dark skin tone, visit day 1",
+    "lesion": "pigmented",
+    "tone": "dark",
+    "fitzpatrick": "V",
+    "acral": true,
+    "variant": null,
+    "true_shift_px": {
+      "blue": [
+        0.0681046299108532,
+        -0.1744018747091034
+      ],
+      "red": [
+        -0.22612656382548368,
+        1.314999875370579
+      ],
+      "nir": [
+        -1.8791381581637356,
+        -1.4409619128975586
+      ]
+    },
+    "true_area_mm2": 18.0
+  },
+  {
+    "phantom_id": "acral_dark_d14",
+    "device_id": "virtual-001",
+    "device_type": "virtual",
+    "bands": [
+      "blue",
+      "green",
+      "red",
+      "nir"
+    ],
+    "wavelengths_nm": {
+      "blue": 470,
+      "green": 550,
+      "red": 660,
+      "nir": 850
+    },
+    "simulated": true,
+    "description": "Acral (sole) pigmented lesion, dark skin tone, visit day 14",
+    "lesion": "pigmented",
+    "tone": "dark",
+    "fitzpatrick": "V",
+    "acral": true,
+    "variant": null,
+    "true_shift_px": {
+      "blue": [
+        -0.08461863577688833,
+        0.8001804758690692
+      ],
+      "red": [
+        -2.098842169068002,
+        -2.9613033115550764
+      ],
+      "nir": [
+        0.24022959227478746,
+        -1.5020548137504577
+      ]
+    },
+    "true_area_mm2": 22.0
+  },
+  {
+    "phantom_id": "acral_dark_d30",
+    "device_id": "virtual-001",
+    "device_type": "virtual",
+    "bands": [
+      "blue",
+      "green",
+      "red",
+      "nir"
+    ],
+    "wavelengths_nm": {
+      "blue": 470,
+      "green": 550,
+      "red": 660,
+      "nir": 850
+    },
+    "simulated": true,
+    "description": "Acral (sole) pigmented lesion, dark skin tone, visit day 30",
+    "lesion": "pigmented",
+    "tone": "dark",
+    "fitzpatrick": "V",
+    "acral": true,
+    "variant": null,
+    "true_shift_px": {
+      "blue": [
+        -1.349523235615846,
+        -0.801910063419079
+      ],
+      "red": [
+        -1.861880909855848,
+        2.936056713193486
+      ],
+      "nir": [
+        2.731723037035086,
+        0.20190599753638927
+      ]
+    },
+    "true_area_mm2": 28.0
+  }
+]

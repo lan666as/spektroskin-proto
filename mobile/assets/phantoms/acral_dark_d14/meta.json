@@ -1,0 +1,38 @@
+{
+  "phantom_id": "acral_dark_d14",
+  "device_id": "virtual-001",
+  "device_type": "virtual",
+  "bands": [
+    "blue",
+    "green",
+    "red",
+    "nir"
+  ],
+  "wavelengths_nm": {
+    "blue": 470,
+    "green": 550,
+    "red": 660,
+    "nir": 850
+  },
+  "simulated": true,
+  "description": "Acral (sole) pigmented lesion, dark skin tone, visit day 14",
+  "lesion": "pigmented",
+  "tone": "dark",
+  "fitzpatrick": "V",
+  "acral": true,
+  "variant": null,
+  "true_shift_px": {
+    "blue": [
+      -0.08461863577688833,
+      0.8001804758690692
+    ],
+    "red": [
+      -2.098842169068002,
+      -2.9613033115550764
+    ],
+    "nir": [
+      0.24022959227478746,
+      -1.5020548137504577
+    ]
+  }
+}

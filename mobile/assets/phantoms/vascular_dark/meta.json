@@ -1,0 +1,38 @@
+{
+  "phantom_id": "vascular_dark",
+  "device_id": "virtual-001",
+  "device_type": "virtual",
+  "bands": [
+    "blue",
+    "green",
+    "red",
+    "nir"
+  ],
+  "wavelengths_nm": {
+    "blue": 470,
+    "green": 550,
+    "red": 660,
+    "nir": 850
+  },
+  "simulated": true,
+  "description": "Vascular lesion, dark skin tone",
+  "lesion": "vascular",
+  "tone": "dark",
+  "fitzpatrick": "V",
+  "acral": false,
+  "variant": null,
+  "true_shift_px": {
+    "blue": [
+      1.4068651749111003,
+      1.9922267316566253
+    ],
+    "red": [
+      -2.049911372045882,
+      0.12829257541828776
+    ],
+    "nir": [
+      -0.9696413717891437,
+      -1.128468479787618
+    ]
+  }
+}

@@ -1,0 +1,38 @@
+{
+  "phantom_id": "mixed_light",
+  "device_id": "virtual-001",
+  "device_type": "virtual",
+  "bands": [
+    "blue",
+    "green",
+    "red",
+    "nir"
+  ],
+  "wavelengths_nm": {
+    "blue": 470,
+    "green": 550,
+    "red": 660,
+    "nir": 850
+  },
+  "simulated": true,
+  "description": "Mixed lesion, light skin tone",
+  "lesion": "mixed",
+  "tone": "light",
+  "fitzpatrick": "III",
+  "acral": false,
+  "variant": null,
+  "true_shift_px": {
+    "blue": [
+      0.48411644719969016,
+      1.3593540883024364
+    ],
+    "red": [
+      -0.6704263150412222,
+      -0.3141849460486612
+    ],
+    "nir": [
+      -0.31811190618252416,
+      -1.365978803054101
+    ]
+  }
+}

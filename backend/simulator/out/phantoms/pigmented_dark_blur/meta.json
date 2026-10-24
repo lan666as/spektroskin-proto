@@ -1,0 +1,38 @@
+{
+  "phantom_id": "pigmented_dark_blur",
+  "device_id": "virtual-001",
+  "device_type": "virtual",
+  "bands": [
+    "blue",
+    "green",
+    "red",
+    "nir"
+  ],
+  "wavelengths_nm": {
+    "blue": 470,
+    "green": 550,
+    "red": 660,
+    "nir": 850
+  },
+  "simulated": true,
+  "description": "Bad capture: motion/focus blur",
+  "lesion": "pigmented",
+  "tone": "dark",
+  "fitzpatrick": "V",
+  "acral": false,
+  "variant": "blur",
+  "true_shift_px": {
+    "blue": [
+      -1.0135102085897698,
+      1.14350301958091
+    ],
+    "red": [
+      -0.06619393906127113,
+      0.8937613634212185
+    ],
+    "nir": [
+      -2.1793924979601567,
+      -2.5301249644301977
+    ]
+  }
+}

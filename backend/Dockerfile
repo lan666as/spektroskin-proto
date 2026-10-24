@@ -13,6 +13,10 @@ COPY pyproject.toml uv.lock .python-version ./
 RUN uv sync --frozen --no-dev
 
 COPY . .
+# Phantoms and the virtual device profile are deterministic (seeded), so the image regenerates
+# exactly the frame sets bundled in the app.
+RUN python -m simulator.generate
+
 EXPOSE 8000
 HEALTHCHECK --interval=10s --timeout=3s --start-period=20s --retries=5 \
     CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/health', timeout=2)"
