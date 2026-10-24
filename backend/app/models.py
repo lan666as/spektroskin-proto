@@ -84,6 +84,8 @@ class User(Base):
     display_name: Mapped[str] = mapped_column(String(128))
     role: Mapped[str] = mapped_column(String(32))
     password_hash: Mapped[str] = mapped_column(String(128))
+    # Automated smoke/e2e accounts. Their records stay out of real users' views.
+    is_test: Mapped[bool] = mapped_column(Boolean, default=False, server_default=sa_false())
     created_at: Mapped[datetime] = _created_at()
 
 

@@ -1,6 +1,6 @@
 import { execFileSync } from 'node:child_process';
 
-import { expect, type Locator, type Page } from '@playwright/test';
+import { type APIRequestContext, expect, type Locator, type Page } from '@playwright/test';
 
 /** Automated runs use the dedicated smoke users so demo accounts stay clean. */
 export function password(user: 'smoke-clinician' | 'smoke-dermatologist'): string {
@@ -28,4 +28,18 @@ export async function login(page: Page, user: 'smoke-clinician' | 'smoke-dermato
 
 export function uniquePatientCode(): string {
   return `PT-${String(8000 + Math.floor(Math.random() * 1000)).padStart(4, '0')}`;
+}
+
+/** Answer a case as the smoke dermatologist through the API so test runs leave no open cases. */
+export async function closeCase(request: APIRequestContext, caseId: string) {
+  const token = await request.post('/api/auth/token', {
+    form: { username: 'smoke-dermatologist', password: password('smoke-dermatologist') },
+  });
+  expect(token.ok()).toBeTruthy();
+  const { access_token } = await token.json();
+  const review = await request.post(`/api/cases/${caseId}/review`, {
+    headers: { Authorization: `Bearer ${access_token}` },
+    data: { impression: 'Automated test: closing the case.', action: 'observe' },
+  });
+  expect(review.status()).toBe(201);
 }

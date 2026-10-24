@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session, selectinload
 
 from app import audit
 from app.api.serialize import lesion_out
-from app.auth import Clinician, CurrentUser
+from app.auth import Clinician, CurrentUser, same_group
 from app.db import get_session
 from app.models import Lesion, Patient
 from app.schemas import PatientCreate, PatientDetail, PatientOut
@@ -19,10 +19,12 @@ SessionDep = Annotated[Session, Depends(get_session)]
 
 @router.get("", response_model=list[PatientOut])
 def list_patients(user: CurrentUser, session: SessionDep) -> list[Patient]:
-    """Clinicians see the patients they registered; dermatologists see all."""
+    """Clinicians see the patients they registered; dermatologists see their user group's."""
     query = select(Patient).order_by(Patient.code)
     if user.role == "clinician":
         query = query.where(Patient.created_by == user.id)
+    else:
+        query = query.where(Patient.created_by.in_(same_group(user)))
     patients = list(session.scalars(query))
     audit.record(session, user, "list", "patient", "*")
     session.commit()

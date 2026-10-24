@@ -106,3 +106,16 @@ Result (22:13 WIB): **done**, commit `193e315`.
 - Verified: Playwright opens the summary after a review, checks print media hides the button and
   `page.pdf()` is non-empty; the printed A4 page was inspected visually (one page, all three views).
   Native renders the page without the print button (NEEDS PHONE CHECK only for layout).
+
+## Fix found during item 6 — automated-test traffic leaked into demo views
+
+The UI review showed the dermatologist queue full of "Smoke Test Clinician" cases. Every deploy runs
+smoke + e2e against production, and the dermatologist role sees all cases, so the demo
+dermatologist would see test cases on stage (production already has one open e2e case).
+
+Plan:
+- Alembic 0004: `users.is_test BOOLEAN NOT NULL DEFAULT false`, data step flags the two smoke users.
+- Dermatologist case list and patient list show only records created by users in the viewer's
+  group (test vs real). Nothing is deleted; the audit log still shows everything.
+- `create_user --test-user`; provision.sh marks the smoke users.
+- Clinician e2e closes its own case through the API so test queues stay small.

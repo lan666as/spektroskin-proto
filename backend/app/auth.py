@@ -12,7 +12,7 @@ import bcrypt
 import jwt
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
-from sqlalchemy import select
+from sqlalchemy import Select, select
 from sqlalchemy.orm import Session
 
 from app.config import get_settings
@@ -118,6 +118,12 @@ def require_role(*roles: str) -> Callable[..., User]:
         return user
 
     return dependency
+
+
+def same_group(user: User) -> Select[tuple[uuid.UUID]]:
+    """Ids of users in the viewer's group: automated test accounts and real accounts never see
+    each other's records in lists."""
+    return select(User.id).where(User.is_test == user.is_test)
 
 
 CurrentUser = Annotated[User, Depends(current_user)]

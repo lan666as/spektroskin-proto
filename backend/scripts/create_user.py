@@ -24,6 +24,11 @@ def main() -> int:
     parser.add_argument("--role", required=True, choices=ROLES)
     parser.add_argument("--display-name", required=True)
     parser.add_argument("--password-stdin", action="store_true", required=True)
+    parser.add_argument(
+        "--test-user",
+        action="store_true",
+        help="automated smoke/e2e account (kept out of demo views)",
+    )
     args = parser.parse_args()
 
     password = sys.stdin.readline().rstrip("\n")
@@ -45,6 +50,7 @@ def main() -> int:
                 role=args.role,
                 display_name=args.display_name,
                 password_hash=hash_password(password),
+                is_test=args.test_user,
             )
         )
         session.commit()

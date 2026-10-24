@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session, selectinload
 
 from app import audit
 from app.api.serialize import case_detail, case_summary
-from app.auth import Clinician, CurrentUser, Dermatologist
+from app.auth import Clinician, CurrentUser, Dermatologist, same_group
 from app.db import get_session
 from app.models import Capture, Case, Lesion, Review, User, utcnow
 from app.schemas import CaseCreate, CaseDetail, CaseStatus, CaseSummary, ReviewCreate
@@ -44,12 +44,15 @@ def list_cases(
     session: SessionDep,
     status_filter: Annotated[list[CaseStatus] | None, Query(alias="status")] = None,
 ) -> list[CaseSummary]:
-    """Dermatologists: the review queue (all cases). Clinicians: cases they submitted."""
+    """Dermatologists: the review queue (all cases from their user group). Clinicians: cases they
+    submitted."""
     query = select(Case).options(*_LOAD).order_by(Case.created_at.desc())
     if status_filter:
         query = query.where(Case.status.in_(status_filter))
     if user.role == "clinician":
         query = query.where(Case.created_by == user.id)
+    else:
+        query = query.where(Case.created_by.in_(same_group(user)))
     cases = list(session.scalars(query))
     names = _requester_names(session, cases)
     audit.record(session, user, "list", "case", "*")

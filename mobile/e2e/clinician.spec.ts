@@ -1,6 +1,6 @@
 import { expect, type Page, test } from '@playwright/test';
 
-import { byId, login, uniquePatientCode } from './helpers';
+import { byId, closeCase, login, uniquePatientCode } from './helpers';
 
 async function captureWith(page: Page, phantom: string) {
   await expect(byId(page, 'capture-screen')).toBeVisible();
@@ -13,6 +13,7 @@ async function captureWith(page: Page, phantom: string) {
 
 test('clinician: login → patient → lesion → capture → results with history → submit', async ({
   page,
+  request,
 }) => {
   await login(page, 'smoke-clinician');
 
@@ -65,7 +66,9 @@ test('clinician: login → patient → lesion → capture → results with histo
   await byId(page, 'submit-case').click();
   await expect(byId(page, 'clinician-case-screen')).toBeVisible();
   await expect(byId(page, 'awaiting-review')).toBeVisible();
+  const caseId = new URL(page.url()).pathname.split('/').pop()!;
 
   await byId(page, 'nav-cases').click();
   await expect(byId(page, 'my-cases-screen')).toContainText(code);
+  await closeCase(request, caseId);
 });
