@@ -60,6 +60,7 @@ test('clinician: login → patient → lesion → capture → results with histo
   await expect(byId(page, 'compare-change')).toContainText('+');
   await expect(byId(page, 'acral-pattern-result')).toContainText('furrows');
   await expect(byId(page, 'acral-guideline')).toHaveCount(0);
+  await byId(page, 'toggle-technical').click();
   await byId(page, 'show-validation').click();
   await expect(byId(page, 'validation-scope')).toContainText('simulated data only');
 

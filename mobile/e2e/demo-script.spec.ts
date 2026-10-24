@@ -157,6 +157,7 @@ test('PLAN §6 demo script: 60 s core + extended', async ({ browser, request }) 
   // 7: the clinician sees the recommendation.
   await expect(byId(clinician, 'recommendation-action')).toContainText('Biopsy', { timeout: 15_000 });
   await expect(byId(clinician, 'recommendation')).toContainText('treating clinician decides');
+  await expect(byId(clinician, 'capture-follow-up')).toContainText('Capture follow-up visit (due');
   await shot(clinician, '10-answer-received');
   const coreSeconds = (Date.now() - started) / 1000;
 
@@ -206,6 +207,7 @@ test('PLAN §6 demo script: 60 s core + extended', async ({ browser, request }) 
   await byId(clinician, 'phantom-acral_dark_d30').click();
   await byId(clinician, 'capture-button').click();
   await expect(byId(clinician, 'qc-passed')).toBeVisible({ timeout: 30_000 });
+  await byId(clinician, 'toggle-technical').click();
   await byId(clinician, 'show-validation').click();
   await expect(byId(clinician, 'validation-scope')).toContainText('simulated data only');
   await shot(clinician, '12-validation');
