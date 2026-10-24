@@ -542,3 +542,10 @@ Timestamped record of what was built during GENOHACK (Sat 24 – Sun 25 Oct 2026
   hidden units) on 2 × 32×32 pigment and blood map crops, same lesions and split as the triage
   model. Held-out 0.93 (dark skin 0.91) vs 0.98 (0.96) for the deployed explainable model, which
   stays. Added as assumption 12 in `assumptions_tested.md`.
+
+## 2026-10-25 05:39 WIB — Iteration loop, batch 35: final audit fix
+
+- Final screenshots: `docs/screenshots/20261025-0535-final/` (demo script on live, full results page,
+  AI page, AI roadmap). The triage and acral card badges were still clipped at 390 px (the batch-12
+  fix wrapped inside a row without a width); they now sit on their own wrapping line. Checked by a
+  screenshot of the card at 390 px.

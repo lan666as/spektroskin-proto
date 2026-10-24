@@ -36,15 +36,13 @@ export function TriageSupport({ capture, read }: { capture: Capture; read?: stri
   );
   return (
     <Card testID="triage-support" style={{ borderColor: colors.accent }}>
-      <Row style={{ justifyContent: 'space-between', flexWrap: 'wrap' }}>
-        <Heading>Triage support</Heading>
-        <Row style={{ gap: spacing.xs, flexWrap: 'wrap' }}>
+      <Heading>Triage support</Heading>
+      <View style={styles.badges}>
           <View style={styles.research}>
             <Text style={styles.researchText}>Research mode · not a diagnosis</Text>
           </View>
           <SimulatedBadge label="Simulated training data" />
-        </Row>
-      </Row>
+      </View>
       <View style={{ gap: 2 }}>
         <Muted>Suggested lesion pattern</Muted>
         <Text style={styles.pattern} testID="triage-pattern">
@@ -119,15 +117,13 @@ export function AcralPattern({ capture, site }: { capture: Capture; site: BodySi
   const ridge = a.pattern === 'ridge';
   return (
     <Card testID="acral-pattern" style={{ borderColor: ridge ? colors.danger : colors.accent }}>
-      <Row style={{ justifyContent: 'space-between', flexWrap: 'wrap' }}>
-        <Heading>Acral pattern</Heading>
-        <Row style={{ gap: spacing.xs, flexWrap: 'wrap' }}>
+      <Heading>Acral pattern</Heading>
+      <View style={styles.badges}>
           <View style={styles.research}>
             <Text style={styles.researchText}>Research mode · not a diagnosis</Text>
           </View>
           <SimulatedBadge label="Simulated training data" />
-        </Row>
-      </Row>
+      </View>
       <Text style={styles.acral} testID="acral-pattern-result">
         {a.pattern ? ACRAL_LABELS[a.pattern] : 'Uncertain: pattern too faint to call'}
       </Text>
@@ -227,6 +223,7 @@ const styles = StyleSheet.create({
   barValue: { width: 44, textAlign: 'right', fontSize: 14, fontWeight: '700', color: colors.text },
   link: { color: colors.accent, fontWeight: '600', paddingVertical: spacing.xs },
   why: { fontSize: 14, fontWeight: '700', color: colors.text },
+  badges: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.xs, width: '100%' },
   glance: {
     backgroundColor: colors.accentSoft,
     borderRadius: radius.lg,
