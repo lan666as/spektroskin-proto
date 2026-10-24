@@ -72,6 +72,12 @@ SEED = (
         (SeedCapture("acral_dark_d01", 29), SeedCapture("acral_dark_d14", 16)),
         None,
     ),
+    # Rehearsal twin of PT-0007: rehearse on this one so PT-0007 is untouched for the live demo.
+    SeedPatient(
+        "PT-0009", 54, "female", "V", "sole", "left",
+        (SeedCapture("acral_dark_d01", 29), SeedCapture("acral_dark_d14", 16)),
+        None,
+    ),
 )  # fmt: skip
 
 
