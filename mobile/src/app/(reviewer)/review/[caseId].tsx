@@ -199,6 +199,15 @@ export default function ReviewCase() {
   const router = useRouter();
   const [justSent, setJustSent] = useState(false);
   const [blind, setBlind] = useState(false);
+  const waiting = useQuery({
+    queryKey: ['queue'],
+    queryFn: () => api.cases(['submitted', 'in_review']),
+    enabled: !!c?.review,
+  });
+  // Oldest waiting case first, as in the queue's first-come-first-served order.
+  const nextCase = [...(waiting.data ?? [])]
+    .filter((other) => other.id !== caseId)
+    .sort((a, b) => a.created_at.localeCompare(b.created_at))[0];
   const hideAI = blind && !c?.review;
 
   return (
@@ -258,6 +267,13 @@ export default function ReviewCase() {
                 ) : null}
                 <Recommendation review={c.review} due={c.follow_up_due} />
                 <OutcomeCard c={c} editable={false} />
+                {nextCase ? (
+                  <Button
+                    label={`Next waiting case: ${nextCase.patient.code}`}
+                    onPress={() => router.replace({ pathname: '/review/[caseId]', params: { caseId: nextCase.id } })}
+                    testID="next-case"
+                  />
+                ) : null}
                 <Button label="Back to queue" variant="secondary" onPress={() => router.navigate('/review')} />
               </>
             ) : (

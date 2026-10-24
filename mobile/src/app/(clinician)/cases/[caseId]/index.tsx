@@ -7,7 +7,7 @@ import { api } from '@/api/client';
 import { Button, Card, ErrorBanner, Heading, Loading, Muted, Pill, Row, Screen } from '@/ui/components';
 import { CaseTimeline, Footnote, HistoryStrip, Recommendation, SpectralViews, VisitCompare } from '@/ui/clinical';
 import { OutcomeCard } from '@/ui/outcome';
-import { formatDateTime, patientLabel, siteLabel, STATUS_LABELS, statusTone } from '@/ui/labels';
+import { formatDate, formatDateTime, patientLabel, siteLabel, STATUS_LABELS, statusTone } from '@/ui/labels';
 import { colors, radius, spacing } from '@/ui/theme';
 
 const POLL_MS = 2_000;
@@ -51,6 +51,15 @@ export default function ClinicianCase() {
               ) : null}
               <Recommendation review={c.review} due={c.follow_up_due} />
               <OutcomeCard c={c} editable />
+              {c.review.follow_up_days != null ? (
+                <Button
+                  label={`Capture follow-up visit${c.follow_up_due ? ` (due ${formatDate(c.follow_up_due)})` : ''}`}
+                  onPress={() =>
+                    router.push({ pathname: '/lesions/[lesionId]/capture', params: { lesionId: c.lesion.id } })
+                  }
+                  testID="capture-follow-up"
+                />
+              ) : null}
               <Button
                 label="Referral summary"
                 variant="secondary"

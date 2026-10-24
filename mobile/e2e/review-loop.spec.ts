@@ -50,6 +50,12 @@ test('review loop: clinician submits → dermatologist reviews → clinician see
   await expect(byId(reviewer, 'recommendation')).toBeVisible();
   await expect(byId(reviewer, 'review-sent')).toContainText('Smoke Test Clinician');
   await expect(byId(reviewer, 'triage-agreement')).toContainText('Your read: unsure');
+  // Checked right away: the audit page lists the newest 50 events and polling adds more.
+  await byId(reviewer, 'nav-audit').click();
+  await expect(byId(reviewer, 'audit-screen')).toBeVisible();
+  await expect(
+    reviewer.getByTestId('audit-row').filter({ hasText: 'Smoke Test Dermatologist' }).filter({ hasText: 'review case' }).first(),
+  ).toBeVisible();
 
   // The clinician's case page polls every 5 s.
   await expect(byId(clinician, 'recommendation-action')).toContainText('Biopsy', { timeout: 15_000 });
@@ -67,11 +73,6 @@ test('review loop: clinician submits → dermatologist reviews → clinician see
   expect(pdf.byteLength).toBeGreaterThan(20_000);
   await clinician.emulateMedia({ media: 'screen' });
 
-  await byId(reviewer, 'nav-audit').click();
-  await expect(byId(reviewer, 'audit-screen')).toBeVisible();
-  await expect(
-    reviewer.getByTestId('audit-row').filter({ hasText: 'Smoke Test Dermatologist' }).filter({ hasText: 'review case' }).first(),
-  ).toBeVisible();
 
   await clinicianContext.close();
   await reviewerContext.close();
