@@ -158,3 +158,16 @@ class CaseDetail(CaseSummary):
     captures: list[CaptureOut]
     lesion_history: list[CaptureOut]
     review: ReviewOut | None
+
+
+class ValidationOut(BaseModel):
+    capture_id: uuid.UUID
+    phantom_id: str
+    simulated: bool
+    metrics: dict[str, float] = Field(
+        description="melanin_r, melanin_rmse, hemoglobin_r, hemoglobin_rmse, mask_dice, "
+        "area_error_pct"
+    )
+    measured_area_mm2: float
+    true_area_mm2: float
+    scope: str

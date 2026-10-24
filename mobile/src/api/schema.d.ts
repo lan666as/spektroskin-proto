@@ -239,6 +239,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/validation/{capture_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Validate Capture */
+        get: operations["validate_capture_api_validation__capture_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -690,6 +707,31 @@ export interface components {
             input?: unknown;
             /** Context */
             ctx?: Record<string, never>;
+        };
+        /** ValidationOut */
+        ValidationOut: {
+            /**
+             * Capture Id
+             * Format: uuid
+             */
+            capture_id: string;
+            /** Phantom Id */
+            phantom_id: string;
+            /** Simulated */
+            simulated: boolean;
+            /**
+             * Metrics
+             * @description melanin_r, melanin_rmse, hemoglobin_r, hemoglobin_rmse, mask_dice, area_error_pct
+             */
+            metrics: {
+                [key: string]: number;
+            };
+            /** Measured Area Mm2 */
+            measured_area_mm2: number;
+            /** True Area Mm2 */
+            true_area_mm2: number;
+            /** Scope */
+            scope: string;
         };
     };
     responses: never;
@@ -1146,6 +1188,37 @@ export interface operations {
                 };
                 content: {
                     "image/png": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    validate_capture_api_validation__capture_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                capture_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ValidationOut"];
                 };
             };
             /** @description Validation Error */

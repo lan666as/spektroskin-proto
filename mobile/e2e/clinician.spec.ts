@@ -56,6 +56,8 @@ test('clinician: login → patient → lesion → capture → results with histo
   await expect(history).toBeVisible();
   await expect(history.getByText(/mm²/)).toHaveCount(4); // 3 visit areas + change line
   await expect(byId(page, 'area-change')).toContainText('+');
+  await byId(page, 'show-validation').click();
+  await expect(byId(page, 'validation-scope')).toContainText('simulated data only');
 
   await byId(page, 'submit-for-review').click();
   await byId(page, 'case-question').fill('E2E: pigmented macule on left sole, growing. Biopsy or observe?');

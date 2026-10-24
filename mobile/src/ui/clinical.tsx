@@ -1,10 +1,11 @@
+import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 
-import type { Capture, Schemas } from '@/api/client';
+import { api, type Capture, type Schemas } from '@/api/client';
 import { absoluteUrl } from '@/api/config';
 
-import { Card, Chips, Heading, Muted, Pill, Row } from './components';
+import { Button, Card, Chips, ErrorBanner, Heading, KeyValue, Loading, Muted, Pill, Row } from './components';
 import { ACTION_LABELS, formatArea, formatDate, formatDateTime, visitDay } from './labels';
 import { SimulatedBadge } from './SimulatedBadge';
 import { colors, radius, spacing } from './theme';
@@ -147,6 +148,45 @@ export function Recommendation({ review }: { review: Schemas['ReviewOut'] }) {
         {review.reviewer_name} · {formatDateTime(review.created_at)}
       </Muted>
       <Text style={styles.decides}>The dermatologist recommends; the treating clinician decides.</Text>
+    </Card>
+  );
+}
+
+/** Recovered maps vs the phantom's known ground truth: checks the math, not clinical accuracy. */
+export function ValidationPanel({ capture }: { capture: Capture }) {
+  const [open, setOpen] = useState(false);
+  const validation = useQuery({
+    queryKey: ['validation', capture.id],
+    queryFn: () => api.validation(capture.id),
+    enabled: open,
+    staleTime: Infinity,
+  });
+  if (!capture.phantom_id || capture.status !== 'processed') return null;
+  const v = validation.data;
+  return (
+    <Card testID="validation-panel">
+      <Row style={{ justifyContent: 'space-between' }}>
+        <Heading>Validation vs simulated ground truth</Heading>
+        <SimulatedBadge />
+      </Row>
+      {!open ? (
+        <Button label="Compare with ground truth" variant="secondary" onPress={() => setOpen(true)} testID="show-validation" />
+      ) : null}
+      {open && validation.isPending ? <Loading label="Re-running the pipeline…" /> : null}
+      <ErrorBanner error={validation.error} />
+      {v ? (
+        <>
+          <KeyValue label="Phantom" value={v.phantom_id} />
+          <KeyValue label="Melanin map correlation (r)" value={v.metrics.melanin_r.toFixed(3)} />
+          <KeyValue label="Hemoglobin map correlation (r)" value={v.metrics.hemoglobin_r.toFixed(3)} />
+          <KeyValue label="Lesion mask overlap (Dice)" value={v.metrics.mask_dice.toFixed(3)} />
+          <KeyValue
+            label="Area measured / true"
+            value={`${formatArea(v.measured_area_mm2)} / ${formatArea(v.true_area_mm2)} (${v.metrics.area_error_pct >= 0 ? '+' : ''}${v.metrics.area_error_pct.toFixed(1)}%)`}
+          />
+          <Muted testID="validation-scope">{v.scope}</Muted>
+        </>
+      ) : null}
     </Card>
   );
 }

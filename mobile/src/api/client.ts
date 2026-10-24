@@ -15,6 +15,7 @@ export type LesionCreate = Schemas['LesionCreate'];
 export type CaseCreate = Schemas['CaseCreate'];
 export type ReviewCreate = Schemas['ReviewCreate'];
 export type BodySite = Schemas['LesionCreate']['body_site'];
+export type Validation = Schemas['ValidationOut'];
 export type ReviewAction = Schemas['ReviewCreate']['action'];
 export type CaseStatus = Schemas['CaseSummary']['status'];
 
@@ -109,5 +110,6 @@ export const api = {
     get<CaseSummary[]>(`/cases${statuses.length ? '?' + statuses.map((s) => `status=${s}`).join('&') : ''}`),
   case: (id: string) => get<CaseDetail>(`/cases/${id}`),
   createCase: (body: CaseCreate) => post<CaseDetail>('/cases', body),
+  validation: (captureId: string) => get<Validation>(`/validation/${captureId}`),
   review: (caseId: string, body: ReviewCreate) => post<CaseDetail>(`/cases/${caseId}/review`, body),
 };

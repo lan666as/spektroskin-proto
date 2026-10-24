@@ -64,8 +64,11 @@ def skin_reflectance(gt: GroundTruth) -> np.ndarray:
     return R0[:, None, None] * np.exp(-absorb) * gt.shading
 
 
-def capture(spec: PhantomSpec, gt: GroundTruth) -> FrameSet:
-    rng = np.random.default_rng(seed_for(spec.id + ":capture"))
+def capture(spec: PhantomSpec, gt: GroundTruth, repeat: int | None = None) -> FrameSet:
+    """Render one capture. `repeat` selects an independent draw of noise, gain drift and hand
+    motion for the same phantom (None = the canonical capture bundled in the app)."""
+    suffix = ":capture" if repeat is None else f":capture:{repeat}"
+    rng = np.random.default_rng(seed_for(spec.id + suffix))
     skin = skin_reflectance(gt)
 
     if spec.variant == "blur":

@@ -188,6 +188,13 @@ def run(base: str) -> None:
     expect(status == 200 and png[:8] == b"\x89PNG\r\n\x1a\n", f"GET /images signed URL: {status}")
     status, _ = c.request("GET", got["views"]["pigment"].replace("sig=", "sig=x"), raw=True)
     expect(status == 403, f"GET /images with tampered signature is 403: {status}")
+    status, val = c.request("GET", f"/api/validation/{capture_id}")
+    expect(
+        status == 200 and val["simulated"] and val["metrics"]["mask_dice"] > 0.9,
+        f"GET /validation/{{id}} against phantom ground truth: {status}",
+    )
+    status, _ = c.request("GET", f"/api/validation/{bad['id']}")
+    expect(status == 422, f"GET /validation for a failed-QC capture is 422: {status}")
     status, lesion_detail = c.request("GET", f"/api/lesions/{lesion['id']}")
     expect(
         status == 200 and len(lesion_detail["captures"]) == 2,
