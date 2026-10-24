@@ -1,8 +1,167 @@
 # ITERATION_BACKLOG — overnight iteration loop (25 Oct 2026, until 08:00 WIB)
 
-## Summary
+## Summary (written 25 Oct, 05:50 WIB)
 
-(written at the end of the loop)
+### How to test it right now
+
+- **Web (demo):** https://spektroskin.zidan.dev. Logins: `clinician` / `clinician2026` and
+  `dermatologist` / `derma2026` (also in the Mac Keychain as `spektroskin-demo-clinician` /
+  `spektroskin-demo-dermatologist`). Use a narrow Chrome window (about 390 px) for the clinician
+  and a wide one for the dermatologist.
+- **Phone (Expo Go, same Wi-Fi as the Mac):** open `exp://192.168.68.143:8081` in Expo Go. The
+  Metro dev server is running on the Mac and serves the latest code. It talks to the live API.
+- **Live state:** tag `live-35` (`5e00339`) is deployed. Gate green (91 unit and API tests, ruff,
+  tsc, web export). Live smoke and all 6 Playwright specs, including the full §6 demo script,
+  passed against the live site after every deploy. Tags `live-1` … `live-35` mark each verified
+  deploy. `pre-iteration` is the state before tonight.
+
+### Do these before the rehearsal (they need you)
+
+1. **Seeded demo history has no AI outputs yet.** PT-0007's and PT-0009's Day 01/14 visits,
+   PT-0003 and PT-0005 were processed before the models existed. Two ways to add them:
+   - open each seeded visit (or the reviewer case) and press **Run AI on this capture**;
+   - or run `docker compose exec api python -m scripts.reprocess_captures` on the VPS: a dry run
+     first, then `--apply`.
+
+   Either way only missing outputs are added, and stored measurements never change. New captures
+   always have the AI. I did not backfill production myself.
+2. **PT-0007 research consent:** open PT-0007 and set Research consent to **Yes**. Then the
+   extended demo's outcome (Biopsy → Benign) makes the case validation-eligible on the AI page.
+3. **My mistake on your PT-0011:** the batch-25 seed reused the code PT-0011 and attached 4 demo
+   lesions (one capture each) to your own test patient (31 F, VI). Nothing of yours was changed or
+   deleted. The seed now uses PT-0091 and refuses codes held by a different patient. If you want
+   them removed:
+   - lesions b8b27005-f046-5d95-be70-a42f8dda3d00, 1a5ae85a-0f71-5384-aa7d-47d41a4c105b,
+     b7b42ec0-1206-5bdd-b132-5fddfe49328a, 08375ce7-c6fc-540d-8b52-a7e1b036c2f0;
+   - captures 9979d285-be2f-5d79-84d5-9f0a1fc113f0, 9101ba4e-76d2-50cb-8108-3e697358dcdb,
+     e18c0e31-be4a-563f-9669-08d373b5aaa3, 85996485-5f4f-546f-b13e-f14241a0a5e9.
+
+   This is a production delete, so I left it to you. PT-0010 and PT-0012 were not touched.
+
+### What changed tonight (35 verified deploys)
+
+Before / after screenshots:
+- before: `docs/screenshots/20261025-0009-audit-before/`;
+- audits: `…-0212-audit-2/`, `…-0359-audit-3/`;
+- after: `docs/screenshots/20261025-0535-final/`, which adds `results-full-ridge-390.png`,
+  `ai-page-full-1440.png` and `ai-roadmap-390.png`.
+
+Compare `05-results-390.png`, `08-review-case-1440.png` and the new `10c-ai-overview-1440.png`.
+
+**AI-assisted diagnosis support.** Real models, trained and tested on simulated data, research
+mode, never a diagnosis:
+- **Three models with model cards** in `docs/evidence/`. All accuracies are on held-out
+  simulated data:
+  - image quality `quality_v2`: 0.96 vs 0.88 for the rules;
+  - lesion-pattern triage `triage_v1`: 0.98; 0.96 on Fitzpatrick V; calibration error 0.034;
+    abstains when unsure; withholds out-of-range captures; explains its top reasons;
+  - acral furrow/ridge pattern `acral_v1`: 0.99; abstains on faint patterns.
+- **RGB-vs-spectral ablation (the optics kill test):** 0.95 → 0.98, with the biggest gain on dark
+  skin (0.93 → 0.96).
+- **Neural-network experiment:** 0.93, worse than the explainable model, so it was not deployed.
+- **In the app:**
+  - an AI assist strip at the top of the results screen;
+  - the triage card with "why this suggestion";
+  - an acral pattern card (a ridge pattern prompts review);
+  - an **AI evidence** view and a **Change since Day 01** view (registered outlines,
+    mm² new / receded);
+  - dermoscopy-style measurements (asymmetry, border, colour, evolution; never a score);
+  - an ugly-duckling flag;
+  - an area trend chart;
+  - attention flags in the dermatologist queue;
+  - similar reviewed lesions with their outcomes;
+  - measured-findings drafts for the question and the impression.
+- **AI & validation page (dermatologist):**
+  - per-model, per-skin-tone results, calibration and the ablation;
+  - live monitoring and a learning queue;
+  - shadow mode with blind reads;
+  - the reviewed → consented → histopathology-confirmed funnel, with a privacy-minimised export.
+- **Evidence:**
+  - `docs/evidence/assumptions_tested.md`: 12 assumptions, including two that failed or partly
+    failed;
+  - `ai_evaluation.md`: repeatability 100 %, and a noise stress test whose finding led to a new
+    QC check and the quality model's v2;
+  - `experiment_mlp_vs_features.md`.
+
+**Care lifecycle:**
+- outcome and histopathology entry, with follow-up due dates;
+- a clinician to-do list and "worth a second look";
+- the referral summary with outcome, measurements and AI suggestions;
+- research consent can be changed later.
+
+**Simulation:** each capture is a new simulated frame set from the server-side virtual module:
+- stable lesion identity, pattern and growth;
+- skin tone from the patient's Fitzpatrick type;
+- about 1 in 10 captures blurred or with glare;
+- offline it falls back to the bundled phantoms.
+
+**Credibility and safety fixes:**
+- per-object authorization on every single-record read and write (before, any signed-in user could
+  read a capture by id);
+- the acral read is only stored for acral sites;
+- the "no AI" statements were corrected;
+- the honesty labels (Simulated, research mode, not a diagnosis) are on every AI output.
+
+### NEEDS PHONE CHECK (Expo Go)
+
+1. **New capture on a fresh lesion.** The capture should cycle through the bands with server-made
+   previews and upload, and the results should show the AI assist strip. Frames are attached by
+   URL, which React Native downloads itself; this was not tested on a device.
+2. **Airplane mode, then capture.** It should fall back to the bundled phantom and say "saved on
+   this phone". Turn the network back on and it should upload.
+3. **Results screen at phone width:** check that the AI cards' badges wrap, the AI evidence and
+   Change views open full screen, and the measurements card sits below Submit.
+4. **Answered case:** record an outcome (Biopsy taken → Benign) and check the to-do list updates.
+5. **Patient page:** the consent Yes/No control saves.
+
+### Updated demo script (PLAN.md §6 has the full version)
+
+**Core, 60 s:**
+1. Capture: QC passes and the learned second opinion agrees.
+2. The **AI assist** strip (pattern, acral furrows, mm² new since Day 01); tap **AI evidence**,
+   then **Change since Day 01**.
+3. Submit.
+4. Dermatologist: the queue shows the **Growing** flag. Open the case and point at "why this
+   suggestion" and the similar lesions. Insert measured findings, choose read Pigment-dominant,
+   Biopsy, send. The card says "model agrees".
+5. Clinician sees the answer.
+6. **AI** tab: per-tone results, the ablation, monitoring, the validation funnel.
+
+**Extended:**
+- outcome → validation-eligible → export;
+- `acral_ridge_dark` → ridge pattern → prompt review;
+- glare retake;
+- the evidence docs.
+
+### Deck and Q&A lines: describing the AI honestly
+
+- "The AI in SpektroSkin is real code you can see running: three small models with model cards.
+  They are trained and tested only on simulated data, because we have no patient images yet, and
+  we say so on every screen."
+- "It assists; it does not diagnose. It suggests a pigment or vascular pattern and an acral ridge
+  pattern, explains why, and abstains when unsure or when an image is unlike anything it was trained
+  on. There is no cancer probability anywhere: our data has no histopathology labels, so any such
+  number would be invented."
+- "We tested our own assumptions overnight:
+  - the spectral bands beat RGB on the same model, by most on dark skin;
+  - a neural network did not beat the explainable model, so we didn't ship it;
+  - our quality gate missed heavy noise, so we fixed it and retrained."
+- "Every number is reported per Fitzpatrick type. Our pattern models are weakest on the darkest
+  simulated skin; closing that gap with Indonesian data is the first job of the pilot."
+- "How it becomes clinical: dermatologists record their own reads, blind if they choose, and
+  biopsy results close the loop. Only consented, histopathology-confirmed cases count as
+  validation data, exported without identities. The model moves past research mode only after
+  shadow-mode results per skin tone, under ethics approval."
+- If asked "is 98 % real?": "Real measurement, simulated lesions. It shows the method works on the
+  physics we modelled, not on skin. The next number that matters comes from bench captures with the
+  physical module."
+
+### Known limits (say them before a judge does)
+
+- All images are simulated, and the simulator and the pipeline share one simplified optical model.
+- Model metrics are on simulated data. The shadow-mode agreement shown so far comes from test
+  accounts.
+- Processing runs on the server; the target architecture runs it on the device.
 
 ## Audit 1 — 00:10 WIB, live site, PLAN.md §6 demo script
 
