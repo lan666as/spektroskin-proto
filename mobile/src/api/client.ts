@@ -41,7 +41,16 @@ export function setUnauthorizedHandler(handler: (() => void) | null) {
   onUnauthorized = handler;
 }
 
-function detailMessage(body: unknown, status: number): string {
+/** Bearer header for callers outside `request` (the XHR upload). */
+export function authHeaders(): Record<string, string> {
+  return accessToken ? { Authorization: `Bearer ${accessToken}` } : {};
+}
+
+export function notifyUnauthorized() {
+  onUnauthorized?.();
+}
+
+export function detailMessage(body: unknown, status: number): string {
   const detail = (body as { detail?: unknown } | null)?.detail;
   if (typeof detail === 'string') return detail;
   if (Array.isArray(detail) && detail[0]?.msg) return String(detail[0].msg);
@@ -69,8 +78,11 @@ async function request<T>(
       body,
       signal: controller.signal,
     });
-  } catch {
-    throw new ApiError(0, 'Network error. Check the connection and try again.');
+  } catch (error) {
+    // Only a real transport failure (or our timeout) is "network"; anything else is a bug to show.
+    const transport = error instanceof TypeError || (error instanceof Error && error.name === 'AbortError');
+    if (transport) throw new ApiError(0, 'Network error. Check the connection and try again.');
+    throw error;
   } finally {
     clearTimeout(timer);
   }
@@ -106,7 +118,6 @@ export const api = {
   createLesion: (body: LesionCreate) => post<Lesion>('/lesions', body),
   lesion: (id: string) => get<LesionDetail>(`/lesions/${id}`),
   capture: (id: string) => get<Capture>(`/captures/${id}`),
-  uploadCapture: (form: FormData) => request<Capture>('POST', '/captures', form, null),
   cases: (statuses: CaseStatus[] = []) =>
     get<CaseSummary[]>(`/cases${statuses.length ? '?' + statuses.map((s) => `status=${s}`).join('&') : ''}`),
   case: (id: string) => get<CaseDetail>(`/cases/${id}`),

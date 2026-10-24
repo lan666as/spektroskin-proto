@@ -18,7 +18,7 @@ import { colors, radius, spacing } from '@/ui/theme';
 type Phase =
   | { kind: 'idle' }
   | { kind: 'capturing'; index: number; total: number }
-  | { kind: 'processing' }
+  | { kind: 'processing'; uploaded: number }
   | { kind: 'queued' };
 
 export default function CaptureScreen() {
@@ -51,8 +51,10 @@ export default function CaptureScreen() {
         }
       });
       setFiring(null);
-      setPhase({ kind: 'processing' });
-      const result = await uploadCapture(frameSet, lesionId);
+      setPhase({ kind: 'processing', uploaded: 0 });
+      const result = await uploadCapture(frameSet, lesionId, (uploaded) =>
+        setPhase({ kind: 'processing', uploaded }),
+      );
       queryClient.invalidateQueries({ queryKey: ['lesion', lesionId] });
       router.replace({ pathname: '/captures/[captureId]', params: { captureId: result.id } });
     } catch (e) {
@@ -97,9 +99,11 @@ export default function CaptureScreen() {
           {phase.kind === 'capturing'
             ? `Capturing frame ${phase.index + 1} of ${phase.total}: four LED bands, then a dark frame`
             : phase.kind === 'processing'
-              ? 'Checking quality and computing spectral views…'
+              ? phase.uploaded < 1
+                ? `Uploading frames… ${Math.round(phase.uploaded * 100)}%`
+                : 'Checking quality and computing spectral views…'
               : phase.kind === 'queued'
-                ? 'Saved on this phone. It uploads automatically when you are back online; results appear after upload.'
+                ? 'Could not reach the server, so the capture is saved on this phone. It uploads automatically when the connection is back; results appear after upload.'
                 : 'Place the spacer flat on the lesion, then capture.'}
         </Muted>
       </Card>
