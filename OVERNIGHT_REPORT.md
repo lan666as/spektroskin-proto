@@ -48,7 +48,7 @@ Plan:
 - Verification: tsc + web export + existing e2e (web path unchanged). NEEDS PHONE CHECK for the
   offline path itself.
 
-Result (22:04 WIB): **done (native path NEEDS PHONE CHECK)**, commit: see "Offline capture queue" below.
+Result (22:04 WIB): **done (native path NEEDS PHONE CHECK)**, commit `4fa48fc`.
 - Implemented as planned. Web behaviour unchanged (queue is a no-op there).
 - Verified: gate green (pytest 40, smoke, Playwright 4/4 on web); `npx expo export -p android`
   compiles the native bundle (Hermes, 3.2 MB) including the native-only queue, frame loader and
