@@ -103,6 +103,13 @@ Timestamped record of what was built during GENOHACK (Sat 24 – Sun 25 Oct 2026
 - UI polish (bottom navigation on narrow screens), README, rehearsal twin PT-0009.
 - Every commit gated (pytest 41, smoke, Playwright 4/4). Details: OVERNIGHT_REPORT.md.
 
+### 2026-10-24 22:26 WIB — Overnight work merged and deployed (builder's request)
+- `overnight` fast-forwarded into `main`; `scripts/deploy.sh` deployed 86c6e33: gate green, Alembic
+  0003 + 0004 applied, public smoke passed, Playwright e2e 4/4 against https://spektroskin.zidan.dev.
+- Verified in production as the demo accounts: dermatologist sees only PT-0005 (submitted) and
+  PT-0003 (answered); clinician sees PT-0003 / 0005 / 0007 / 0009; PT-0007 and PT-0009 each have
+  Day 01 (18.4 mm²) and Day 14 (22.6 mm²) visits.
+
 ## Decisions made alone
 - M1: Expo routes live in `mobile/src/app/` (SDK 58 template convention) instead of `mobile/app/`.
 - M1: web export uses `web.output: "single"` (SPA) so Caddy can serve deep links via `try_files`.
