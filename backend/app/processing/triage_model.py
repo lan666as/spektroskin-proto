@@ -99,6 +99,8 @@ def predict(
         "held_out_coverage": held_out["coverage"],
         "trained_on": "simulated phantoms only",
         "drivers": drivers(x, w, best),
+        # Standardised features: the vector similar-case retrieval compares.
+        "embedding": [round(float(v), 4) for v in (x - np.array(w["mean"])) / np.array(w["scale"])],
     }
 
 

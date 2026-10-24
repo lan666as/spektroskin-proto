@@ -371,3 +371,16 @@ class AISummary(BaseModel):
     models: list[ModelSummary]
     shadow: ShadowAgreement
     data: DataFlywheel
+
+
+class SimilarCase(BaseModel):
+    case_id: uuid.UUID
+    patient_code: str
+    site: str
+    fitzpatrick: str
+    thumbnail_url: str | None
+    distance: float = Field(description="Euclidean distance between standardised feature vectors")
+    review_action: ReviewAction | None
+    pattern_read: PatternRead | None
+    outcome_action: OutcomeAction | None
+    histopathology: Histopathology | None

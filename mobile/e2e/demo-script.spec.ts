@@ -133,6 +133,8 @@ test('PLAN §6 demo script: 60 s core + extended', async ({ browser, request }) 
   await expect(byId(reviewer, 'triage-pattern')).toContainText('Pigment-dominant');
   await expect(byId(reviewer, 'morph-asymmetry')).toBeVisible();
   await expect(byId(reviewer, 'attention-flags')).toContainText('since the first visit');
+  // The clinician spec runs first and leaves a reviewed acral case, so there is always a neighbour.
+  await expect(byId(reviewer, 'similar-cases')).toContainText('Recommended');
   await shot(reviewer, '08-review-case');
   await byId(reviewer, 'phrase-0').click();
   await byId(reviewer, 'action-biopsy').click();

@@ -308,3 +308,14 @@ Timestamped record of what was built during GENOHACK (Sat 24 – Sun 25 Oct 2026
   they now say what the AI is (research-mode suggestions from models trained on simulated data) and
   still rule out diagnosis, cancer probability and risk scores. About's real-vs-simulated table lists
   the models (real code) and their accuracy numbers (simulated data).
+
+## 2026-10-25 02:08 WIB — Iteration loop, batch 11: similar-case retrieval
+
+- Triage output now stores its standardised feature vector (`embedding`). `GET /api/cases/{id}/similar`
+  (dermatologists, group-scoped, audited): reviewed cases of other lesions nearest by Euclidean
+  distance, with recommendation, dermatologist pattern read, outcome and histopathology.
+- Reviewer case page: "Similar reviewed lesions" card (hidden during a blind read). Stated as
+  retrieval for context, not a prediction. Captures processed before this batch have no embedding
+  and are not retrieved (no production backfill).
+- Tests: DB test for ranking and same-lesion exclusion; smoke covers the endpoint; demo e2e asserts
+  the card.

@@ -245,6 +245,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/cases/{case_id}/similar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Similar Cases
+         * @description Reviewed cases whose latest capture is nearest in pigment and blood statistics, with what
+         *     was recommended and found. Retrieval, not prediction: no probability is derived from it.
+         */
+        get: operations["similar_cases_api_cases__case_id__similar_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/images/{capture_id}/{name}": {
         parameters: {
             query?: never;
@@ -1152,6 +1173,35 @@ export interface components {
                 };
             };
         };
+        /** SimilarCase */
+        SimilarCase: {
+            /**
+             * Case Id
+             * Format: uuid
+             */
+            case_id: string;
+            /** Patient Code */
+            patient_code: string;
+            /** Site */
+            site: string;
+            /** Fitzpatrick */
+            fitzpatrick: string;
+            /** Thumbnail Url */
+            thumbnail_url: string | null;
+            /**
+             * Distance
+             * @description Euclidean distance between standardised feature vectors
+             */
+            distance: number;
+            /** Review Action */
+            review_action: ("observe" | "biopsy" | "refer") | null;
+            /** Pattern Read */
+            pattern_read: ("pigmented" | "vascular" | "mixed" | "unsure") | null;
+            /** Outcome Action */
+            outcome_action: ("observed" | "biopsied" | "excised" | "referred" | "declined") | null;
+            /** Histopathology */
+            histopathology: ("pending" | "benign" | "malignant" | "indeterminate") | null;
+        };
         /** SimulatedCaptureIn */
         SimulatedCaptureIn: {
             /**
@@ -1768,6 +1818,39 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["CaseDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    similar_cases_api_cases__case_id__similar_get: {
+        parameters: {
+            query?: {
+                limit?: number;
+            };
+            header?: never;
+            path: {
+                case_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SimilarCase"][];
                 };
             };
             /** @description Validation Error */

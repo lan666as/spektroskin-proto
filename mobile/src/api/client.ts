@@ -130,6 +130,7 @@ export const api = {
     get<AuditEvent[]>(`/audit?limit=50${before ? `&before=${encodeURIComponent(before)}` : ''}`),
   validation: (captureId: string) => get<Validation>(`/validation/${captureId}`),
   review: (caseId: string, body: ReviewCreate) => post<CaseDetail>(`/cases/${caseId}/review`, body),
+  similarCases: (caseId: string) => get<Schemas['SimilarCase'][]>(`/cases/${caseId}/similar`),
   aiSummary: () => get<Schemas['AISummary']>('/ai/summary'),
   simulateCapture: (body: Schemas['SimulatedCaptureIn']) => post<SimulatedCapture>('/simulator/captures', body),
   recordOutcome: (caseId: string, body: OutcomeIn) => put<CaseDetail>(`/cases/${caseId}/outcome`, body),

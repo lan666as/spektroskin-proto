@@ -1,16 +1,25 @@
 import uuid
 from typing import Annotated
 
+import numpy as np
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy import select
 from sqlalchemy.orm import Session, selectinload
 
 from app import audit
 from app.api.serialize import case_detail, case_summary
-from app.auth import Clinician, CurrentUser, Dermatologist, same_group
+from app.auth import Clinician, CurrentUser, Dermatologist, same_group, sign_image_url
 from app.db import get_session
 from app.models import Capture, Case, Lesion, Outcome, Review, User, utcnow
-from app.schemas import CaseCreate, CaseDetail, CaseStatus, CaseSummary, OutcomeIn, ReviewCreate
+from app.schemas import (
+    CaseCreate,
+    CaseDetail,
+    CaseStatus,
+    CaseSummary,
+    OutcomeIn,
+    ReviewCreate,
+    SimilarCase,
+)
 
 router = APIRouter(prefix="/cases", tags=["cases"])
 SessionDep = Annotated[Session, Depends(get_session)]
@@ -142,3 +151,52 @@ def record_outcome(
     session.commit()
     session.expire_all()
     return case_detail(_load_case(session, case_id, user), user, user.display_name)
+
+
+def _embedding(case: Case) -> np.ndarray | None:
+    if not case.captures:
+        return None
+    vector = ((case.captures[-1].result or {}).get("triage_model") or {}).get("embedding")
+    return None if vector is None else np.array(vector)
+
+
+@router.get("/{case_id}/similar", response_model=list[SimilarCase])
+def similar_cases(
+    case_id: uuid.UUID, user: Dermatologist, session: SessionDep, limit: int = 3
+) -> list[SimilarCase]:
+    """Reviewed cases whose latest capture is nearest in pigment and blood statistics, with what
+    was recommended and found. Retrieval, not prediction: no probability is derived from it."""
+    case = _load_case(session, case_id, user)
+    target = _embedding(case)
+    if target is None:
+        return []
+    # ponytail: linear scan over the group's reviewed cases; a vector index if this grows.
+    candidates = session.scalars(
+        select(Case)
+        .options(*_LOAD)
+        .where(Case.created_by.in_(same_group(user)), Case.status == "answered")
+        .where(Case.lesion_id != case.lesion_id)
+    )
+    scored = []
+    for other in candidates:
+        vector = _embedding(other)
+        if vector is not None and vector.shape == target.shape:
+            scored.append((float(np.linalg.norm(vector - target)), other))
+    scored.sort(key=lambda pair: pair[0])
+    audit.record(session, user, "similar", "case", case.id)
+    session.commit()
+    return [
+        SimilarCase(
+            case_id=other.id,
+            patient_code=other.lesion.patient.code,
+            site=other.lesion.body_site,
+            fitzpatrick=other.lesion.patient.fitzpatrick,
+            thumbnail_url=sign_image_url(other.captures[-1].id, "standard", user.id),
+            distance=round(distance, 3),
+            review_action=other.review.action if other.review else None,
+            pattern_read=other.review.pattern_read if other.review else None,
+            outcome_action=other.outcome.action_taken if other.outcome else None,
+            histopathology=other.outcome.histopathology if other.outcome else None,
+        )
+        for distance, other in scored[: max(1, min(limit, 10))]
+    ]

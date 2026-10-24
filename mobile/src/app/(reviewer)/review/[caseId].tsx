@@ -22,6 +22,7 @@ import { CaseTimeline, Footnote, HistoryStrip, Recommendation, SpectralViews, Vi
 import { areaChange, AutomatedAnalysis, formatSize, MorphologyCard } from '@/ui/analysis';
 import { AcralPattern, TriageSupport } from '@/ui/triage';
 import { OutcomeCard } from '@/ui/outcome';
+import { SimilarCases } from '@/ui/similar';
 import { SpectralSignature } from '@/ui/measurement';
 import { isAcral } from '@/ui/labels';
 import { FLAG_LABELS, formatArea, formatDateTime, siteLabel, STATUS_LABELS, statusTone } from '@/ui/labels';
@@ -221,6 +222,7 @@ export default function ReviewCase() {
             ) : null}
             {latest && !hideAI ? <TriageSupport capture={latest} read={c.review?.pattern_read} /> : null}
             {latest && !hideAI ? <AcralPattern capture={latest} site={c.lesion.body_site} /> : null}
+            {!hideAI ? <SimilarCases caseId={c.id} /> : null}
             <CaseTimeline c={c} />
             {c.review ? (
               <>
