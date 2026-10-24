@@ -293,6 +293,8 @@ def run(base: str) -> None:
             "action": "biopsy",
             "follow_up_days": 14,
             "notes": "automated",
+            "pattern_read": "pigmented",
+            "ai_hidden": True,
         },
     )
     expect(
@@ -303,6 +305,11 @@ def run(base: str) -> None:
         "POST", f"/api/cases/{case['id']}/review", body={"impression": "x", "action": "observe"}
     )
     expect(status == 409, f"second review is 409: {status}")
+    status, ai = c.request("GET", "/api/ai/summary")
+    expect(
+        status == 200 and ai["shadow"]["reads"] >= 1 and len(ai["models"]) == 3,
+        f"GET /ai/summary: {status}",
+    )
 
     c.login("smoke-clinician")
     status, answered = c.request("GET", f"/api/cases/{case['id']}")
@@ -310,6 +317,8 @@ def run(base: str) -> None:
         status == 200 and answered["review"]["action"] == "biopsy",
         f"clinician sees the recommendation: {status}",
     )
+    status, _ = c.request("GET", "/api/ai/summary")
+    expect(status == 403, f"clinician cannot read /ai/summary: {status}")
     expect(answered["follow_up_due"] is not None, "answered case carries the follow-up due date")
     outcome = {
         "action_taken": "biopsied",

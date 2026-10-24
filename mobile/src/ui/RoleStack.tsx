@@ -10,7 +10,7 @@ import { useSync } from '@/sync/SyncProvider';
 import { Loading } from './components';
 import { colors, spacing } from './theme';
 
-type Link = { label: string; href: '/cases' | '/patients' | '/review' | '/audit'; testID: string };
+type Link = { label: string; href: '/cases' | '/patients' | '/review' | '/ai' | '/audit'; testID: string };
 
 // Below this width the header has no room for a title plus links (the demo's phone-sized window),
 // so navigation moves to a bottom bar.

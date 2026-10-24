@@ -51,6 +51,7 @@ CASE_STATUSES = ("submitted", "in_review", "answered")
 REVIEW_ACTIONS = ("observe", "biopsy", "refer")
 OUTCOME_ACTIONS = ("observed", "biopsied", "excised", "referred", "declined")
 HISTOPATHOLOGY = ("pending", "benign", "malignant", "indeterminate")
+PATTERN_READS = ("pigmented", "vascular", "mixed", "unsure")
 
 
 def utcnow() -> datetime:
@@ -199,6 +200,10 @@ class Review(Base):
         CheckConstraint(
             "follow_up_days IS NULL OR follow_up_days BETWEEN 0 AND 3650", name="follow_up_range"
         ),
+        CheckConstraint(
+            "pattern_read IS NULL OR " + _in("pattern_read", PATTERN_READS),
+            name="pattern_read_valid",
+        ),
     )
 
     id: Mapped[uuid.UUID] = mapped_column(Uuid, primary_key=True, default=uuid.uuid4)
@@ -208,6 +213,9 @@ class Review(Base):
     action: Mapped[str] = mapped_column(String(16))
     follow_up_days: Mapped[int | None] = mapped_column(Integer)
     notes: Mapped[str | None] = mapped_column(Text)
+    # The dermatologist's own read of the dominant pattern: the shadow-mode reference label.
+    pattern_read: Mapped[str | None] = mapped_column(String(16))
+    ai_hidden: Mapped[bool | None] = mapped_column(Boolean)
     created_at: Mapped[datetime] = _created_at()
 
     case: Mapped[Case] = relationship(back_populates="review")

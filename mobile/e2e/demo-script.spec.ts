@@ -135,8 +135,10 @@ test('PLAN §6 demo script: 60 s core + extended', async ({ browser, request }) 
   await byId(reviewer, 'phrase-0').click();
   await byId(reviewer, 'action-biopsy').click();
   await byId(reviewer, 'follow-up-14').click();
+  await byId(reviewer, 'pattern-read-pigmented').click();
   await byId(reviewer, 'send-review').click();
   await expect(byId(reviewer, 'review-sent')).toBeVisible();
+  await expect(byId(reviewer, 'triage-agreement')).toContainText('model agrees');
   await shot(reviewer, '09-review-sent');
 
   // 7: the clinician sees the recommendation.
@@ -157,6 +159,11 @@ test('PLAN §6 demo script: 60 s core + extended', async ({ browser, request }) 
   await shot(clinician, '10b-outcome-recorded');
   await reviewer.reload();
   await expect(byId(reviewer, 'outcome-histopathology')).toContainText('Benign');
+  await byId(reviewer, 'nav-ai').click();
+  await expect(byId(reviewer, 'shadow-agreement')).toContainText('%');
+  await expect(byId(reviewer, 'ablation')).toContainText('RGB bands only');
+  await expect(byId(reviewer, 'validation-eligible')).toBeVisible();
+  await shot(reviewer, '10c-ai-overview');
 
   // Extended: glare capture fails QC with retake guidance; validation panel on a retake.
   await byId(clinician, 'nav-patients').click();

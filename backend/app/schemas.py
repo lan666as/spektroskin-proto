@@ -34,6 +34,7 @@ CaseStatus = Literal["submitted", "in_review", "answered"]
 ReviewAction = Literal["observe", "biopsy", "refer"]
 OutcomeAction = Literal["observed", "biopsied", "excised", "referred", "declined"]
 Histopathology = Literal["pending", "benign", "malignant", "indeterminate"]
+PatternRead = Literal["pigmented", "vascular", "mixed", "unsure"]
 ViewName = Literal["standard", "pigment", "vascular"]
 
 PatientCode = Annotated[str, StringConstraints(pattern=r"^PT-\d{4}$")]
@@ -226,6 +227,12 @@ class ReviewCreate(BaseModel):
     action: ReviewAction
     follow_up_days: int | None = Field(default=None, ge=0, le=3650)
     notes: Annotated[str, StringConstraints(strip_whitespace=True, max_length=2000)] | None = None
+    pattern_read: PatternRead | None = Field(
+        default=None, description="Dermatologist's own read of the dominant pattern (shadow mode)"
+    )
+    ai_hidden: bool | None = Field(
+        default=None, description="True if the AI suggestions were hidden while reviewing"
+    )
 
 
 class ReviewOut(BaseModel):
@@ -235,6 +242,8 @@ class ReviewOut(BaseModel):
     action: ReviewAction
     follow_up_days: int | None
     notes: str | None
+    pattern_read: PatternRead | None = None
+    ai_hidden: bool | None = None
     created_at: datetime
 
 
@@ -308,3 +317,53 @@ class AuditEventOut(BaseModel):
     action: str
     entity_type: str
     entity_id: str
+
+
+class HeldOut(BaseModel):
+    accuracy: float
+    coverage: float | None = None
+    accuracy_when_answered: float | None = None
+    n: int
+
+
+class ModelSummary(BaseModel):
+    name: str
+    version: str
+    purpose: str
+    status: Literal["advisory", "research"]
+    trained_at: str
+    held_out: HeldOut
+    ablation: dict[str, float] | None = Field(
+        default=None, description="Held-out accuracy per feature set (triage: rgb_only, spectral)"
+    )
+    model_card: str
+
+
+class ShadowAgreement(BaseModel):
+    reads: int = Field(description="Reviews with a dermatologist pattern read")
+    compared: int = Field(description="Reads where the model gave a pattern (did not abstain)")
+    agreed: int
+    model_abstained: int
+    blind_reads: int = Field(description="Reads made with the AI suggestions hidden")
+    blind_compared: int
+    blind_agreed: int
+    confusion: dict[str, dict[str, int]] = Field(description="dermatologist read → model pattern")
+
+
+class DataFlywheel(BaseModel):
+    cases: int
+    reviewed: int
+    consented_reviewed: int
+    with_outcome: int
+    histopathology_confirmed: int
+    validation_eligible: int = Field(
+        description="Consented, reviewed and histopathology-confirmed: usable to validate a model"
+    )
+
+
+class AISummary(BaseModel):
+    computed_at: datetime
+    scope: str
+    models: list[ModelSummary]
+    shadow: ShadowAgreement
+    data: DataFlywheel

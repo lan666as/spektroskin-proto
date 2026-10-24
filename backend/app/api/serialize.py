@@ -102,6 +102,8 @@ def case_detail(case: Case, viewer: User, requested_by: str) -> CaseDetail:
             action=review.action,
             follow_up_days=review.follow_up_days,
             notes=review.notes,
+            pattern_read=review.pattern_read,
+            ai_hidden=review.ai_hidden,
             created_at=review.created_at,
         )
         if review

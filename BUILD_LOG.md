@@ -274,3 +274,17 @@ Timestamped record of what was built during GENOHACK (Sat 24 – Sun 25 Oct 2026
 - App: "Acral pattern" card (results, reviewer) only for palm, sole and nail sites; a ridge pattern
   shows the guideline line (Saida 2004: prompt dermatologist review). Analysis row and AI roadmap
   entry. E2E: demo lesion reads furrows; a ridge lesion is flagged.
+
+## 2026-10-25 01:43 WIB — Iteration loop, batch 8: shadow-mode validation and the AI & validation page (backlog item 7)
+
+- Migration 0006: `reviews.pattern_read` (dermatologist's own read of the dominant pattern) and
+  `reviews.ai_hidden` (blind read). Review form: optional pattern read; reviewer case: "Hide AI until
+  I send" toggle (hides triage, acral and automated-analysis cards); after sending, the triage card
+  shows "Your read … · model agrees / differs / abstained".
+- `GET /api/ai/summary` (dermatologists, group-scoped, audited): model cards with held-out metrics
+  and the triage RGB-vs-spectral ablation; live shadow-mode agreement (all and blind); validation
+  funnel (cases → reviewed → consented → outcome → histopathology-confirmed → eligible). Scope text
+  states all captures are simulated.
+- Reviewer "AI" page renders it. Tests: agreement and eligibility logic; smoke covers the endpoint
+  and the 403 for clinicians; e2e covers the pattern read, the agreement line, the blind read and
+  the AI page.

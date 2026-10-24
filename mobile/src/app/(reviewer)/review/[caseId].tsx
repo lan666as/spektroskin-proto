@@ -39,6 +39,13 @@ const FOLLOW_UP = [
   { value: 'none', label: 'None' },
 ] as const;
 type FollowUp = (typeof FOLLOW_UP)[number]['value'];
+const PATTERN_READS = [
+  { value: 'pigmented', label: 'Pigment-dominant' },
+  { value: 'vascular', label: 'Blood-vessel-dominant' },
+  { value: 'mixed', label: 'Mixed' },
+  { value: 'unsure', label: 'Unsure' },
+] as const;
+type PatternRead = (typeof PATTERN_READS)[number]['value'];
 // Phrases the dermatologist can tap to start the impression, then edit. Typed by the human
 // reviewer's choice; nothing here is generated from the images.
 const PHRASES = [
@@ -48,12 +55,13 @@ const PHRASES = [
   'Vascular pattern visible on the hemoglobin map.',
 ] as const;
 
-function ReviewForm({ caseId, onSent }: { caseId: string; onSent: () => void }) {
+function ReviewForm({ caseId, aiHidden, onSent }: { caseId: string; aiHidden: boolean; onSent: () => void }) {
   const queryClient = useQueryClient();
   const [impression, setImpression] = useState('');
   const [action, setAction] = useState<ReviewAction | null>(null);
   const [followUp, setFollowUp] = useState<FollowUp | null>(null);
   const [notes, setNotes] = useState('');
+  const [read, setRead] = useState<PatternRead | null>(null);
   const submit = useMutation({
     mutationFn: () =>
       api.review(caseId, {
@@ -61,6 +69,8 @@ function ReviewForm({ caseId, onSent }: { caseId: string; onSent: () => void }) 
         action: action!,
         follow_up_days: followUp && followUp !== 'none' ? Number(followUp) : null,
         notes: notes.trim() || null,
+        pattern_read: read,
+        ai_hidden: aiHidden,
       }),
     onSuccess: (updated) => {
       queryClient.setQueryData(['review-case', caseId], updated);
@@ -93,6 +103,13 @@ function ReviewForm({ caseId, onSent }: { caseId: string; onSent: () => void }) 
       <Chips label="Recommended action" options={ACTIONS} value={action} onChange={setAction} testIDPrefix="action" />
       <Chips label="Follow-up" options={FOLLOW_UP} value={followUp} onChange={setFollowUp} testIDPrefix="follow-up" />
       <Field label="Notes (optional)" value={notes} onChangeText={setNotes} maxLength={2000} testID="review-notes" />
+      <Chips
+        label="Your read of the dominant pattern (optional: validates the triage model in shadow mode)"
+        options={PATTERN_READS}
+        value={read}
+        onChange={setRead}
+        testIDPrefix="pattern-read"
+      />
       <Muted>Your recommendation goes back to the requesting clinician, who makes the decision.</Muted>
       <ErrorBanner error={submit.error} />
       <Button
@@ -149,6 +166,8 @@ export default function ReviewCase() {
   const twoColumns = width >= 960;
   const router = useRouter();
   const [justSent, setJustSent] = useState(false);
+  const [blind, setBlind] = useState(false);
+  const hideAI = blind && !c?.review;
 
   return (
     <Screen wide testID="review-case-screen">
@@ -166,14 +185,31 @@ export default function ReviewCase() {
             />
             <VisitCompare captures={c.lesion_history} selectedId={reviewed?.id} />
             {latest ? <MorphologyCard capture={latest} visits={c.lesion_history} /> : null}
-            {latest ? <AutomatedAnalysis capture={latest} visits={c.lesion_history} site={c.lesion.body_site} /> : null}
+            {latest && !hideAI ? (
+              <AutomatedAnalysis capture={latest} visits={c.lesion_history} site={c.lesion.body_site} />
+            ) : null}
             {latest ? <SpectralSignature capture={latest} /> : null}
             <Footnote />
           </View>
           <View style={{ flex: twoColumns ? 2 : undefined, width: twoColumns ? undefined : '100%', gap: spacing.lg }}>
             <CaseInfo c={c} />
-            {latest ? <TriageSupport capture={latest} /> : null}
-            {latest ? <AcralPattern capture={latest} site={c.lesion.body_site} /> : null}
+            {!c.review ? (
+              <Card testID="blind-read">
+                <Chips
+                  label="AI suggestions while you review"
+                  options={[
+                    { value: 'shown', label: 'Show' },
+                    { value: 'hidden', label: 'Hide until I send (blind read)' },
+                  ]}
+                  value={blind ? 'hidden' : 'shown'}
+                  onChange={(v) => setBlind(v === 'hidden')}
+                  testIDPrefix="ai"
+                />
+                <Muted>Blind reads avoid anchoring on the model and make the shadow-mode comparison fair.</Muted>
+              </Card>
+            ) : null}
+            {latest && !hideAI ? <TriageSupport capture={latest} read={c.review?.pattern_read} /> : null}
+            {latest && !hideAI ? <AcralPattern capture={latest} site={c.lesion.body_site} /> : null}
             <CaseTimeline c={c} />
             {c.review ? (
               <>
@@ -192,7 +228,7 @@ export default function ReviewCase() {
                 <Button label="Back to queue" variant="secondary" onPress={() => router.navigate('/review')} />
               </>
             ) : (
-              <ReviewForm caseId={c.id} onSent={() => setJustSent(true)} />
+              <ReviewForm caseId={c.id} aiHidden={hideAI} onSent={() => setJustSent(true)} />
             )}
           </View>
         </View>

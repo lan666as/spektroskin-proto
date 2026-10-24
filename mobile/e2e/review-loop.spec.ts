@@ -38,12 +38,18 @@ test('review loop: clinician submits → dermatologist reviews → clinician see
   await expect(byId(reviewer, 'case-question-text')).toHaveText(question);
   await expect(byId(reviewer, 'history-strip')).toBeVisible();
   await expect(byId(reviewer, 'review-case-screen')).toContainText('Research consent');
+  // Blind read: AI suggestions stay hidden until the recommendation is sent.
+  await byId(reviewer, 'ai-hidden').click();
+  await expect(byId(reviewer, 'triage-support')).toHaveCount(0);
+  await expect(byId(reviewer, 'automated-analysis')).toHaveCount(0);
   await byId(reviewer, 'review-impression').fill('Irregular pigment on an acral site with growth over visits.');
+  await byId(reviewer, 'pattern-read-unsure').click();
   await byId(reviewer, 'action-biopsy').click();
   await byId(reviewer, 'follow-up-14').click();
   await byId(reviewer, 'send-review').click();
   await expect(byId(reviewer, 'recommendation')).toBeVisible();
   await expect(byId(reviewer, 'review-sent')).toContainText('Smoke Test Clinician');
+  await expect(byId(reviewer, 'triage-agreement')).toContainText('Your read: unsure');
 
   // The clinician's case page polls every 5 s.
   await expect(byId(clinician, 'recommendation-action')).toContainText('Biopsy', { timeout: 15_000 });

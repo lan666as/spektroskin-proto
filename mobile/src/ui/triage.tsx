@@ -25,7 +25,7 @@ export function patternSummary(t: Triage): string {
  * Research-mode lesion-pattern suggestion. It describes which chromophore pattern dominates,
  * never whether a lesion is benign or malignant: the simulated training data has no such labels.
  */
-export function TriageSupport({ capture }: { capture: Capture }) {
+export function TriageSupport({ capture, read }: { capture: Capture; read?: string | null }) {
   const router = useRouter();
   const t = capture.triage_model;
   if (!t) return null;
@@ -61,6 +61,17 @@ export function TriageSupport({ capture }: { capture: Capture }) {
           </View>
         );
       })}
+      {read ? (
+        <Text style={styles.agreement} testID="triage-agreement">
+          {read === 'unsure'
+            ? 'Your read: unsure'
+            : !t.pattern
+              ? `Your read: ${PATTERN_LABELS[read as Pattern]} · model abstained`
+              : read === t.pattern
+                ? `Your read: ${PATTERN_LABELS[read as Pattern]} · model agrees`
+                : `Your read: ${PATTERN_LABELS[read as Pattern]} · model differs`}
+        </Text>
+      ) : null}
       {t.drivers?.length ? (
         <View style={{ gap: 4 }} testID="triage-drivers">
           <Text style={styles.why}>Why this suggestion</Text>
@@ -160,6 +171,7 @@ const styles = StyleSheet.create({
   link: { color: colors.accent, fontWeight: '600', paddingVertical: spacing.xs },
   why: { fontSize: 14, fontWeight: '700', color: colors.text },
   acral: { fontSize: 18, fontWeight: '800', color: colors.text },
+  agreement: { fontSize: 14, fontWeight: '700', color: colors.accent },
   guideline: { fontSize: 14, fontWeight: '600', color: colors.danger },
   driver: { fontSize: 14, color: colors.text, flex: 1 },
   driverEffect: { fontSize: 13, fontWeight: '700' },

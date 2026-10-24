@@ -342,10 +342,41 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/ai/summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Ai Summary */
+        get: operations["ai_summary_api_ai_summary_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** AISummary */
+        AISummary: {
+            /**
+             * Computed At
+             * Format: date-time
+             */
+            computed_at: string;
+            /** Scope */
+            scope: string;
+            /** Models */
+            models: components["schemas"]["ModelSummary"][];
+            shadow: components["schemas"]["ShadowAgreement"];
+            data: components["schemas"]["DataFlywheel"];
+        };
         /**
          * AcralOpinion
          * @description Research-mode acral pattern read (pigment along furrows or ridges) from a model trained on
@@ -638,10 +669,39 @@ export interface components {
             /** Skin */
             skin: number;
         };
+        /** DataFlywheel */
+        DataFlywheel: {
+            /** Cases */
+            cases: number;
+            /** Reviewed */
+            reviewed: number;
+            /** Consented Reviewed */
+            consented_reviewed: number;
+            /** With Outcome */
+            with_outcome: number;
+            /** Histopathology Confirmed */
+            histopathology_confirmed: number;
+            /**
+             * Validation Eligible
+             * @description Consented, reviewed and histopathology-confirmed: usable to validate a model
+             */
+            validation_eligible: number;
+        };
         /** HTTPValidationError */
         HTTPValidationError: {
             /** Detail */
             detail?: components["schemas"]["ValidationError"][];
+        };
+        /** HeldOut */
+        HeldOut: {
+            /** Accuracy */
+            accuracy: number;
+            /** Coverage */
+            coverage?: number | null;
+            /** Accuracy When Answered */
+            accuracy_when_answered?: number | null;
+            /** N */
+            n: number;
         };
         /** LesionCreate */
         LesionCreate: {
@@ -734,6 +794,32 @@ export interface components {
              * @description Signed standard view of the latest processed visit
              */
             latest_thumbnail_url?: string | null;
+        };
+        /** ModelSummary */
+        ModelSummary: {
+            /** Name */
+            name: string;
+            /** Version */
+            version: string;
+            /** Purpose */
+            purpose: string;
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "advisory" | "research";
+            /** Trained At */
+            trained_at: string;
+            held_out: components["schemas"]["HeldOut"];
+            /**
+             * Ablation
+             * @description Held-out accuracy per feature set (triage: rgb_only, spectral)
+             */
+            ablation?: {
+                [key: string]: number;
+            } | null;
+            /** Model Card */
+            model_card: string;
         };
         /** Morphology */
         Morphology: {
@@ -978,6 +1064,16 @@ export interface components {
             follow_up_days?: number | null;
             /** Notes */
             notes?: string | null;
+            /**
+             * Pattern Read
+             * @description Dermatologist's own read of the dominant pattern (shadow mode)
+             */
+            pattern_read?: ("pigmented" | "vascular" | "mixed" | "unsure") | null;
+            /**
+             * Ai Hidden
+             * @description True if the AI suggestions were hidden while reviewing
+             */
+            ai_hidden?: boolean | null;
         };
         /** ReviewOut */
         ReviewOut: {
@@ -999,11 +1095,50 @@ export interface components {
             follow_up_days: number | null;
             /** Notes */
             notes: string | null;
+            /** Pattern Read */
+            pattern_read?: ("pigmented" | "vascular" | "mixed" | "unsure") | null;
+            /** Ai Hidden */
+            ai_hidden?: boolean | null;
             /**
              * Created At
              * Format: date-time
              */
             created_at: string;
+        };
+        /** ShadowAgreement */
+        ShadowAgreement: {
+            /**
+             * Reads
+             * @description Reviews with a dermatologist pattern read
+             */
+            reads: number;
+            /**
+             * Compared
+             * @description Reads where the model gave a pattern (did not abstain)
+             */
+            compared: number;
+            /** Agreed */
+            agreed: number;
+            /** Model Abstained */
+            model_abstained: number;
+            /**
+             * Blind Reads
+             * @description Reads made with the AI suggestions hidden
+             */
+            blind_reads: number;
+            /** Blind Compared */
+            blind_compared: number;
+            /** Blind Agreed */
+            blind_agreed: number;
+            /**
+             * Confusion
+             * @description dermatologist read → model pattern
+             */
+            confusion: {
+                [key: string]: {
+                    [key: string]: number;
+                };
+            };
         };
         /** SimulatedCaptureIn */
         SimulatedCaptureIn: {
@@ -1793,6 +1928,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    ai_summary_api_ai_summary_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AISummary"];
                 };
             };
         };
