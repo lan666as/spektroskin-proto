@@ -109,3 +109,11 @@ def test_spectral_signature_shows_band_contrast() -> None:
     red_drop = 1 - vsig["lesion"][2] / vsig["skin"][2]
     assert green_drop > red_drop  # hemoglobin absorbs green far more than red
     assert vsig["hemoglobin"]["lesion"] > vsig["hemoglobin"]["skin"]
+
+
+def test_measurements_match_lesion_scale() -> None:
+    result, gt, _ = _run("acral_dark_d30")
+    m = result.measurements
+    # A 28 mm² irregular lesion: diameter a little above the equal-area circle (6.0 mm).
+    assert 6.0 <= m["diameter_mm"] <= 8.5
+    assert 4.5 <= m["width_mm"] <= m["diameter_mm"]

@@ -1,7 +1,7 @@
 import numpy as np
 from scipy import ndimage
 from skimage.filters import apply_hysteresis_threshold, threshold_otsu
-from skimage.measure import label
+from skimage.measure import label, regionprops
 
 from app.processing.optics import MM_PER_PX, spacer_mask
 
@@ -28,3 +28,14 @@ def segment(melanin: np.ndarray, hemoglobin: np.ndarray) -> tuple[np.ndarray, fl
     largest = np.argmax(np.bincount(labels.ravel())[1:]) + 1
     mask = ndimage.binary_fill_holes(labels == largest)
     return mask, float(mask.sum() * MM_PER_PX**2)
+
+
+def measurements(mask: np.ndarray) -> dict[str, float] | None:
+    """Longest diameter (maximum Feret) and width (minor axis of the fitted ellipse), in mm."""
+    if not mask.any():
+        return None
+    props = regionprops(mask.astype(np.uint8))[0]
+    return {
+        "diameter_mm": round(float(props.feret_diameter_max) * MM_PER_PX, 2),
+        "width_mm": round(float(props.axis_minor_length) * MM_PER_PX, 2),
+    }

@@ -37,6 +37,7 @@ export default function RootLayout() {
           <Stack.Screen name="index" options={{ headerShown: false }} />
           <Stack.Screen name="login" options={{ headerShown: false }} />
           <Stack.Screen name="about" options={{ title: 'About this prototype' }} />
+          <Stack.Screen name="ai-roadmap" options={{ title: 'AI roadmap' }} />
           <Stack.Screen name="(clinician)" options={{ headerShown: false }} />
           <Stack.Screen name="(reviewer)" options={{ headerShown: false }} />
         </Stack>

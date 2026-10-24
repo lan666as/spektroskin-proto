@@ -412,6 +412,16 @@ export interface components {
                 [key: string]: string;
             };
             spectral_signature?: components["schemas"]["SpectralSignature"] | null;
+            /**
+             * Diameter Mm
+             * @description Longest diameter of the outline
+             */
+            diameter_mm?: number | null;
+            /**
+             * Width Mm
+             * @description Width (ellipse minor axis)
+             */
+            width_mm?: number | null;
             /** Registration Shift Px */
             registration_shift_px?: {
                 [key: string]: number[];

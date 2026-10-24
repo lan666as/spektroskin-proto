@@ -2,7 +2,7 @@ from app.processing import render
 from app.processing.calibration import calibrate
 from app.processing.qc import run_qc
 from app.processing.registration import register
-from app.processing.segmentation import segment
+from app.processing.segmentation import measurements, segment
 from app.processing.signature import spectral_signature
 from app.processing.spectral import unmix
 from app.processing.types import DeviceProfile, FrameSet, ProcessingResult
@@ -38,6 +38,7 @@ def run(frame_set: FrameSet, device_profile: DeviceProfile) -> ProcessingResult:
         mask=mask,
         area_mm2=area_mm2,
         signature=spectral_signature(aligned, melanin, hemoglobin, mask),
+        measurements=measurements(mask),
         shifts_px=shifts,
         gain_correction=gains,
     )

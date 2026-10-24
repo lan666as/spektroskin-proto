@@ -135,6 +135,18 @@ Timestamped record of what was built during GENOHACK (Sat 24 – Sun 25 Oct 2026
   pending-upload strip; referral summary visit comparison.
 - E2E flake fixed (random patient codes collided after many runs; now picks an unused code).
 
+### 2026-10-25 00:16 WIB — Iteration loop, batch 1 (backlog items 1, 2, 4, 10)
+- Lesion measurements: longest diameter (max Feret) and width (ellipse minor axis) in mm, computed
+  by the pipeline; measurement summary above the fold on the results screen (area, size, change
+  since the first visit); reviewer case card shows size and change.
+- "Automated analysis" card on results and reviewer screens: quality check, outline and size,
+  change across visits, pigment and blood maps, each with how it works and its limits; "Lesion
+  assessment (triage support): Not active".
+- In-app AI roadmap (tiers active / research / planned; the RGB-vs-spectral ablation as the optics
+  kill test; "never shown" rules).
+- Demo-script Playwright spec (PLAN §6 core + extended, smoke users, screenshots on demand) now part
+  of every gate and every live verification; `scripts/ship.sh` tags each verified deploy live-N.
+
 ## Decisions made alone
 - M1: Expo routes live in `mobile/src/app/` (SDK 58 template convention) instead of `mobile/app/`.
 - M1: web export uses `web.output: "single"` (SPA) so Caddy can serve deep links via `try_files`.

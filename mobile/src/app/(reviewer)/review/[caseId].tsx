@@ -19,6 +19,7 @@ import {
   Screen,
 } from '@/ui/components';
 import { CaseTimeline, Footnote, HistoryStrip, Recommendation, SpectralViews, VisitCompare } from '@/ui/clinical';
+import { areaChange, AutomatedAnalysis, formatSize } from '@/ui/analysis';
 import { SpectralSignature } from '@/ui/measurement';
 import { isAcral } from '@/ui/labels';
 import { formatArea, formatDateTime, siteLabel, STATUS_LABELS, statusTone } from '@/ui/labels';
@@ -115,7 +116,16 @@ function CaseInfo({ c }: { c: CaseDetail }) {
       <KeyValue label="Fitzpatrick" value={c.patient.fitzpatrick} />
       <KeyValue label="Research consent" value={c.patient.research_consent ? 'Yes' : 'No'} />
       <KeyValue label="Site" value={`${siteLabel(c.lesion)}${isAcral(c.lesion.body_site) ? ' (acral)' : ''}`} />
-      <KeyValue label="Area (latest)" value={formatArea(latest?.area_mm2)} />
+      <KeyValue
+        label="Area · size (latest)"
+        value={`${formatArea(latest?.area_mm2)}${latest && formatSize(latest) ? ` · ${formatSize(latest)}` : ''}`}
+      />
+      {latest && areaChange(c.lesion_history[0], latest) ? (
+        <KeyValue
+          label="Change since first visit"
+          value={`${(areaChange(c.lesion_history[0], latest)!.percent >= 0 ? '+' : '')}${areaChange(c.lesion_history[0], latest)!.percent.toFixed(0)}% in ${areaChange(c.lesion_history[0], latest)!.days} days`}
+        />
+      ) : null}
       <KeyValue label="Requested by" value={c.requested_by} />
       <KeyValue label="Submitted" value={formatDateTime(c.created_at)} />
       <Heading>Question</Heading>
@@ -153,6 +163,7 @@ export default function ReviewCase() {
               onSelect={(v) => setSelectedId(v.id)}
             />
             <VisitCompare captures={c.lesion_history} selectedId={reviewed?.id} />
+            {latest ? <AutomatedAnalysis capture={latest} visits={c.lesion_history} /> : null}
             {latest ? <SpectralSignature capture={latest} /> : null}
             <Footnote />
           </View>

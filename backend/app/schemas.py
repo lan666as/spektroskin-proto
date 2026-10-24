@@ -139,6 +139,8 @@ class CaptureOut(BaseModel):
     area_mm2: float | None
     views: dict[str, str] = Field(description="View name → short-lived signed image URL")
     spectral_signature: SpectralSignature | None = None
+    diameter_mm: float | None = Field(default=None, description="Longest diameter of the outline")
+    width_mm: float | None = Field(default=None, description="Width (ellipse minor axis)")
     registration_shift_px: dict[str, list[float]] | None = None
     gain_correction: dict[str, float] | None = None
 
