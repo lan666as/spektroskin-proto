@@ -10,7 +10,8 @@
   and a wide one for the dermatologist.
 - **Phone (Expo Go, same Wi-Fi as the Mac):** open `exp://192.168.68.143:8081` in Expo Go. The
   Metro dev server is running on the Mac and serves the latest code. It talks to the live API.
-- **Live state:** tag `live-35` (`5e00339`) is deployed. Gate green (91 unit and API tests, ruff,
+- **Live state:** the newest `live-*` tag (`git tag -l 'live-*' | sort -V | tail -1`; `live-37`
+  at 05:55 WIB) is deployed, and main equals that tag. Gate green (91 unit and API tests, ruff,
   tsc, web export). Live smoke and all 6 Playwright specs, including the full §6 demo script,
   passed against the live site after every deploy. Tags `live-1` … `live-35` mark each verified
   deploy. `pre-iteration` is the state before tonight.
