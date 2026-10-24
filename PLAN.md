@@ -15,6 +15,13 @@ Taken from the team's Drive (proposal, rewritten deck, pitch strategy, GENOHACK 
 - **Users:** a general physician or dermatology staff member captures the image (clinician app). A remote
   dermatologist gives the "second look" (reviewer portal) and *recommends* observe, biopsy or refer.
   **The treating clinician decides.** No AI, no risk score, no autonomous triage.
+  *Amendment (25 Oct 2026, 00:15 WIB, builder's overnight brief):* automated assistance that really
+  exists (image-quality check, lesion outline and measurements, change tracking across visits) is
+  shown and labelled as automated assistance with its limits. One small model may be trained on the
+  synthetic phantoms (an image-quality classifier, scikit-learn) and shown with its real held-out
+  metrics as an advisory second opinion. An in-app AI roadmap shows planned tiers (triage support,
+  shadow-mode validation, RGB-vs-spectral ablation) as not active. Still never: a diagnosis, a
+  malignancy probability, a risk score or an invented performance number.
 - **Pitch:** 6 min pitch+demo, 4 min Q&A (track round, Sun 10:00–12:00); the Grand Final allows 7 min.
   The deck gives the demo **~60 s** (slide 6). Judges score prototype strength, "assumptions
   tested during the hackathon", and "real outputs wherever possible"; there is a Best Prototype prize.

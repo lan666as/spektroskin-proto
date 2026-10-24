@@ -24,3 +24,7 @@ test-results/
 
 # Simulator build output (regenerated deterministically; the app bundles its own copy)
 backend/simulator/out/
+
+# Pre-hackathon Figma mockups: inspiration only. Not committed because they contain photo-like
+# lesion images and malignancy percentages (CLAUDE.md §2). See ITERATION_BACKLOG.md.
+docs/figma/

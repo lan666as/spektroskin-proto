@@ -35,7 +35,7 @@ carries a "Simulated" badge. No real or public patient images are used anywhere.
 
 | Before (not in this repo) | During GENOHACK (this repo, see BUILD_LOG.md) |
 |---|---|
-| Proposal, 12 customer-discovery interviews, Figma UI concept, pitch deck drafts | Simulator + virtual device, processing pipeline with ground-truth tests, data model and API, clinician app, reviewer portal, deploy, validation report, offline queue, consent + audit, referral summary |
+| Proposal, 12 customer-discovery interviews, Figma UI concept (layout ideas reused tonight as inspiration: analysis checklist, lesion timeline with a trend chart, greeting home with device card and stat tiles, filter pills; its risk scores and photo-like images were not used and the mockups are not in this repo), pitch deck drafts | Simulator + virtual device, processing pipeline with ground-truth tests, data model and API, clinician app, reviewer portal, deploy, validation report, offline queue, consent + audit, referral summary |
 
 ## Architecture
 
