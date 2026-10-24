@@ -412,3 +412,11 @@ Timestamped record of what was built during GENOHACK (Sat 24 – Sun 25 Oct 2026
 - `/api/ai/summary` `learning_queue`: newest reviewed cases where the dermatologist's pattern read
   differs from the model or the model abstained (an "unsure" read is skipped). AI page "Learn from
   these first" card, each case linking to its review. Unit test; demo e2e asserts the card.
+
+## 2026-10-25 03:45 WIB — Iteration loop, batch 22: area trend on the lesion page; demo script revised
+
+- Lesion page: "Area over visits" bar chart (zero-based, first and latest values labelled) with the AI
+  pattern suggested at each visit underneath (Figma timeline idea, pre-hackathon inspiration only).
+  Demo e2e asserts it.
+- PLAN §6 demo script rewritten around the AI moments (AI assist strip, evidence and change views,
+  flags, reasons, similar lesions, findings draft, AI page, outcome → validation export).

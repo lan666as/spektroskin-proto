@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { api } from '@/api/client';
 import { useSync } from '@/sync/SyncProvider';
 import { Footnote, HistoryStrip, SpectralViews, VisitCompare } from '@/ui/clinical';
+import { AreaTrend } from '@/ui/analysis';
 import { Button, Card, Empty, ErrorBanner, Loading, Muted, Row, Screen, Title } from '@/ui/components';
 import { formatArea, formatDate, patientLabel, siteLabel, visitDay } from '@/ui/labels';
 
@@ -65,6 +66,7 @@ export default function LesionScreen() {
                 />
               </Row>
               <VisitCompare captures={l.captures} selectedId={selected.id} />
+              <AreaTrend visits={l.captures} />
               <Footnote />
             </>
           ) : (

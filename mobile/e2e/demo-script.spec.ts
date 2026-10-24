@@ -86,6 +86,7 @@ test('PLAN §6 demo script: 60 s core + extended', async ({ browser, request }) 
   await byId(clinician, `patient-${code}`).click();
   await byId(clinician, 'lesion-sole').click();
   await expect(byId(clinician, 'history-strip')).toBeVisible();
+  await expect(byId(clinician, 'area-trend')).toContainText('Day 14');
   await shot(clinician, '02-lesion');
   await byId(clinician, 'new-capture').click();
   await expect(byId(clinician, 'simulated-badge')).toBeVisible();

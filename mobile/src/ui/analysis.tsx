@@ -210,6 +210,18 @@ const styles = StyleSheet.create({
   stepTitle: { fontSize: 15, fontWeight: '700', color: colors.text },
   stepResult: { fontSize: 14, color: colors.text },
   link: { color: colors.accent, fontWeight: '600', paddingVertical: spacing.xs },
+  chart: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    gap: spacing.md,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+    paddingBottom: 0,
+  },
+  barColumn: { flex: 1, alignItems: 'center', gap: 2, maxWidth: 88 },
+  bar: { width: 28, backgroundColor: colors.accent, borderTopLeftRadius: 4, borderTopRightRadius: 4 },
+  barValue: { fontSize: 12, fontWeight: '700', color: colors.text },
+  barDay: { fontSize: 12, color: colors.textMuted, marginTop: 4 },
   morphRow: { gap: 2, borderTopWidth: 1, borderTopColor: colors.border, paddingTop: spacing.sm },
   morphValue: { fontSize: 16, fontWeight: '800', color: colors.text },
   morphChange: { fontSize: 13, fontWeight: '700', color: colors.textMuted, textAlign: 'right' },
@@ -332,4 +344,40 @@ export function measuredFindings(
     parts.push(`AI acral read (research mode): pigment along the ${capture.acral_model.pattern === 'ridge' ? 'ridges' : 'furrows'}.`);
   }
   return parts.join(' ');
+}
+
+const CHART_HEIGHT = 120;
+const PATTERN_SHORT = { pigmented: 'Pigment', vascular: 'Vascular', mixed: 'Mixed' } as const;
+
+/**
+ * Area per visit as bars on one zero-based axis, with the AI pattern suggested at each visit
+ * underneath. Values are labelled on the first and latest visit only.
+ */
+export function AreaTrend({ visits }: { visits: Capture[] }) {
+  const measured = visits.filter((v) => v.status === 'processed' && v.area_mm2);
+  if (measured.length < 2) return null;
+  const max = Math.max(...measured.map((v) => v.area_mm2!));
+  const first = measured[0];
+  return (
+    <Card testID="area-trend">
+      <Heading>Area over visits</Heading>
+      <View style={styles.chart} accessibilityRole="image" accessibilityLabel={measured
+        .map((v) => `Day ${visitDay(v.captured_at, first.captured_at)}: ${formatArea(v.area_mm2)}`)
+        .join(', ')}>
+        {measured.map((v, i) => {
+          const labelled = i === 0 || i === measured.length - 1;
+          const pattern = v.triage_model?.pattern;
+          return (
+            <View key={v.id} style={styles.barColumn}>
+              <Text style={styles.barValue}>{labelled ? formatArea(v.area_mm2) : ' '}</Text>
+              <View style={[styles.bar, { height: Math.max(4, (v.area_mm2! / max) * CHART_HEIGHT) }]} />
+              <Text style={styles.barDay}>Day {String(visitDay(v.captured_at, first.captured_at)).padStart(2, '0')}</Text>
+              <Muted style={{ fontSize: 12 }}>{pattern ? PATTERN_SHORT[pattern] : '–'}</Muted>
+            </View>
+          );
+        })}
+      </View>
+      <Muted>Automated area of each visit (zero-based scale); below each bar, the AI pattern suggested then (research mode).</Muted>
+    </Card>
+  );
 }
