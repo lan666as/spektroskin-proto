@@ -33,3 +33,29 @@ Result (22:01 WIB): **done**, commits `c55d991` (code) and the following report 
   hemoglobin r ≥ 0.971, Dice ≥ 0.962, |area error| ≤ 7.8 % (small positive bias); blur and glare
   rejected 10/10 at every tone; growth series 18.4 / 22.6 / 28.7 mm² vs 18 / 22 / 28.
 - Verified: gate green (pytest 40, smoke incl. validation, Playwright 4/4 incl. the panel).
+
+## Item 3 — Offline capture queue (native)
+
+Plan:
+- `src/sync/queue.ts` (native): persist pending uploads (capture id, lesion, frame file references)
+  in AsyncStorage; `flush()` uploads in order with the capture id as idempotency key; network
+  errors stop the flush, 4xx marks the item failed (kept and shown, not retried forever).
+- `src/sync/queue.web.ts`: no-op (web frames are Blobs; web keeps the current online-only flow).
+- `SyncProvider`: flush on app start, on NetInfo reconnect, and every 30 s while items are pending;
+  single in-flight flush (no concurrent writers).
+- Capture screen: on a network error, queue the capture and tell the clinician it will upload
+  automatically. Lesion screen: pending-upload banner.
+- Verification: tsc + web export + existing e2e (web path unchanged). NEEDS PHONE CHECK for the
+  offline path itself.
+
+Result (22:04 WIB): **done (native path NEEDS PHONE CHECK)**, commit: see "Offline capture queue" below.
+- Implemented as planned. Web behaviour unchanged (queue is a no-op there).
+- Verified: gate green (pytest 40, smoke, Playwright 4/4 on web); `npx expo export -p android`
+  compiles the native bundle (Hermes, 3.2 MB) including the native-only queue, frame loader and
+  SecureStore token store. The offline path itself was **not** exercised (needs a phone).
+- NEEDS PHONE CHECK (about 2 min, Expo Go, logged in as clinician):
+  1. Open PT-0007 → Left sole → New capture. Turn on airplane mode. Tap Capture.
+  2. Expect: after a few seconds, "Saved on this phone. It uploads automatically…".
+  3. Go back to the lesion: "1 capture(s) saved on this phone, waiting for a connection."
+  4. Turn airplane mode off. Within ~30 s (or tap "Try upload now") the banner disappears and the
+     new visit appears in the history strip.

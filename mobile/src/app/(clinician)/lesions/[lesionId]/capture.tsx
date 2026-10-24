@@ -3,11 +3,12 @@ import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
-import { api } from '@/api/client';
+import { api, ApiError } from '@/api/client';
 import { uploadCapture } from '@/api/uploadCapture';
 import { type CaptureProgress, FRAME_NAMES } from '@/device/CaptureDevice';
 import { PHANTOMS } from '@/device/phantoms.generated';
 import { captureDevice } from '@/device/VirtualCaptureDevice';
+import { useSync } from '@/sync/SyncProvider';
 import { Button, Card, Chips, ErrorBanner, Heading, Muted, Row, Screen } from '@/ui/components';
 import { patientLabel, siteLabel } from '@/ui/labels';
 import { SimulatedBadge } from '@/ui/SimulatedBadge';
@@ -21,7 +22,11 @@ const STEP_LABELS: Record<string, string> = {
   dark: 'Dark frame · LEDs off',
 };
 
-type Phase = { kind: 'idle' } | { kind: 'capturing'; progress: CaptureProgress } | { kind: 'processing' };
+type Phase =
+  | { kind: 'idle' }
+  | { kind: 'capturing'; progress: CaptureProgress }
+  | { kind: 'processing' }
+  | { kind: 'queued' };
 
 export default function CaptureScreen() {
   const { lesionId } = useLocalSearchParams<{ lesionId: string }>();
@@ -33,22 +38,29 @@ export default function CaptureScreen() {
   const [devOpen, setDevOpen] = useState(false);
   const [phantom, setPhantom] = useState(captureDevice.selectedPhantom());
   const status = captureDevice.status();
+  const sync = useSync();
 
   async function capture() {
     setError(null);
+    let frameSet;
     try {
-      const frameSet = await captureDevice.capture((progress) => setPhase({ kind: 'capturing', progress }));
+      frameSet = await captureDevice.capture((progress) => setPhase({ kind: 'capturing', progress }));
       setPhase({ kind: 'processing' });
       const result = await uploadCapture(frameSet, lesionId);
       queryClient.invalidateQueries({ queryKey: ['lesion', lesionId] });
       router.replace({ pathname: '/captures/[captureId]', params: { captureId: result.id } });
     } catch (e) {
+      const offline = e instanceof ApiError && e.status === 0;
+      if (offline && frameSet && (await sync.enqueue(frameSet, lesionId))) {
+        setPhase({ kind: 'queued' });
+        return;
+      }
       setError(e);
       setPhase({ kind: 'idle' });
     }
   }
 
-  const busy = phase.kind !== 'idle';
+  const busy = phase.kind === 'capturing' || phase.kind === 'processing';
   const stepIndex = phase.kind === 'capturing' ? phase.progress.index : phase.kind === 'processing' ? FRAME_NAMES.length : -1;
 
   return (
@@ -92,7 +104,9 @@ export default function CaptureScreen() {
             ? `Capturing ${phase.progress.index + 1} of ${phase.progress.total}…`
             : phase.kind === 'processing'
               ? 'Checking quality and computing spectral views…'
-              : 'Place the spacer flat on the lesion, then capture.'}
+              : phase.kind === 'queued'
+                ? 'Saved on this phone. It uploads automatically when you are back online; results appear after upload.'
+                : 'Place the spacer flat on the lesion, then capture.'}
         </Muted>
       </Card>
 

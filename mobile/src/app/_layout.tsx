@@ -4,6 +4,7 @@ import { useState } from 'react';
 
 import { ApiError } from '@/api/client';
 import { SessionProvider } from '@/api/session';
+import { SyncProvider } from '@/sync/SyncProvider';
 import { colors } from '@/ui/theme';
 
 function makeQueryClient() {
@@ -24,6 +25,7 @@ export default function RootLayout() {
   return (
     <QueryClientProvider client={queryClient}>
       <SessionProvider>
+        <SyncProvider>
         <Stack
           screenOptions={{
             headerStyle: { backgroundColor: colors.background },
@@ -37,6 +39,7 @@ export default function RootLayout() {
           <Stack.Screen name="(clinician)" options={{ headerShown: false }} />
           <Stack.Screen name="(reviewer)" options={{ headerShown: false }} />
         </Stack>
+        </SyncProvider>
       </SessionProvider>
     </QueryClientProvider>
   );
