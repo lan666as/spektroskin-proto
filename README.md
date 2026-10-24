@@ -60,6 +60,8 @@ Around the models:
 - **AI & validation page:** model cards, per-tone results, live monitoring, a learning queue, and
   the reviewed → consented → histopathology-confirmed funnel, with a privacy-minimised export.
 
+Assumptions tested tonight, one page: [docs/evidence/assumptions_tested.md](docs/evidence/assumptions_tested.md).
+
 Evaluation: [docs/evidence/ai_evaluation.md](docs/evidence/ai_evaluation.md) covers:
 - repeatability, which is 100 % for the same lesion captured again;
 - a sensor-noise stress test. Its first run found noisy captures passing QC; that led to a QC noise
