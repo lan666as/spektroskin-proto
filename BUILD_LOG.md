@@ -600,3 +600,18 @@ Timestamped record of what was built during GENOHACK (Sat 24 – Sun 25 Oct 2026
 - Dermatologist: after sending, "Next waiting case: PT-…" opens the oldest waiting case.
 - Results: spectral signature, quality metrics and validation fold under "Technical details"; e2e
   opens it before the validation step.
+
+## 2026-10-25 06:55 WIB — Live failure, revert, root cause, re-land (UX batch 2)
+
+- **What failed:** after UX batch 2 deployed (live-41 → 9973d97), the live review-loop e2e failed:
+  the audit row was not among the newest 50.
+- **Revert:** 9973d97 was reverted and redeployed at once. That deploy failed live too, this time
+  on the clinician spec (60 s test timeout, 1.3 min run).
+- **Root cause:** environmental, not the change.
+  - Right after `up --build` and provisioning the VPS was slow.
+  - Live uploads take 0.8 s and the patient and case lists 0.35 s.
+  - A calm re-run of the reverted state passed 6/6, so it was tagged live-42.
+- **Fixes, no assertion weakened:**
+  - the clinician spec declares a 120 s budget (it runs about 42 s against the 60 s default);
+  - review-loop checks the audit row right after sending instead of at the end.
+- UX batch 2 re-landed with these test fixes.
