@@ -26,7 +26,7 @@ const TIERS: { tier: string; title: string; status: Status; what: string; gate: 
     title: 'Outline, measurement and change tracking',
     status: 'active',
     what:
-      'Classical segmentation of the pigment and blood maps; area, diameter and change across visits of the same lesion.',
+      'Classical segmentation of the pigment and blood maps; area, diameter, asymmetry, border and colour measurements; change across visits from registered outlines; a lesion that looks unlike the patient\'s others is flagged (ugly duckling sign). Repeat captures of the same simulated lesion: area varies by 0.1% or less.',
     gate: 'Next: repeatability on physical phantoms (same lesion, repeated captures).',
   },
   {
@@ -46,6 +46,14 @@ const TIERS: { tier: string; title: string; status: Status; what: string; gate: 
     gate: 'Next: real, consented acral captures from Indonesian clinics, read by dermatologists.',
   },
   {
+    tier: 'Tier 3a',
+    title: 'Shadow-mode validation',
+    status: 'researchActive',
+    what:
+      'Running now: dermatologists can record their own pattern read, optionally with the AI hidden (blind read). The AI page compares reads with the model, lists disagreements to learn from first, and counts consented, histopathology-confirmed cases that are eligible to validate a model.',
+    gate: 'Report sensitivity and specificity with confidence intervals per Fitzpatrick type before any display.',
+  },
+  {
     tier: 'Tier 3b',
     title: 'Triage support: suspicion for biopsy',
     status: 'research',
@@ -54,20 +62,12 @@ const TIERS: { tier: string; title: string; status: Status; what: string; gate: 
     gate: 'Only after local, ethics-approved data with histopathology labels and skin-tone-stratified results.',
   },
   {
-    tier: 'Tier 3a',
-    title: 'Shadow-mode validation',
-    status: 'planned',
-    what:
-      'The model runs silently beside real dermatologist reviews on consented cases; its output is stored, never shown, and compared with the dermatologist and histopathology.',
-    gate: 'Report sensitivity and specificity with confidence intervals per Fitzpatrick type before any display.',
-  },
-  {
     tier: 'Tier 4',
     title: 'RGB vs RGB + spectral ablation',
-    status: 'planned',
+    status: 'researchActive',
     what:
       'The same model trained with and without the extra bands. If the spectral bands add nothing measurable, we drop them: this is the kill test for the optics. Run tonight on simulated lesions for the pattern model: RGB bands only 95%, RGB + NIR + maps 98% held-out accuracy (dark skin 93% vs 96%). Simulated physics only.',
-    gate: 'The real test is on held-out hospital sites, not on the training site.',
+    gate: 'Done on simulated physics. The real test is on held-out hospital sites, not on the training site.',
   },
 ];
 

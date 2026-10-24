@@ -523,3 +523,9 @@ Timestamped record of what was built during GENOHACK (Sat 24 – Sun 25 Oct 2026
 - Read-only check on live as the demo clinician (PT-0007 seeded Day 14 visit): "Run AI on this
   capture" shows as intended. The visit compare card offered AI evidence / change views that the
   older visit lacks; it now lists only views both visits have.
+
+## 2026-10-25 05:14 WIB — Iteration loop, batch 32: AI roadmap matches what runs
+
+- Roadmap: Tier 2 lists the new measurements, registered change and ugly-duckling flag; Tier 3a
+  shadow-mode validation and Tier 4 ablation are now marked "Research mode · simulated data"
+  (both implemented tonight); Tier 3b (suspicion for biopsy) stays "Not active"; tiers in order.
