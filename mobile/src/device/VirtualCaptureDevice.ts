@@ -12,7 +12,9 @@ import { PHANTOMS } from './phantoms.generated';
 import { uuidv4 } from './uuid';
 
 export const DEFAULT_PHANTOM = 'acral_dark_d30';
-const BAND_DELAY_MS = 350; // paces the band cycle so the clinician sees each LED fire
+// Paces the band cycle so the clinician sees each LED fire, then its frame (about 2.8 s in total).
+const FIRE_MS = 300;
+const SHOW_MS = 250;
 
 const STATUS: DeviceStatus = {
   connected: true,
@@ -48,12 +50,15 @@ export class VirtualCaptureDevice implements CaptureDevice {
     if (!phantom) throw new Error(`Unknown phantom ${this.phantomId}`);
     const frames = {} as Record<FrameName, FramePart>;
     for (const [index, name] of FRAME_NAMES.entries()) {
-      onProgress?.({ step: name, index, total: FRAME_NAMES.length });
+      const total = FRAME_NAMES.length;
+      onProgress?.({ step: name, index, total, state: 'firing' });
       const [frame] = await Promise.all([
         loadFrame(phantom.frames[name], name),
-        new Promise((resolve) => setTimeout(resolve, BAND_DELAY_MS)),
+        new Promise((resolve) => setTimeout(resolve, FIRE_MS)),
       ]);
       frames[name] = frame;
+      onProgress?.({ step: name, index, total, state: 'captured', preview: phantom.previews[name] });
+      await new Promise((resolve) => setTimeout(resolve, SHOW_MS));
     }
     return {
       id: uuidv4(),

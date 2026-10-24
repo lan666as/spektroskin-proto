@@ -2,6 +2,8 @@
  * Boundary between the app and the optical module. Tonight only VirtualCaptureDevice exists;
  * a USB implementation of this interface replaces it with no changes elsewhere.
  */
+import type { ImageSourcePropType } from 'react-native';
+
 export const BANDS = ['blue', 'green', 'red', 'nir'] as const;
 export type Band = (typeof BANDS)[number];
 export type FrameName = Band | 'dark';
@@ -25,7 +27,15 @@ export type DeviceStatus = {
   simulated: boolean;
 };
 
-export type CaptureProgress = { step: FrameName; index: number; total: number };
+export type CaptureProgress = {
+  step: FrameName;
+  index: number;
+  total: number;
+  /** 'firing' when the LED for this band switches on, 'captured' once its frame is read. */
+  state: 'firing' | 'captured';
+  /** Display-only preview of the captured frame. */
+  preview?: ImageSourcePropType;
+};
 
 export interface CaptureDevice {
   connect(): Promise<DeviceStatus>;

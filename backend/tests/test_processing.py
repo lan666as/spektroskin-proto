@@ -88,6 +88,8 @@ def test_generator_bundles_frames_but_never_ground_truth(tmp_path) -> None:
     generate.generate(out)
     generate.export_to_mobile(mobile, out)
     bundled = {p.name for p in (mobile / "assets" / "phantoms").rglob("*") if p.is_file()}
-    assert bundled == {"blue.png", "green.png", "red.png", "nir.png", "dark.png", "meta.json"}
+    frames = {"blue", "green", "red", "nir", "dark"}
+    expected = {f"{f}.png" for f in frames} | {f"preview_{f}.png" for f in frames} | {"meta.json"}
+    assert bundled == expected
     index = (mobile / "src" / "device" / "phantoms.generated.ts").read_text()
     assert "acral_dark_d30" in index and "npz" not in index

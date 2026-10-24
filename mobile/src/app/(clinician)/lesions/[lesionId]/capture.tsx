@@ -1,30 +1,23 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { type ImageSourcePropType, Pressable, StyleSheet, View } from 'react-native';
 
 import { api, ApiError } from '@/api/client';
 import { uploadCapture } from '@/api/uploadCapture';
-import { type CaptureProgress, FRAME_NAMES } from '@/device/CaptureDevice';
+import type { FrameName } from '@/device/CaptureDevice';
 import { PHANTOMS } from '@/device/phantoms.generated';
 import { captureDevice } from '@/device/VirtualCaptureDevice';
 import { useSync } from '@/sync/SyncProvider';
 import { Button, Card, Chips, ErrorBanner, Heading, Muted, Row, Screen } from '@/ui/components';
 import { patientLabel, siteLabel } from '@/ui/labels';
+import { MultispectralCapture } from '@/ui/MultispectralCapture';
 import { SimulatedBadge } from '@/ui/SimulatedBadge';
 import { colors, radius, spacing } from '@/ui/theme';
 
-const STEP_LABELS: Record<string, string> = {
-  blue: 'Blue LED · 470 nm',
-  green: 'Green LED · 550 nm',
-  red: 'Red LED · 660 nm',
-  nir: 'Near-infrared LED · 850 nm',
-  dark: 'Dark frame · LEDs off',
-};
-
 type Phase =
   | { kind: 'idle' }
-  | { kind: 'capturing'; progress: CaptureProgress }
+  | { kind: 'capturing'; index: number; total: number }
   | { kind: 'processing' }
   | { kind: 'queued' };
 
@@ -39,12 +32,25 @@ export default function CaptureScreen() {
   const [phantom, setPhantom] = useState(captureDevice.selectedPhantom());
   const status = captureDevice.status();
   const sync = useSync();
+  const [frames, setFrames] = useState<Partial<Record<FrameName, ImageSourcePropType>>>({});
+  const [firing, setFiring] = useState<FrameName | null>(null);
 
   async function capture() {
     setError(null);
+    setFrames({});
     let frameSet;
     try {
-      frameSet = await captureDevice.capture((progress) => setPhase({ kind: 'capturing', progress }));
+      frameSet = await captureDevice.capture((progress) => {
+        setPhase({ kind: 'capturing', index: progress.index, total: progress.total });
+        if (progress.state === 'firing') {
+          setFiring(progress.step);
+        } else {
+          setFiring(null);
+          const preview = progress.preview;
+          if (preview) setFrames((f) => ({ ...f, [progress.step]: preview }));
+        }
+      });
+      setFiring(null);
       setPhase({ kind: 'processing' });
       const result = await uploadCapture(frameSet, lesionId);
       queryClient.invalidateQueries({ queryKey: ['lesion', lesionId] });
@@ -61,7 +67,6 @@ export default function CaptureScreen() {
   }
 
   const busy = phase.kind === 'capturing' || phase.kind === 'processing';
-  const stepIndex = phase.kind === 'capturing' ? phase.progress.index : phase.kind === 'processing' ? FRAME_NAMES.length : -1;
 
   return (
     <Screen testID="capture-screen">
@@ -87,21 +92,10 @@ export default function CaptureScreen() {
       </Card>
 
       <Card>
-        {FRAME_NAMES.map((name, i) => (
-          <Row key={name}>
-            <View
-              style={[
-                styles.step,
-                i < stepIndex && styles.stepDone,
-                i === stepIndex && phase.kind === 'capturing' && styles.stepActive,
-              ]}
-            />
-            <Text style={[styles.stepText, i === stepIndex && { fontWeight: '700' }]}>{STEP_LABELS[name]}</Text>
-          </Row>
-        ))}
-        <Muted testID="capture-status">
+        <MultispectralCapture frames={frames} firing={firing} processing={phase.kind === 'processing'} />
+        <Muted testID="capture-status" style={{ textAlign: 'center' }}>
           {phase.kind === 'capturing'
-            ? `Capturing ${phase.progress.index + 1} of ${phase.progress.total}…`
+            ? `Capturing frame ${phase.index + 1} of ${phase.total}: four LED bands, then a dark frame`
             : phase.kind === 'processing'
               ? 'Checking quality and computing spectral views…'
               : phase.kind === 'queued'
@@ -136,9 +130,5 @@ export default function CaptureScreen() {
 
 const styles = StyleSheet.create({
   dot: { width: 10, height: 10, borderRadius: 5 },
-  step: { width: 14, height: 14, borderRadius: 7, borderWidth: 2, borderColor: colors.border },
-  stepDone: { backgroundColor: colors.accent, borderColor: colors.accent },
-  stepActive: { borderColor: colors.accent, backgroundColor: colors.accentSoft },
-  stepText: { fontSize: 15, color: colors.text },
   devToggle: { alignSelf: 'center', padding: spacing.sm, borderRadius: radius.sm },
 });
