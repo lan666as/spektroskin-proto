@@ -2,6 +2,7 @@
 
 from datetime import date, timedelta
 
+from app.attention import attention_flags
 from app.auth import sign_image_url
 from app.models import Capture, Case, Lesion, Outcome, User
 from app.schemas import (
@@ -77,6 +78,7 @@ def case_summary(case: Case, viewer: User, requested_by: str) -> CaseSummary:
         follow_up_due=follow_up_due(case),
         outcome_action=case.outcome.action_taken if case.outcome else None,
         histopathology=case.outcome.histopathology if case.outcome else None,
+        attention_flags=attention_flags(case),
     )
 
 

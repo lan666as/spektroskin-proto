@@ -288,3 +288,12 @@ Timestamped record of what was built during GENOHACK (Sat 24 – Sun 25 Oct 2026
 - Reviewer "AI" page renders it. Tests: agreement and eligibility logic; smoke covers the endpoint
   and the 403 for clinicians; e2e covers the pattern read, the agreement line, the blind read and
   the AI page.
+
+## 2026-10-25 01:51 WIB — Iteration loop, batch 9: explainable attention flags in the review queue
+
+- `app/attention.py`: per case, named flags from the lesion's captures: `ridge_pattern` (acral site
+  and the acral model reads ridges), `growing` (area +20 % since the first visit), `border_change`
+  (border irregularity +0.05), `ai_unsure` (triage model abstained). Additive `attention_flags` on
+  cases. Never a score; the queue order stays first come, first served.
+- Queue: flag pills and an "All / With attention flags" filter; case page lists each flag with why
+  it was raised. Tests for the flag rules; demo e2e asserts "Growing" on the demo lesion.

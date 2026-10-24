@@ -35,6 +35,7 @@ ReviewAction = Literal["observe", "biopsy", "refer"]
 OutcomeAction = Literal["observed", "biopsied", "excised", "referred", "declined"]
 Histopathology = Literal["pending", "benign", "malignant", "indeterminate"]
 PatternRead = Literal["pigmented", "vascular", "mixed", "unsure"]
+AttentionFlag = Literal["ridge_pattern", "growing", "border_change", "ai_unsure"]
 ViewName = Literal["standard", "pigment", "vascular"]
 
 PatientCode = Annotated[str, StringConstraints(pattern=r"^PT-\d{4}$")]
@@ -287,6 +288,9 @@ class CaseSummary(BaseModel):
     )
     outcome_action: OutcomeAction | None = None
     histopathology: Histopathology | None = None
+    attention_flags: list[AttentionFlag] = Field(
+        default=[], description="Named criteria worth the dermatologist's attention; not a score"
+    )
 
 
 class CaseDetail(CaseSummary):

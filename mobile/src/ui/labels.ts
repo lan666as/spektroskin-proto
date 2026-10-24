@@ -1,4 +1,4 @@
-import type { BodySite, CaseStatus, Lesion, Patient, ReviewAction } from '@/api/client';
+import type { BodySite, CaseStatus, CaseSummary, Lesion, Patient, ReviewAction } from '@/api/client';
 
 export const BODY_SITES: { value: BodySite; label: string; acral?: boolean }[] = [
   { value: 'sole', label: 'Sole', acral: true },
@@ -94,3 +94,29 @@ export function duration(fromIso: string, toIso?: string | null): string {
 export function isAcral(site: BodySite): boolean {
   return BODY_SITES.some((s) => s.value === site && s.acral);
 }
+
+export type AttentionFlag = CaseSummary['attention_flags'][number];
+
+/** Queue flag text and why it is raised; each is a named criterion, never a score. */
+export const FLAG_LABELS: Record<AttentionFlag, { label: string; why: string; tone: 'danger' | 'info' | 'neutral' }> = {
+  ridge_pattern: {
+    label: 'Ridge pattern',
+    why: 'Acral pattern model (research mode): pigment along the ridges, a guideline reason for prompt review.',
+    tone: 'danger',
+  },
+  growing: {
+    label: 'Growing',
+    why: 'Area grew 20% or more since the first visit (evolution).',
+    tone: 'danger',
+  },
+  border_change: {
+    label: 'Border changed',
+    why: 'Border became less regular since the first visit.',
+    tone: 'info',
+  },
+  ai_unsure: {
+    label: 'AI unsure',
+    why: 'The triage model abstained: no pattern suggestion for this lesion.',
+    tone: 'neutral',
+  },
+};

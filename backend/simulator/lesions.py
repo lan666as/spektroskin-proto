@@ -10,10 +10,10 @@ import hashlib
 import random
 import re
 
+from app.attention import ACRAL_SITES
 from simulator.phantoms import PhantomSpec, catalogue
 
 TONE_BY_FITZPATRICK = {"I": "light", "II": "light", "III": "light", "IV": "medium"}
-ACRAL_SITES = {"palm", "sole", "fingernail", "toenail"}
 _GEN_ID = re.compile(r"^gen-([0-9a-f]{8})-([lmd])([01])-d(\d{3})(?:-(blur|glare))?$")
 _TONES = {"l": "light", "m": "medium", "d": "dark"}
 MAX_AREA_MM2 = 60.0

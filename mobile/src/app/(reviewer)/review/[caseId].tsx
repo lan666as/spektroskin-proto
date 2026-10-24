@@ -24,7 +24,7 @@ import { AcralPattern, TriageSupport } from '@/ui/triage';
 import { OutcomeCard } from '@/ui/outcome';
 import { SpectralSignature } from '@/ui/measurement';
 import { isAcral } from '@/ui/labels';
-import { formatArea, formatDateTime, siteLabel, STATUS_LABELS, statusTone } from '@/ui/labels';
+import { FLAG_LABELS, formatArea, formatDateTime, siteLabel, STATUS_LABELS, statusTone } from '@/ui/labels';
 import { colors, radius, spacing } from '@/ui/theme';
 
 const ACTIONS = [
@@ -133,6 +133,17 @@ function CaseInfo({ c }: { c: CaseDetail }) {
       </Row>
       <KeyValue label="Age / sex" value={`${c.patient.age} · ${c.patient.sex === 'female' ? 'Female' : 'Male'}`} />
       <KeyValue label="Fitzpatrick" value={c.patient.fitzpatrick} />
+      {c.attention_flags.length ? (
+        <View style={{ gap: 4 }} testID="attention-flags">
+          <Text style={{ fontWeight: '700', color: colors.text }}>Attention flags</Text>
+          {c.attention_flags.map((f) => (
+            <View key={f} style={{ flexDirection: 'row', gap: spacing.sm, alignItems: 'flex-start' }}>
+              <Pill label={FLAG_LABELS[f].label} tone={FLAG_LABELS[f].tone} />
+              <Muted style={{ flex: 1 }}>{FLAG_LABELS[f].why}</Muted>
+            </View>
+          ))}
+        </View>
+      ) : null}
       <KeyValue label="Research consent" value={c.patient.research_consent ? 'Yes' : 'No'} />
       <KeyValue label="Site" value={`${siteLabel(c.lesion)}${isAcral(c.lesion.body_site) ? ' (acral)' : ''}`} />
       <KeyValue

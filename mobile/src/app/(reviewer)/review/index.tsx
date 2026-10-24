@@ -5,8 +5,17 @@ import { Image, Platform, StyleSheet, View } from 'react-native';
 
 import { api, type CaseSummary } from '@/api/client';
 import { absoluteUrl } from '@/api/config';
-import { Empty, ErrorBanner, Heading, ListItem, Loading, Muted, Pill, Row, Screen } from '@/ui/components';
-import { ACTION_LABELS, duration, formatDateTime, isAcral, siteLabel, STATUS_LABELS, statusTone } from '@/ui/labels';
+import { Chips, Empty, ErrorBanner, Heading, ListItem, Loading, Muted, Pill, Row, Screen } from '@/ui/components';
+import {
+  ACTION_LABELS,
+  duration,
+  FLAG_LABELS,
+  formatDateTime,
+  isAcral,
+  siteLabel,
+  STATUS_LABELS,
+  statusTone,
+} from '@/ui/labels';
 import { radius } from '@/ui/theme';
 
 const POLL_MS = 2_000;
@@ -26,6 +35,9 @@ function CaseRow({ item, onOpen, fresh }: { item: CaseSummary; onOpen: () => voi
         <Row>
           {fresh ? <Pill label="New" tone="danger" /> : null}
           {isAcral(item.lesion.body_site) ? <Pill label="Acral site" tone="info" /> : null}
+          {item.attention_flags.map((f) => (
+            <Pill key={f} label={FLAG_LABELS[f].label} tone={FLAG_LABELS[f].tone} />
+          ))}
           {item.thumbnail_url ? (
             <Image source={{ uri: absoluteUrl(item.thumbnail_url) }} style={styles.thumb} />
           ) : null}
@@ -71,6 +83,9 @@ export default function Queue() {
     document.title = `${waitingCount ? `(${waitingCount}) ` : ''}Review queue · SpektroSkin`;
   }, [waitingCount]);
   const isFresh = (id: string) => (arrivals[id] ?? 0) > Date.now() - NEW_HIGHLIGHT_MS;
+  const [filter, setFilter] = useState<'all' | 'flagged'>('all');
+  const waiting = open.data?.filter((c) => filter === 'all' || c.attention_flags.length) ?? [];
+  const flaggedCount = open.data?.filter((c) => c.attention_flags.length).length ?? 0;
   const openCase = (id: string) => router.push({ pathname: '/review/[caseId]', params: { caseId: id } });
 
   return (
@@ -80,7 +95,24 @@ export default function Queue() {
       <ErrorBanner error={open.error} />
       {open.isPending ? <Loading /> : null}
       {open.data?.length === 0 ? <Empty>No cases waiting. New cases appear here automatically.</Empty> : null}
-      {open.data?.map((c) => (
+      {open.data?.length ? (
+        <Chips
+          options={[
+            { value: 'all', label: `All waiting (${open.data.length})` },
+            { value: 'flagged', label: `With attention flags (${flaggedCount})` },
+          ]}
+          value={filter}
+          onChange={setFilter}
+          testIDPrefix="queue-filter"
+        />
+      ) : null}
+      {open.data?.length ? (
+        <Muted>
+          Flags are named criteria (ridge pattern, growth, border change, AI unsure), not a score; the
+          order stays first come, first served.
+        </Muted>
+      ) : null}
+      {waiting.map((c) => (
         <CaseRow key={c.id} item={c} fresh={isFresh(c.id)} onOpen={() => openCase(c.id)} />
       ))}
       {answered.data?.length ? (

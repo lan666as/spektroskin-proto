@@ -611,6 +611,12 @@ export interface components {
             outcome_action?: ("observed" | "biopsied" | "excised" | "referred" | "declined") | null;
             /** Histopathology */
             histopathology?: ("pending" | "benign" | "malignant" | "indeterminate") | null;
+            /**
+             * Attention Flags
+             * @description Named criteria worth the dermatologist's attention; not a score
+             * @default []
+             */
+            attention_flags: ("ridge_pattern" | "growing" | "border_change" | "ai_unsure")[];
             /** Captures */
             captures: components["schemas"]["CaptureOut"][];
             /** Lesion History */
@@ -661,6 +667,12 @@ export interface components {
             outcome_action?: ("observed" | "biopsied" | "excised" | "referred" | "declined") | null;
             /** Histopathology */
             histopathology?: ("pending" | "benign" | "malignant" | "indeterminate") | null;
+            /**
+             * Attention Flags
+             * @description Named criteria worth the dermatologist's attention; not a score
+             * @default []
+             */
+            attention_flags: ("ridge_pattern" | "growing" | "border_change" | "ai_unsure")[];
         };
         /** ChromophoreContrast */
         ChromophoreContrast: {

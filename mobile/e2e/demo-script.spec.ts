@@ -126,11 +126,13 @@ test('PLAN §6 demo script: 60 s core + extended', async ({ browser, request }) 
   // 6: dermatologist recommends biopsy, follow-up 14 days.
   const row = reviewer.getByTestId(/^queue-case-/).filter({ hasText: code }).first();
   await expect(row).toBeVisible({ timeout: 15_000 });
+  await expect(row).toContainText('Growing');
   await shot(reviewer, '07-queue-new-case');
   await row.click();
   await expect(byId(reviewer, 'history-strip')).toBeVisible();
   await expect(byId(reviewer, 'triage-pattern')).toContainText('Pigment-dominant');
   await expect(byId(reviewer, 'morph-asymmetry')).toBeVisible();
+  await expect(byId(reviewer, 'attention-flags')).toContainText('since the first visit');
   await shot(reviewer, '08-review-case');
   await byId(reviewer, 'phrase-0').click();
   await byId(reviewer, 'action-biopsy').click();
