@@ -1,13 +1,14 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { useState } from 'react';
+import { Pressable } from 'react-native';
 
-import { api, type BodySite, type LesionCreate } from '@/api/client';
-import { Button, Card, Chips, ErrorBanner, Muted, Screen } from '@/ui/components';
-import { BODY_SITES } from '@/ui/labels';
+import { api } from '@/api/client';
+import { BodyMap, type SiteChoice } from '@/ui/BodyMap';
+import { Button, Card, Chips, ErrorBanner, Heading, Muted, Screen } from '@/ui/components';
+import { BODY_SITES, siteLabel } from '@/ui/labels';
+import { colors } from '@/ui/theme';
 
-const ACRAL = BODY_SITES.filter((s) => s.acral);
-const OTHER = BODY_SITES.filter((s) => !s.acral);
 const LATERALITY = [
   { value: 'left', label: 'Left' },
   { value: 'right', label: 'Right' },
@@ -18,13 +19,15 @@ export default function NewLesion() {
   const { patientId } = useLocalSearchParams<{ patientId: string }>();
   const router = useRouter();
   const queryClient = useQueryClient();
-  const [site, setSite] = useState<BodySite | null>(null);
-  const [laterality, setLaterality] = useState<LesionCreate['laterality'] | null>(null);
+  const [choice, setChoice] = useState<SiteChoice | null>(null);
+  const [listOpen, setListOpen] = useState(false);
 
   const create = useMutation({
-    mutationFn: () => api.createLesion({ patient_id: patientId, body_site: site!, laterality }),
+    mutationFn: () =>
+      api.createLesion({ patient_id: patientId, body_site: choice!.site, laterality: choice!.laterality }),
     onSuccess: (lesion) => {
       queryClient.invalidateQueries({ queryKey: ['patient', patientId] });
+      queryClient.invalidateQueries({ queryKey: ['patients'] });
       router.replace({ pathname: '/lesions/[lesionId]/capture', params: { lesionId: lesion.id } });
     },
   });
@@ -33,21 +36,37 @@ export default function NewLesion() {
     <Screen>
       <Stack.Screen options={{ title: 'New lesion' }} />
       <Card>
-        <Chips label="Acral sites" options={ACRAL} value={site} onChange={setSite} testIDPrefix="site" />
-        <Muted>Palms, soles and nails are listed first: acral sites matter in Indonesian patients.</Muted>
-        <Chips label="Other sites" options={OTHER} value={site} onChange={setSite} testIDPrefix="site" />
-        <Chips
-          label="Side"
-          options={LATERALITY}
-          value={laterality ?? null}
-          onChange={setLaterality}
-          testIDPrefix="side"
-        />
+        <Heading>Where is the lesion?</Heading>
+        <BodyMap value={choice} onChange={setChoice} />
+        <Pressable onPress={() => setListOpen((v) => !v)} testID="toggle-site-list">
+          <Muted style={{ color: colors.accent, textAlign: 'center' }}>
+            {listOpen ? 'Hide the list of sites' : 'Pick from a list instead'}
+          </Muted>
+        </Pressable>
+        {listOpen ? (
+          <>
+            <Chips
+              label="Site"
+              options={BODY_SITES}
+              value={choice?.site ?? null}
+              onChange={(site) => setChoice({ site, laterality: choice?.laterality ?? null })}
+              testIDPrefix="site"
+            />
+            <Chips
+              label="Side"
+              options={LATERALITY}
+              value={choice?.laterality ?? null}
+              onChange={(laterality) => choice && setChoice({ ...choice, laterality })}
+              testIDPrefix="side"
+            />
+          </>
+        ) : null}
+        <Heading>{choice ? siteLabel({ body_site: choice.site, laterality: choice.laterality ?? null }) : 'No site selected'}</Heading>
         <ErrorBanner error={create.error} />
         <Button
           label="Save and capture"
           onPress={() => create.mutate()}
-          disabled={!site}
+          disabled={!choice}
           busy={create.isPending}
           testID="create-lesion"
         />

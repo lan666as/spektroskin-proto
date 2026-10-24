@@ -20,7 +20,8 @@ test('review loop: clinician submits → dermatologist reviews → clinician see
   await byId(clinician, 'consent-yes').click();
   await byId(clinician, 'create-patient').click();
   await byId(clinician, 'add-lesion').click();
-  await byId(clinician, 'site-sole').click();
+  await byId(clinician, 'body-side-back').click();
+  await byId(clinician, 'region-back-sole-left').click();
   await byId(clinician, 'create-lesion').click();
   await byId(clinician, 'capture-button').click();
   await expect(byId(clinician, 'qc-passed')).toBeVisible({ timeout: 30_000 });

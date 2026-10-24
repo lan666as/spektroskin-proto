@@ -34,15 +34,20 @@ export function SpectralViews({
   caption,
   view: controlledView,
   onViewChange,
+  allowAll = false,
 }: {
   capture: Capture;
+  /** Offer an "All" tab that shows the three views side by side (wide screens). */
+  allowAll?: boolean;
   /** Shown above the image and in the full-screen viewer, e.g. "Day 30 · 28.7 mm²". */
   caption?: string;
   view?: ViewName;
   onViewChange?: (view: ViewName) => void;
 }) {
   const [ownView, setOwnView] = useState<ViewName>('standard');
+  const [all, setAll] = useState(false);
   const [zoomed, setZoomed] = useState(false);
+  const [zoomAll, setZoomAll] = useState<{ uri: string; title: string } | null>(null);
   const view = controlledView ?? ownView;
   const setView = onViewChange ?? setOwnView;
   const available = VIEW_OPTIONS.filter((o) => capture.views[o.value]);
@@ -51,8 +56,38 @@ export function SpectralViews({
   const label = `${VIEW_OPTIONS.find((o) => o.value === current)?.label} view${caption ? ` · ${caption}` : ''}`;
   return (
     <View style={{ gap: spacing.md }} testID="spectral-views">
-      <Chips options={available} value={current} onChange={setView} testIDPrefix="view" />
+      <Chips
+        options={allowAll ? [...available, { value: 'all' as const, label: 'All side by side' }] : available}
+        value={all ? 'all' : current}
+        onChange={(v) => {
+          if (v === 'all') {
+            setAll(true);
+          } else {
+            setAll(false);
+            setView(v);
+          }
+        }}
+        testIDPrefix="view"
+      />
       {caption ? <Text style={styles.caption}>{caption}</Text> : null}
+      {all ? (
+        <View style={styles.compareRow} testID="views-all">
+          {available.map((o) => {
+            const viewUri = absoluteUrl(capture.views[o.value]);
+            return (
+              <Pressable
+                key={o.value}
+                style={styles.compareCell}
+                onPress={() => setZoomAll({ uri: viewUri, title: `${o.label} view${caption ? ` · ${caption}` : ''}` })}
+              >
+                <Image source={{ uri: viewUri }} style={styles.compareImage} />
+                <Text style={styles.visitDay}>{o.label}</Text>
+              </Pressable>
+            );
+          })}
+          <ImageViewer uri={zoomAll?.uri ?? null} title={zoomAll?.title ?? ''} onClose={() => setZoomAll(null)} />
+        </View>
+      ) : (
       <Pressable
         style={styles.imageFrame}
         onPress={() => setZoomed(true)}
@@ -67,7 +102,8 @@ export function SpectralViews({
           <Text style={styles.zoomHintText}>Tap to enlarge</Text>
         </View>
       </Pressable>
-      <Muted>{VIEW_HELP[current]}</Muted>
+      )}
+      <Muted>{all ? 'Standard, pigment and vascular views of the same capture.' : VIEW_HELP[current]}</Muted>
       <ImageViewer uri={zoomed ? uri : null} title={label} onClose={() => setZoomed(false)} />
     </View>
   );

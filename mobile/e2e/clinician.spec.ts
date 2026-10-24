@@ -28,8 +28,7 @@ test('clinician: login → patient → lesion → capture → results with histo
   await expect(byId(page, 'patient-screen')).toBeVisible();
 
   await byId(page, 'add-lesion').click();
-  await byId(page, 'site-sole').click();
-  await byId(page, 'side-left').click();
+  await byId(page, 'acral-sole-left').click();
   await byId(page, 'create-lesion').click();
 
   // A glare capture fails QC with retake guidance; retake goes back to the capture screen.

@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { Stack, useRouter } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
-import { Image, StyleSheet, View } from 'react-native';
+import { Image, Platform, StyleSheet, View } from 'react-native';
 
 import { api, type CaseSummary } from '@/api/client';
 import { absoluteUrl } from '@/api/config';
@@ -63,6 +63,12 @@ export default function Queue() {
     }
     known.current = new Set(ids);
   }, [open.data]);
+  // Web: show the number of waiting cases in the browser tab so a new case is noticed.
+  const waitingCount = open.data?.length ?? 0;
+  useEffect(() => {
+    if (Platform.OS !== 'web') return;
+    document.title = `${waitingCount ? `(${waitingCount}) ` : ''}Review queue · SpektroSkin`;
+  }, [waitingCount]);
   const isFresh = (id: string) => (arrivals[id] ?? 0) > Date.now() - NEW_HIGHLIGHT_MS;
   const openCase = (id: string) => router.push({ pathname: '/review/[caseId]', params: { caseId: id } });
 

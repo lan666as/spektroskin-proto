@@ -145,7 +145,7 @@ export default function ReviewCase() {
       {c ? (
         <View style={{ flexDirection: twoColumns ? 'row' : 'column', gap: spacing.lg, alignItems: 'flex-start' }}>
           <View style={{ flex: twoColumns ? 3 : undefined, width: twoColumns ? undefined : '100%', gap: spacing.lg }}>
-            {latest ? <SpectralViews key={latest.id} capture={latest} /> : null}
+            {latest ? <SpectralViews key={latest.id} capture={latest} allowAll={twoColumns} /> : null}
             <HistoryStrip
               captures={c.lesion_history}
               currentId={latest?.id}
