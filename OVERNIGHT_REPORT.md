@@ -137,3 +137,10 @@ Result (22:18 WIB): **done**, commit `da9bd49`.
 - Loading, empty and error states were already present on every screen (checked in screenshots:
   login error banner, empty lists, loading spinners); spacing and type come from one theme file.
 - Verified: screenshots re-taken and inspected; gate green.
+
+## Item 7 — README
+
+Result (22:20 WIB): **done**, commit `4576b6d`. Architecture (Mermaid), pipeline, real-vs-simulated
+table, before/during GENOHACK table, target-vs-prototype table (from docs/context/chat-handoff.md
+§2, labeled as target design), run instructions, quality gate, repository map. Verified: the
+documented seed command runs; gate green (docs only, e2e skipped).
