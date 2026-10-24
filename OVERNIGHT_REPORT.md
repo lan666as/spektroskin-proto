@@ -96,3 +96,13 @@ Plan:
 - Entry: "Referral summary" button on the answered case page.
 - Verify: Playwright opens the summary for an answered case and renders it with print media
   emulation (and `page.pdf()` produces a non-empty PDF).
+
+Result (22:13 WIB): **done**, commit `193e315`.
+- `/cases/[caseId]/summary` (clinician, answered cases): patient and lesion, question,
+  recommendation ("the treating clinician decides"), visit timeline with areas, the three views of
+  the reviewed capture, disclaimer. Opened from "Referral summary" on the answered case page.
+- Web: "Print / Save as PDF" → `window.print()`; print CSS hides controls, expands the scroll
+  container and keeps image backgrounds (RN Web draws images as CSS backgrounds). No dependency.
+- Verified: Playwright opens the summary after a review, checks print media hides the button and
+  `page.pdf()` is non-empty; the printed A4 page was inspected visually (one page, all three views).
+  Native renders the page without the print button (NEEDS PHONE CHECK only for layout).
