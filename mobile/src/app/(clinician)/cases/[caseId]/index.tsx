@@ -1,8 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
-import { Stack, useLocalSearchParams } from 'expo-router';
+import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 
 import { api } from '@/api/client';
-import { Card, ErrorBanner, Heading, Loading, Muted, Pill, Row, Screen } from '@/ui/components';
+import { Button, Card, ErrorBanner, Heading, Loading, Muted, Pill, Row, Screen } from '@/ui/components';
 import { Footnote, HistoryStrip, Recommendation, SpectralViews } from '@/ui/clinical';
 import { formatDateTime, patientLabel, siteLabel, STATUS_LABELS, statusTone } from '@/ui/labels';
 
@@ -10,6 +10,7 @@ const POLL_MS = 5_000;
 
 export default function ClinicianCase() {
   const { caseId } = useLocalSearchParams<{ caseId: string }>();
+  const router = useRouter();
   const query = useQuery({
     queryKey: ['case', caseId],
     queryFn: () => api.case(caseId),
@@ -26,7 +27,15 @@ export default function ClinicianCase() {
       {c ? (
         <>
           {c.review ? (
-            <Recommendation review={c.review} />
+            <>
+              <Recommendation review={c.review} />
+              <Button
+                label="Referral summary"
+                variant="secondary"
+                onPress={() => router.push({ pathname: '/cases/[caseId]/summary', params: { caseId } })}
+                testID="open-summary"
+              />
+            </>
           ) : (
             <Card testID="awaiting-review">
               <Row>

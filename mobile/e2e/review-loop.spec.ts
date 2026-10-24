@@ -47,6 +47,15 @@ test('review loop: clinician submits → dermatologist reviews → clinician see
   await expect(byId(clinician, 'recommendation-action')).toContainText('Biopsy', { timeout: 15_000 });
   await expect(byId(clinician, 'recommendation')).toContainText('treating clinician decides');
 
+  await byId(clinician, 'open-summary').click();
+  await expect(byId(clinician, 'summary-action')).toContainText('Biopsy');
+  await expect(byId(clinician, 'summary-screen')).toContainText(code);
+  await clinician.emulateMedia({ media: 'print' });
+  await expect(clinician.getByTestId('print')).toBeHidden();
+  const pdf = await clinician.pdf({ format: 'A4' });
+  expect(pdf.byteLength).toBeGreaterThan(20_000);
+  await clinician.emulateMedia({ media: 'screen' });
+
   await byId(reviewer, 'nav-audit').click();
   await expect(byId(reviewer, 'audit-screen')).toBeVisible();
   await expect(

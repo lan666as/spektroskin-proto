@@ -83,3 +83,16 @@ Result (22:09 WIB): **done**, commit `cecb336`.
   paging), Playwright 4/4 (consent chosen in both flows, consent visible to the reviewer, the
   review event visible in the audit log). Gate green.
 - Morning merge note: deploy applies migration 0003 automatically on API start.
+
+## Item 5 — Printable referral summary
+
+Plan:
+- Clinician route `/cases/[caseId]/summary` for answered cases: patient (pseudonymous), lesion site,
+  visit timeline with areas, the three views of the reviewed capture, question, recommendation,
+  reviewer and time, plus the simulation/no-diagnosis disclaimer.
+- "Print / Save as PDF" on web uses `window.print()` (the browser's PDF is the "trivial PDF"); no new
+  dependency. Print-only CSS is injected while the page is mounted (hides controls, lets the scroll
+  container expand). On native the page renders without the print button.
+- Entry: "Referral summary" button on the answered case page.
+- Verify: Playwright opens the summary for an answered case and renders it with print media
+  emulation (and `page.pdf()` produces a non-empty PDF).
