@@ -18,6 +18,15 @@ MODEL_PATH = Path(__file__).resolve().parent / "models" / "triage_v1.json"
 CLASSES = ("pigmented", "vascular", "mixed")
 RGB_BANDS = ("blue", "green", "red")
 ABSTAIN_BELOW = 0.70  # top-class probability under this → "uncertain, dermatologist decides"
+FEATURE_LABELS = (
+    *(f"{b} {k}" for b in RGB_BANDS for k in ("contrast", "texture")),
+    "NIR contrast",
+    "NIR texture",
+    "melanin excess",
+    "melanin focality",
+    "blood excess",
+    "blood focality",
+)
 
 
 def _band_stats(r: np.ndarray, lesion: np.ndarray, ring: np.ndarray) -> list[float]:
@@ -89,4 +98,23 @@ def predict(
         "held_out_accuracy_when_answered": held_out["accuracy_when_answered"],
         "held_out_coverage": held_out["coverage"],
         "trained_on": "simulated phantoms only",
+        "drivers": drivers(x, w, best),
     }
+
+
+def drivers(x: np.ndarray, w: dict, cls: int, top: int = 3) -> list[dict]:
+    """Features that pushed most toward (positive) or away from the suggested pattern, relative to
+    the other patterns: (coefficient − mean coefficient) × standardised value. level: the value
+    compared with the training average."""
+    coef = np.array(w["coef"])
+    z = (x - np.array(w["mean"])) / np.array(w["scale"])
+    contribution = (coef[cls] - coef.mean(axis=0)) * z
+    order = np.argsort(-np.abs(contribution))[:top]
+    return [
+        {
+            "feature": FEATURE_LABELS[i],
+            "level": "high" if z[i] > 0 else "low",
+            "contribution": round(float(contribution[i]), 3),
+        }
+        for i in order
+    ]

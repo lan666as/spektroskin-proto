@@ -190,4 +190,88 @@ const styles = StyleSheet.create({
   stepTitle: { fontSize: 15, fontWeight: '700', color: colors.text },
   stepResult: { fontSize: 14, color: colors.text },
   link: { color: colors.accent, fontWeight: '600', paddingVertical: spacing.xs },
+  morphRow: { gap: 2, borderTopWidth: 1, borderTopColor: colors.border, paddingTop: spacing.sm },
+  morphValue: { fontSize: 16, fontWeight: '800', color: colors.text },
+  morphChange: { fontSize: 13, fontWeight: '700', color: colors.textMuted, textAlign: 'right' },
 });
+
+type MorphologyRow = { label: string; value: string; change?: string; how: string; testID: string };
+
+/**
+ * Dermoscopy-style criteria measured on the outline (asymmetry, border, colour, diameter,
+ * evolution). Each value stands alone: no combined score, the dermatologist interprets.
+ */
+export function MorphologyCard({ capture, visits }: { capture: Capture; visits: Capture[] }) {
+  const m = capture.morphology;
+  if (!m) return null;
+  const first = visits.find((v) => v.status === 'processed');
+  const firstM = first && first.id !== capture.id ? first.morphology : null;
+  const change = areaChange(first, capture);
+  const delta = (now: number, then?: number | null) =>
+    then != null ? `${now - then >= 0 ? '+' : ''}${(now - then).toFixed(2)} since Day 01` : undefined;
+  const rows: MorphologyRow[] = [
+    {
+      label: 'Asymmetry',
+      value: m.asymmetry.toFixed(2),
+      change: delta(m.asymmetry, firstM?.asymmetry),
+      how: 'Share of the outline that does not overlap its mirror image (0 = symmetric).',
+      testID: 'morph-asymmetry',
+    },
+    {
+      label: 'Border irregularity',
+      value: m.border_irregularity.toFixed(2),
+      change: delta(m.border_irregularity, firstM?.border_irregularity),
+      how: 'Perimeter² ÷ (4π × area): 1.0 is a circle, higher is more notched.',
+      testID: 'morph-border',
+    },
+    {
+      label: 'Pigment variation',
+      value: m.pigment_variation != null ? m.pigment_variation.toFixed(2) : 'Not pigmented',
+      how: 'How uneven the melanin is inside the outline (from the pigment map).',
+      testID: 'morph-pigment',
+    },
+    {
+      label: 'Blood-spot focality',
+      value: m.vessel_focality.toFixed(2),
+      how: 'Brightest blood spots vs the typical level (from the blood map): dots and vessels raise it.',
+      testID: 'morph-vessels',
+    },
+    {
+      label: 'Diameter',
+      value: formatSize(capture) ?? '–',
+      how: 'Longest diameter × width of the outline.',
+      testID: 'morph-diameter',
+    },
+    {
+      label: 'Evolution',
+      value: change ? `${change.percent >= 0 ? '+' : ''}${change.percent.toFixed(0)}% area in ${change.days} days` : 'First visit',
+      how: 'Area change across visits of the same lesion.',
+      testID: 'morph-evolution',
+    },
+  ];
+  return (
+    <Card testID="morphology">
+      <Row style={{ justifyContent: 'space-between' }}>
+        <Heading>Dermoscopy-style measurements</Heading>
+        <View style={styles.assist}>
+          <Text style={styles.assistText}>Automated · no score</Text>
+        </View>
+      </Row>
+      {rows.map((r) => (
+        <View key={r.label} style={styles.morphRow} testID={r.testID}>
+          <Row style={{ justifyContent: 'space-between', flexWrap: 'nowrap' }}>
+            <Text style={styles.stepTitle}>{r.label}</Text>
+            <Text style={styles.morphValue}>{r.value}</Text>
+          </Row>
+          {r.change ? <Text style={styles.morphChange}>{r.change}</Text> : null}
+          <Muted>{r.how}</Muted>
+        </View>
+      ))}
+      <Muted>
+        Asymmetry, border, colour, diameter and evolution, measured on the automated outline of a
+        simulated capture. Each is shown on its own, never added up into a risk score: the
+        dermatologist interprets them.
+      </Muted>
+    </Card>
+  );
+}

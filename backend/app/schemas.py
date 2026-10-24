@@ -139,6 +139,23 @@ class QualityOpinion(BaseModel):
     )
 
 
+class TriageDriver(BaseModel):
+    feature: str
+    level: Literal["high", "low"] = Field(description="Value relative to the training average")
+    contribution: float = Field(description="> 0 supports the suggested pattern")
+
+
+class Morphology(BaseModel):
+    asymmetry: float = Field(
+        description="Non-overlapping area with the mirror image (0 = symmetric)"
+    )
+    border_irregularity: float = Field(description="perimeter² / (4π·area); 1 = circle")
+    pigment_variation: float | None = Field(
+        description="Coefficient of variation of melanin excess; null when barely pigmented"
+    )
+    vessel_focality: float = Field(description="99th percentile / median blood level in the lesion")
+
+
 class TriageOpinion(BaseModel):
     """Research-mode lesion-pattern suggestion from a model trained on simulated phantoms only.
     Not a diagnosis; no malignancy probability exists anywhere in this model."""
@@ -152,6 +169,7 @@ class TriageOpinion(BaseModel):
     held_out_accuracy_when_answered: float
     held_out_coverage: float
     trained_on: str
+    drivers: list[TriageDriver] = []
 
 
 class CaptureOut(BaseModel):
@@ -171,6 +189,7 @@ class CaptureOut(BaseModel):
     width_mm: float | None = Field(default=None, description="Width (ellipse minor axis)")
     quality_model: QualityOpinion | None = None
     triage_model: TriageOpinion | None = None
+    morphology: Morphology | None = None
     registration_shift_px: dict[str, list[float]] | None = None
     gain_correction: dict[str, float] | None = None
 

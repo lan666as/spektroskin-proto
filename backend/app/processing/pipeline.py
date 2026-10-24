@@ -5,7 +5,7 @@ from app.processing.calibration import calibrate
 from app.processing.qc import run_qc
 from app.processing.quality_model import predict as quality_opinion
 from app.processing.registration import register
-from app.processing.segmentation import measurements, segment
+from app.processing.segmentation import measurements, morphology, segment
 from app.processing.signature import spectral_signature
 from app.processing.spectral import unmix
 from app.processing.triage_model import predict as triage_opinion
@@ -61,6 +61,7 @@ def measure(frame_set: FrameSet, device_profile: DeviceProfile) -> ProcessingRes
         area_mm2=area_mm2,
         signature=spectral_signature(aligned, melanin, hemoglobin, mask),
         measurements=measurements(mask),
+        morphology=morphology(mask, melanin, hemoglobin),
         reflectance=aligned,
         shifts_px=shifts,
         gain_correction=gains,

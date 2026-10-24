@@ -230,3 +230,15 @@ Timestamped record of what was built during GENOHACK (Sat 24 – Sun 25 Oct 2026
   follow-up due or overdue).
 - Tests: outcome ordering, ownership, idempotent replace, tissue rule; smoke covers the endpoint;
   the demo-script e2e records biopsy → pending → benign and checks the reviewer sees it.
+
+## 2026-10-25 01:09 WIB — Iteration loop, batch 5: explainable triage and dermoscopy-style measurements
+
+- Builder directive (01:35 WIB): prioritise the AI-assisted diagnosis story and features.
+- Triage model output now carries its top 3 drivers ((coefficient − mean) × standardised value),
+  shown as "Why this suggestion" (e.g. "High blood excess · supports").
+- `segmentation.morphology()`: asymmetry (mirror overlap about the principal axes), border
+  irregularity (perimeter²/4π·area), pigment variation (CV of melanin excess; null when barely
+  pigmented), blood-spot focality. New "Dermoscopy-style measurements" card (results and reviewer)
+  with change since Day 01; values are shown individually and never summed into a score.
+- Tests: drivers name the expected chromophores; border irregularity rises across the acral growth
+  series. E2E asserts the card, the drivers, and that no numeric score appears.

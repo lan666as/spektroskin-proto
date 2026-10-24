@@ -60,6 +60,21 @@ export function TriageSupport({ capture }: { capture: Capture }) {
           </View>
         );
       })}
+      {t.drivers?.length ? (
+        <View style={{ gap: 4 }} testID="triage-drivers">
+          <Text style={styles.why}>Why this suggestion</Text>
+          {t.drivers.map((d) => (
+            <Row key={d.feature} style={{ justifyContent: 'space-between', flexWrap: 'nowrap' }}>
+              <Text style={styles.driver}>
+                {d.level === 'high' ? 'High' : 'Low'} {d.feature}
+              </Text>
+              <Text style={[styles.driverEffect, { color: d.contribution > 0 ? colors.success : colors.danger }]}>
+                {d.contribution > 0 ? 'supports' : 'argues against'}
+              </Text>
+            </Row>
+          ))}
+        </View>
+      ) : null}
       <Muted>
         Model confidence across the three patterns, from the pigment and blood maps. Below{' '}
         {Math.round(t.abstain_below * 100)}% it abstains. On held-out simulated lesions it answered{' '}
@@ -90,4 +105,7 @@ const styles = StyleSheet.create({
   fill: { height: 10, borderRadius: 5, backgroundColor: colors.accent },
   barValue: { width: 44, textAlign: 'right', fontSize: 14, fontWeight: '700', color: colors.text },
   link: { color: colors.accent, fontWeight: '600', paddingVertical: spacing.xs },
+  why: { fontSize: 14, fontWeight: '700', color: colors.text },
+  driver: { fontSize: 14, color: colors.text, flex: 1 },
+  driverEffect: { fontSize: 13, fontWeight: '700' },
 });

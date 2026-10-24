@@ -445,6 +445,7 @@ export interface components {
             width_mm?: number | null;
             quality_model?: components["schemas"]["QualityOpinion"] | null;
             triage_model?: components["schemas"]["TriageOpinion"] | null;
+            morphology?: components["schemas"]["Morphology"] | null;
             /** Registration Shift Px */
             registration_shift_px?: {
                 [key: string]: number[];
@@ -663,6 +664,29 @@ export interface components {
              * @description Signed standard view of the latest processed visit
              */
             latest_thumbnail_url?: string | null;
+        };
+        /** Morphology */
+        Morphology: {
+            /**
+             * Asymmetry
+             * @description Non-overlapping area with the mirror image (0 = symmetric)
+             */
+            asymmetry: number;
+            /**
+             * Border Irregularity
+             * @description perimeter² / (4π·area); 1 = circle
+             */
+            border_irregularity: number;
+            /**
+             * Pigment Variation
+             * @description Coefficient of variation of melanin excess; null when barely pigmented
+             */
+            pigment_variation: number | null;
+            /**
+             * Vessel Focality
+             * @description 99th percentile / median blood level in the lesion
+             */
+            vessel_focality: number;
         };
         /** OutcomeIn */
         OutcomeIn: {
@@ -940,6 +964,22 @@ export interface components {
             token_type: "bearer";
             user: components["schemas"]["UserOut"];
         };
+        /** TriageDriver */
+        TriageDriver: {
+            /** Feature */
+            feature: string;
+            /**
+             * Level
+             * @description Value relative to the training average
+             * @enum {string}
+             */
+            level: "high" | "low";
+            /**
+             * Contribution
+             * @description > 0 supports the suggested pattern
+             */
+            contribution: number;
+        };
         /**
          * TriageOpinion
          * @description Research-mode lesion-pattern suggestion from a model trained on simulated phantoms only.
@@ -965,6 +1005,11 @@ export interface components {
             held_out_coverage: number;
             /** Trained On */
             trained_on: string;
+            /**
+             * Drivers
+             * @default []
+             */
+            drivers: components["schemas"]["TriageDriver"][];
         };
         /** UserOut */
         UserOut: {

@@ -19,7 +19,7 @@ import {
   Screen,
 } from '@/ui/components';
 import { CaseTimeline, Footnote, HistoryStrip, Recommendation, SpectralViews, VisitCompare } from '@/ui/clinical';
-import { areaChange, AutomatedAnalysis, formatSize } from '@/ui/analysis';
+import { areaChange, AutomatedAnalysis, formatSize, MorphologyCard } from '@/ui/analysis';
 import { TriageSupport } from '@/ui/triage';
 import { OutcomeCard } from '@/ui/outcome';
 import { SpectralSignature } from '@/ui/measurement';
@@ -165,6 +165,7 @@ export default function ReviewCase() {
               onSelect={(v) => setSelectedId(v.id)}
             />
             <VisitCompare captures={c.lesion_history} selectedId={reviewed?.id} />
+            {latest ? <MorphologyCard capture={latest} visits={c.lesion_history} /> : null}
             {latest ? <AutomatedAnalysis capture={latest} visits={c.lesion_history} /> : null}
             {latest ? <SpectralSignature capture={latest} /> : null}
             <Footnote />

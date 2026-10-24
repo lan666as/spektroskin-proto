@@ -106,6 +106,9 @@ test('PLAN §6 demo script: 60 s core + extended', async ({ browser, request }) 
   await expect(byId(clinician, 'lesion-area')).toContainText('mm²');
   await expect(byId(clinician, 'triage-pattern')).toContainText('Pigment-dominant');
   await expect(byId(clinician, 'triage-support')).toContainText('not a diagnosis');
+  await expect(byId(clinician, 'triage-drivers')).toContainText('melanin excess');
+  await expect(byId(clinician, 'morph-border')).toContainText('since Day 01');
+  await expect(byId(clinician, 'morphology')).not.toContainText(/score\s*[:=]?\s*\d/i);
   await expect(byId(clinician, 'triage-support')).not.toContainText(/malignan(cy|t) (probability|risk)|risk score/i);
   // 4: history Day 01 → Day 14 → Day 30 with area change.
   await expect(byId(clinician, 'visit-day-1')).toBeVisible();
@@ -126,6 +129,7 @@ test('PLAN §6 demo script: 60 s core + extended', async ({ browser, request }) 
   await row.click();
   await expect(byId(reviewer, 'history-strip')).toBeVisible();
   await expect(byId(reviewer, 'triage-pattern')).toContainText('Pigment-dominant');
+  await expect(byId(reviewer, 'morph-asymmetry')).toBeVisible();
   await shot(reviewer, '08-review-case');
   await byId(reviewer, 'phrase-0').click();
   await byId(reviewer, 'action-biopsy').click();

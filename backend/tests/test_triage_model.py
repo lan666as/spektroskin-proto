@@ -31,3 +31,18 @@ def test_suggests_the_generating_pattern(phantom_id: str) -> None:
 def test_no_opinion_without_an_outline() -> None:
     spec = spec_by_id("pigmented_dark_glare")
     assert run(capture(spec, ground_truth(spec)), PROFILE).triage_model is None
+
+
+def test_explains_with_the_expected_chromophores() -> None:
+    spec = spec_by_id("vascular_dark")
+    opinion = run(capture(spec, ground_truth(spec)), PROFILE).triage_model
+    top = {d["feature"]: d for d in opinion["drivers"]}
+    assert top["blood excess"]["level"] == "high" and top["blood excess"]["contribution"] > 0
+
+
+def test_growth_series_border_becomes_less_regular() -> None:
+    def border(phantom_id: str) -> float:
+        spec = spec_by_id(phantom_id)
+        return run(capture(spec, ground_truth(spec)), PROFILE).morphology["border_irregularity"]
+
+    assert border("acral_dark_d01") < border("acral_dark_d30")

@@ -4,7 +4,7 @@ import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { api } from '@/api/client';
 import { Button, Card, ErrorBanner, Heading, KeyValue, Loading, Muted, Screen } from '@/ui/components';
 import { Footnote, HistoryStrip, QCCard, SpectralViews, ValidationPanel, VisitCompare } from '@/ui/clinical';
-import { AutomatedAnalysis, MeasurementSummary } from '@/ui/analysis';
+import { AutomatedAnalysis, MeasurementSummary, MorphologyCard } from '@/ui/analysis';
 import { TriageSupport } from '@/ui/triage';
 import { QualityDetails, SpectralSignature } from '@/ui/measurement';
 import { formatArea, formatDateTime, patientLabel, siteLabel, visitDay } from '@/ui/labels';
@@ -48,6 +48,7 @@ export default function Results() {
               <MeasurementSummary capture={c} visits={lesion.data?.captures ?? []} />
               <SpectralViews capture={c} />
               <TriageSupport capture={c} />
+              <MorphologyCard capture={c} visits={lesion.data?.captures ?? []} />
               {lesion.data ? <VisitCompare captures={lesion.data.captures} selectedId={c.id} /> : null}
               <Button label="Submit for dermatologist review" onPress={submit} testID="submit-for-review" />
               <AutomatedAnalysis capture={c} visits={lesion.data?.captures ?? []} />
