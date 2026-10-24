@@ -38,6 +38,19 @@
 
    This is a production delete, so I left it to you. PT-0010 and PT-0012 were not touched.
 
+4. **Security advisories (new tonight, 05:02 WIB), reported, not patched:** GitHub Dependabot
+   lists two high-severity npm advisories in `mobile/package-lock.json`. Both come only from the
+   Expo developer CLI (`expo` → `@expo/cli`), which runs on the Mac. They are not in the deployed
+   web bundle (checked: no matches in `dist/`) and not in the backend.
+   - `zod` 3.25.76 (GHSA-mrhx-c7xc-m3w5, memory exhaustion; fixed in 4.6.6). Forcing zod 4 into
+     the Expo CLI could break the build and the dev server.
+   - `node-forge` 1.4.0 (GHSA-86w9-cpqp-85rv, RSA signature check; no fix released). It is used
+     for Expo code signing, which this project does not use.
+
+   Recommendation: after the competition, upgrade Expo when a release pulls in fixed versions. If
+   you want it closed before submission, an npm `overrides` entry for zod is the option, followed
+   by a full gate run. Your call.
+
 ### What changed tonight (35 verified deploys)
 
 Before / after screenshots:
