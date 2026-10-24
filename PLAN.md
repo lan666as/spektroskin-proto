@@ -22,6 +22,13 @@ Taken from the team's Drive (proposal, rewritten deck, pitch strategy, GENOHACK 
   metrics as an advisory second opinion. An in-app AI roadmap shows planned tiers (triage support,
   shadow-mode validation, RGB-vs-spectral ablation) as not active. Still never: a diagnosis, a
   malignancy probability, a risk score or an invented performance number.
+  *Amendment (25 Oct 2026, 00:30 WIB, builder override: "start the model to help diagnose, as
+  promised in the proposal and deck"):* Tier 3 triage support starts now in **research mode**: a
+  lesion-pattern model (pigment-dominant / vascular / mixed, abstains when unsure) trained on
+  simulated lesions, with real held-out metrics per skin tone and an RGB-vs-spectral ablation
+  (`docs/evidence/triage_model_card.md`), shown to clinician and dermatologist as "research mode ·
+  not a diagnosis · simulated training data". Benign-vs-malignant stays off: the phantoms carry no
+  such labels, so any such number would be fabricated.
 - **Pitch:** 6 min pitch+demo, 4 min Q&A (track round, Sun 10:00–12:00); the Grand Final allows 7 min.
   The deck gives the demo **~60 s** (slide 6). Judges score prototype strength, "assumptions
   tested during the hackathon", and "real outputs wherever possible"; there is a Best Prototype prize.

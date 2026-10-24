@@ -4,9 +4,10 @@ import { StyleSheet, Text, View } from 'react-native';
 import { Card, Heading, Muted, Screen, Title } from '@/ui/components';
 import { colors, radius, spacing } from '@/ui/theme';
 
-type Status = 'active' | 'research' | 'planned';
+type Status = 'active' | 'researchActive' | 'research' | 'planned';
 const STATUS: Record<Status, { label: string; bg: string; fg: string }> = {
   active: { label: 'Active in this prototype', bg: colors.successSoft, fg: colors.success },
+  researchActive: { label: 'Research mode · simulated data', bg: colors.accentSoft, fg: colors.accent },
   research: { label: 'Not active · research', bg: colors.simulatedBg, fg: colors.simulatedText },
   planned: { label: 'Planned · not active', bg: colors.surface, fg: colors.textMuted },
 };
@@ -30,10 +31,18 @@ const TIERS: { tier: string; title: string; status: Status; what: string; gate: 
   },
   {
     tier: 'Tier 3',
-    title: 'Triage support',
+    title: 'Triage support: lesion pattern',
+    status: 'researchActive',
+    what:
+      'Running now in research mode: a small model suggests whether a lesion is pigment-dominant, blood-vessel-dominant or mixed, from the pigment and blood maps, and abstains when unsure. Trained on 900 simulated lesions; on 450 held-out simulated lesions it was right 98% of the time (96% on dark skin). It never says benign or malignant.',
+    gate: 'Next: retrain on real, consented captures; add a medical image encoder and patient metadata.',
+  },
+  {
+    tier: 'Tier 3b',
+    title: 'Triage support: suspicion for biopsy',
     status: 'research',
     what:
-      'A model that helps prioritise which lesions a dermatologist sees first, using a medical image encoder, a spectral branch and patient metadata, and abstaining when unsure. It would never output a diagnosis.',
+      'Helps prioritise which lesions a dermatologist sees first, abstaining when unsure. Needs labels the simulator cannot provide, so it does not exist yet. It would never output a diagnosis.',
     gate: 'Only after local, ethics-approved data with histopathology labels and skin-tone-stratified results.',
   },
   {
@@ -49,8 +58,8 @@ const TIERS: { tier: string; title: string; status: Status; what: string; gate: 
     title: 'RGB vs RGB + spectral ablation',
     status: 'planned',
     what:
-      'The same model trained with and without the extra bands. If the spectral bands add nothing measurable, we drop them: this is the kill test for the optics.',
-    gate: 'Decided on held-out hospital sites, not on the training site.',
+      'The same model trained with and without the extra bands. If the spectral bands add nothing measurable, we drop them: this is the kill test for the optics. Run tonight on simulated lesions for the pattern model: RGB bands only 95%, RGB + NIR + maps 98% held-out accuracy (dark skin 93% vs 96%). Simulated physics only.',
+    gate: 'The real test is on held-out hospital sites, not on the training site.',
   },
 ];
 

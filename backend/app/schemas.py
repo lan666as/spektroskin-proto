@@ -137,6 +137,21 @@ class QualityOpinion(BaseModel):
     )
 
 
+class TriageOpinion(BaseModel):
+    """Research-mode lesion-pattern suggestion from a model trained on simulated phantoms only.
+    Not a diagnosis; no malignancy probability exists anywhere in this model."""
+
+    model: str
+    pattern: Literal["pigmented", "vascular", "mixed"] | None = Field(
+        description="Suggested dominant pattern; null = uncertain, the dermatologist decides"
+    )
+    probabilities: dict[str, float]
+    abstain_below: float
+    held_out_accuracy_when_answered: float
+    held_out_coverage: float
+    trained_on: str
+
+
 class CaptureOut(BaseModel):
     id: uuid.UUID
     lesion_id: uuid.UUID
@@ -153,6 +168,7 @@ class CaptureOut(BaseModel):
     diameter_mm: float | None = Field(default=None, description="Longest diameter of the outline")
     width_mm: float | None = Field(default=None, description="Width (ellipse minor axis)")
     quality_model: QualityOpinion | None = None
+    triage_model: TriageOpinion | None = None
     registration_shift_px: dict[str, list[float]] | None = None
     gain_correction: dict[str, float] | None = None
 

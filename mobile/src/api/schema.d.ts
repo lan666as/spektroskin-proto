@@ -423,6 +423,7 @@ export interface components {
              */
             width_mm?: number | null;
             quality_model?: components["schemas"]["QualityOpinion"] | null;
+            triage_model?: components["schemas"]["TriageOpinion"] | null;
             /** Registration Shift Px */
             registration_shift_px?: {
                 [key: string]: number[];
@@ -852,6 +853,32 @@ export interface components {
              */
             token_type: "bearer";
             user: components["schemas"]["UserOut"];
+        };
+        /**
+         * TriageOpinion
+         * @description Research-mode lesion-pattern suggestion from a model trained on simulated phantoms only.
+         *     Not a diagnosis; no malignancy probability exists anywhere in this model.
+         */
+        TriageOpinion: {
+            /** Model */
+            model: string;
+            /**
+             * Pattern
+             * @description Suggested dominant pattern; null = uncertain, the dermatologist decides
+             */
+            pattern: ("pigmented" | "vascular" | "mixed") | null;
+            /** Probabilities */
+            probabilities: {
+                [key: string]: number;
+            };
+            /** Abstain Below */
+            abstain_below: number;
+            /** Held Out Accuracy When Answered */
+            held_out_accuracy_when_answered: number;
+            /** Held Out Coverage */
+            held_out_coverage: number;
+            /** Trained On */
+            trained_on: string;
         };
         /** UserOut */
         UserOut: {

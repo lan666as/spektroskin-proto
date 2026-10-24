@@ -27,6 +27,9 @@ class PhantomSpec:
     variant: str | None = None  # blur | glare
     shape_seed: str | None = None  # phantoms sharing a shape (growth series)
     description: str = ""
+    # Lesion chromophore strength; None keeps the per-type default (training sets vary these).
+    pigment_amplitude: float | None = None
+    vascular_amplitude: float | None = None
 
     @property
     def fitzpatrick(self) -> str:
@@ -185,7 +188,7 @@ def ground_truth(spec: PhantomSpec) -> GroundTruth:
     if spec.lesion in ("pigmented", "mixed"):
         density = 0.8 + 0.2 * _smooth_noise(tex_rng, 12)
         network = _reticular_network(tex_rng)
-        amplitude = 1.6 if spec.lesion == "pigmented" else 1.0
+        amplitude = spec.pigment_amplitude or (1.6 if spec.lesion == "pigmented" else 1.0)
         core = ndimage.gaussian_filter(profile, 12) ** 1.5  # darker centre, lighter rim
         modulation = np.clip(density, 0.5, 1.3) * (0.55 + 0.7 * network) * (0.7 + 0.5 * core)
         lesion_mel = amplitude * profile * modulation
@@ -196,8 +199,11 @@ def ground_truth(spec: PhantomSpec) -> GroundTruth:
         hemoglobin = hemoglobin + 0.08 * profile
     if spec.lesion in ("vascular", "mixed"):
         vessels = _vessels(tex_rng, profile)
-        amplitude = 0.7 if spec.lesion == "vascular" else 0.5
-        hemoglobin = hemoglobin + amplitude * profile + 0.8 * vessels * profile
+        default = 0.7 if spec.lesion == "vascular" else 0.5
+        amplitude = spec.vascular_amplitude or default
+        hemoglobin = (
+            hemoglobin + amplitude * profile + 0.8 * (amplitude / default) * vessels * profile
+        )
 
     mask = profile > 0.5
     return GroundTruth(

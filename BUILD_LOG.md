@@ -195,3 +195,25 @@ Timestamped record of what was built during GENOHACK (Sat 24 – Sun 25 Oct 2026
 - Builder override at 00:30 WIB: start a diagnosis-assist model. Agreed path: synthetic lesion-pattern
   triage model with real held-out metrics and an RGB-vs-spectral ablation, research mode, no
   malignancy probability (phantoms carry no such labels).
+
+## 2026-10-25 00:47 WIB — Iteration loop, batch 3: research-mode triage model (builder override)
+
+- `backend/scripts/train_triage_model.py`: 900 training and 450 held-out simulated lesions (disjoint
+  seeds; random tone, size, acral site, and overlapping pigment/blood strengths so faint mixed lesions
+  genuinely resemble pigmented ones). A first run with narrower ranges scored 100 % held-out, which
+  meant the task was trivial; the ranges were widened before accepting any number.
+- Multinomial logistic regression on lesion-vs-skin statistics (scikit-learn dev-only, numpy inference
+  from `app/processing/models/triage_v1.json`). Abstains below 70 % top probability.
+- Held-out: accuracy 0.98 (light 0.99, medium 0.98, dark 0.96); answers 96 %, 0.99 correct when it
+  answers. Ablation, same outline: RGB bands only 0.95 (dark 0.93) vs RGB + NIR + maps 0.98.
+  Model card: `docs/evidence/triage_model_card.md`.
+- Pipeline split into `measure()` (deterministic, no ML) and `run()` (measure + advisory opinions),
+  so training reuses the exact production measurements.
+- App: "Triage support" card (results screen and reviewer case) with pattern, per-pattern bars, abstain
+  state, held-out numbers and "Research mode · not a diagnosis · Simulated training data" badges; row in
+  the automated analysis card; "Benign or malignant assessment: Not active" row kept; AI roadmap Tier 3
+  split into 3 (pattern, research mode) and 3b (suspicion for biopsy, not active); Tier 4 shows the
+  ablation. PLAN.md §0 amendment recorded. E2E demo script asserts the card and that no malignancy
+  probability or risk score text appears.
+- Seeded captures processed before this change carry no triage opinion (no backfill on production
+  data); new captures do.

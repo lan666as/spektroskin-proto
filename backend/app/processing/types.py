@@ -42,6 +42,8 @@ class ProcessingResult:
     signature: dict[str, Any] | None = None
     measurements: dict[str, float] | None = None
     quality_model: dict[str, Any] | None = None
+    triage_model: dict[str, Any] | None = None
+    reflectance: dict[str, np.ndarray] | None = None  # registered, calibrated bands
     shifts_px: dict[str, tuple[float, float]] = field(default_factory=dict)
     gain_correction: dict[str, float] = field(default_factory=dict)
 
@@ -63,4 +65,5 @@ class ProcessingResult:
             "signature": self.signature,
             "measurements": self.measurements,
             "quality_model": self.quality_model,
+            "triage_model": self.triage_model,
         }

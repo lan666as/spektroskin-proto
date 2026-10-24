@@ -1,3 +1,5 @@
+from dataclasses import replace
+
 from app.processing import render
 from app.processing.calibration import calibrate
 from app.processing.qc import run_qc
@@ -6,18 +8,32 @@ from app.processing.registration import register
 from app.processing.segmentation import measurements, segment
 from app.processing.signature import spectral_signature
 from app.processing.spectral import unmix
+from app.processing.triage_model import predict as triage_opinion
 from app.processing.types import DeviceProfile, FrameSet, ProcessingResult
 
 
 def run(frame_set: FrameSet, device_profile: DeviceProfile) -> ProcessingResult:
-    """QC → calibration → registration → spectral maps → segmentation.
+    """measure(), then the learned models' advisory opinions. Neither gates nor changes a
+    measurement: the quality model sits beside the rule-based QC, the triage model (research
+    mode) suggests a pattern for the dermatologist."""
+    result = measure(frame_set, device_profile)
+    triage = (
+        triage_opinion(result.reflectance, result.melanin, result.hemoglobin, result.mask)
+        if result.mask is not None
+        else None
+    )
+    return replace(
+        result, quality_model=quality_opinion(frame_set, device_profile), triage_model=triage
+    )
+
+
+def measure(frame_set: FrameSet, device_profile: DeviceProfile) -> ProcessingResult:
+    """QC → calibration → registration → spectral maps → segmentation. Deterministic; no ML.
 
     Calibration runs before registration because flat-field and reference patches live in
-    sensor coordinates, while hand motion shifts only the skin. Deterministic. The learned quality
-    model is an advisory second opinion stored beside the rule-based QC; it never gates.
+    sensor coordinates, while hand motion shifts only the skin.
     """
     qc = run_qc(frame_set, device_profile)
-    quality = quality_opinion(frame_set, device_profile)
     reflectance, gains = calibrate(frame_set, device_profile)
     aligned, shifts = register(reflectance)
     standard = render.mask_spacer(render.standard_view(aligned))
@@ -25,7 +41,6 @@ def run(frame_set: FrameSet, device_profile: DeviceProfile) -> ProcessingResult:
         return ProcessingResult(
             qc=qc,
             views={"standard": standard},
-            quality_model=quality,
             shifts_px=shifts,
             gain_correction=gains,
         )
@@ -46,7 +61,7 @@ def run(frame_set: FrameSet, device_profile: DeviceProfile) -> ProcessingResult:
         area_mm2=area_mm2,
         signature=spectral_signature(aligned, melanin, hemoglobin, mask),
         measurements=measurements(mask),
-        quality_model=quality,
+        reflectance=aligned,
         shifts_px=shifts,
         gain_correction=gains,
     )

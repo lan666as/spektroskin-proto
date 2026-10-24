@@ -49,6 +49,7 @@ def capture_out(capture: Capture, viewer: User) -> CaptureOut:
         diameter_mm=(capture.result.get("measurements") or {}).get("diameter_mm"),
         width_mm=(capture.result.get("measurements") or {}).get("width_mm"),
         quality_model=capture.result.get("quality_model"),
+        triage_model=capture.result.get("triage_model"),
         registration_shift_px=capture.result.get("registration_shift_px"),
         gain_correction=capture.result.get("gain_correction"),
     )

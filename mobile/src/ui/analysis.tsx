@@ -5,6 +5,7 @@ import type { Capture } from '@/api/client';
 
 import { Card, Heading, Muted, Row } from './components';
 import { formatArea, visitDay } from './labels';
+import { patternSummary } from './triage';
 import { colors, radius, spacing } from './theme';
 
 export function areaChange(first: Capture | undefined, current: Capture) {
@@ -133,6 +134,17 @@ export function AutomatedAnalysis({ capture, visits }: { capture: Capture; visit
       how: 'Physics-based unmixing of four bands (simplified optical model), not a learned model.',
       active: capture.status === 'processed',
     },
+    ...(capture.triage_model
+      ? [
+          {
+            title: 'Lesion pattern (triage support, research mode)',
+            result: patternSummary(capture.triage_model),
+            how: 'Small model trained on simulated lesions only. Describes the dominant pigment or blood pattern; not validated on real skin.',
+            active: true,
+            testID: 'triage-row',
+          },
+        ]
+      : []),
   ];
   return (
     <Card testID="automated-analysis">
@@ -147,9 +159,9 @@ export function AutomatedAnalysis({ capture, visits }: { capture: Capture; visit
       ))}
       <StepRow
         step={{
-          title: 'Lesion assessment (triage support)',
+          title: 'Benign or malignant assessment',
           result: 'Not active',
-          how: 'Research roadmap only. Never shown to clinicians before local, ethics-approved validation.',
+          how: 'Needs real, consented, histopathology-labelled captures and ethics approval. Never estimated from simulated data.',
           active: false,
           testID: 'triage-not-active',
         }}

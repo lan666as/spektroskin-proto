@@ -15,9 +15,10 @@ records) → dermatologist review portal → recommendation back to the clinicia
 **Evidence:** [docs/evidence/validation_report.md](docs/evidence/validation_report.md)
 
 **What this is not:** no diagnosis, no cancer probability, no risk score. Automated outputs are
-image quality checks, deterministic image processing, and one small learned image-quality
-classifier trained on simulated captures only, shown as an advisory second opinion
-([model card](docs/evidence/quality_model_card.md)). Every simulated element
+image quality checks, deterministic image processing, and two small learned models trained on
+simulated data only: an image-quality classifier shown as an advisory second opinion
+([model card](docs/evidence/quality_model_card.md)) and a research-mode lesion-pattern triage
+model with an RGB-vs-spectral ablation ([model card](docs/evidence/triage_model_card.md)). Every simulated element
 carries a "Simulated" badge. No real or public patient images are used anywhere.
 
 ## Real vs simulated

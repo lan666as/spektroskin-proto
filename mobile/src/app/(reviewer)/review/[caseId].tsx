@@ -20,6 +20,7 @@ import {
 } from '@/ui/components';
 import { CaseTimeline, Footnote, HistoryStrip, Recommendation, SpectralViews, VisitCompare } from '@/ui/clinical';
 import { areaChange, AutomatedAnalysis, formatSize } from '@/ui/analysis';
+import { TriageSupport } from '@/ui/triage';
 import { SpectralSignature } from '@/ui/measurement';
 import { isAcral } from '@/ui/labels';
 import { formatArea, formatDateTime, siteLabel, STATUS_LABELS, statusTone } from '@/ui/labels';
@@ -169,6 +170,7 @@ export default function ReviewCase() {
           </View>
           <View style={{ flex: twoColumns ? 2 : undefined, width: twoColumns ? undefined : '100%', gap: spacing.lg }}>
             <CaseInfo c={c} />
+            {latest ? <TriageSupport capture={latest} /> : null}
             <CaseTimeline c={c} />
             {c.review ? (
               <>

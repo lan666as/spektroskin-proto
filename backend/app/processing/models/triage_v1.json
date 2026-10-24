@@ -1,0 +1,268 @@
+{
+ "version": "triage_v1",
+ "classes": [
+  "pigmented",
+  "vascular",
+  "mixed"
+ ],
+ "mean": [
+  -0.70053331,
+  0.18896403,
+  -0.68787197,
+  0.16298528,
+  -0.23835045,
+  0.07191042,
+  -0.11997136,
+  0.03927164,
+  0.5172251,
+  0.27857415,
+  0.33865193,
+  0.12691532
+ ],
+ "scale": [
+  0.39902213,
+  0.1094882,
+  0.29748389,
+  0.07502736,
+  0.17420363,
+  0.04387991,
+  0.08800214,
+  0.02085542,
+  0.46948886,
+  0.19457472,
+  0.25633016,
+  0.10071298
+ ],
+ "coef": [
+  [
+   -0.52218978,
+   0.61953778,
+   1.89229198,
+   -0.35309386,
+   -1.49499748,
+   0.66586176,
+   -1.48067235,
+   0.49022992,
+   2.09903072,
+   0.16793432,
+   -4.84126498,
+   -1.38936999
+  ],
+  [
+   1.45863574,
+   -0.57218995,
+   -0.33427026,
+   0.1663588,
+   2.06993319,
+   -0.6715297,
+   2.0393954,
+   -0.64261673,
+   -2.4063398,
+   -0.29941946,
+   3.46809858,
+   0.90746323
+  ],
+  [
+   -0.93644596,
+   -0.04734783,
+   -1.55802172,
+   0.18673506,
+   -0.57493571,
+   0.00566794,
+   -0.55872305,
+   0.1523868,
+   0.30730909,
+   0.13148514,
+   1.3731664,
+   0.48190676
+  ]
+ ],
+ "intercept": [
+  -1.86226587,
+  -4.83717255,
+  6.69943842
+ ],
+ "trained_at": "2026-10-24 17:42 UTC",
+ "trained_from_commit": "4465576",
+ "data": "synthetic phantoms only; train and test lesions generated from disjoint seeds",
+ "metrics": {
+  "spectral": {
+   "n_features": 12,
+   "train": {
+    "n": 891,
+    "accuracy": 0.9776,
+    "coverage": 0.9663,
+    "accuracy_when_answered": 0.9942,
+    "by_tone": {
+     "light (III)": {
+      "n": 274,
+      "accuracy": 0.9891,
+      "coverage": 0.9672,
+      "accuracy_when_answered": 0.9962
+     },
+     "medium (IV)": {
+      "n": 293,
+      "accuracy": 0.9625,
+      "coverage": 0.9659,
+      "accuracy_when_answered": 0.9894
+     },
+     "dark (V)": {
+      "n": 324,
+      "accuracy": 0.9815,
+      "coverage": 0.966,
+      "accuracy_when_answered": 0.9968
+     }
+    },
+    "confusion": [
+     [
+      296,
+      0,
+      0
+     ],
+     [
+      0,
+      296,
+      0
+     ],
+     [
+      18,
+      2,
+      279
+     ]
+    ]
+   },
+   "held_out": {
+    "n": 445,
+    "accuracy": 0.9775,
+    "coverage": 0.964,
+    "accuracy_when_answered": 0.993,
+    "by_tone": {
+     "light (III)": {
+      "n": 143,
+      "accuracy": 0.993,
+      "coverage": 0.972,
+      "accuracy_when_answered": 1.0
+     },
+     "medium (IV)": {
+      "n": 150,
+      "accuracy": 0.98,
+      "coverage": 0.96,
+      "accuracy_when_answered": 1.0
+     },
+     "dark (V)": {
+      "n": 152,
+      "accuracy": 0.9605,
+      "coverage": 0.9605,
+      "accuracy_when_answered": 0.9795
+     }
+    },
+    "confusion": [
+     [
+      148,
+      0,
+      0
+     ],
+     [
+      0,
+      147,
+      0
+     ],
+     [
+      10,
+      0,
+      140
+     ]
+    ]
+   }
+  },
+  "rgb_only": {
+   "n_features": 6,
+   "train": {
+    "n": 891,
+    "accuracy": 0.9596,
+    "coverage": 0.927,
+    "accuracy_when_answered": 0.9915,
+    "by_tone": {
+     "light (III)": {
+      "n": 274,
+      "accuracy": 0.9635,
+      "coverage": 0.9234,
+      "accuracy_when_answered": 0.996
+     },
+     "medium (IV)": {
+      "n": 293,
+      "accuracy": 0.9488,
+      "coverage": 0.9215,
+      "accuracy_when_answered": 0.9852
+     },
+     "dark (V)": {
+      "n": 324,
+      "accuracy": 0.966,
+      "coverage": 0.9352,
+      "accuracy_when_answered": 0.9934
+     }
+    },
+    "confusion": [
+     [
+      296,
+      0,
+      0
+     ],
+     [
+      0,
+      296,
+      0
+     ],
+     [
+      29,
+      7,
+      263
+     ]
+    ]
+   },
+   "held_out": {
+    "n": 445,
+    "accuracy": 0.9483,
+    "coverage": 0.9236,
+    "accuracy_when_answered": 0.9805,
+    "by_tone": {
+     "light (III)": {
+      "n": 143,
+      "accuracy": 0.965,
+      "coverage": 0.9091,
+      "accuracy_when_answered": 0.9923
+     },
+     "medium (IV)": {
+      "n": 150,
+      "accuracy": 0.9467,
+      "coverage": 0.9067,
+      "accuracy_when_answered": 0.9926
+     },
+     "dark (V)": {
+      "n": 152,
+      "accuracy": 0.9342,
+      "coverage": 0.9539,
+      "accuracy_when_answered": 0.9586
+     }
+    },
+    "confusion": [
+     [
+      148,
+      0,
+      0
+     ],
+     [
+      0,
+      147,
+      0
+     ],
+     [
+      19,
+      4,
+      127
+     ]
+    ]
+   }
+  }
+ }
+}
