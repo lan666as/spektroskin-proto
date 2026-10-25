@@ -10,8 +10,9 @@
   and a wide one for the dermatologist.
 - **Phone (Expo Go, same Wi-Fi as the Mac):** open `exp://192.168.68.143:8081` in Expo Go. The
   Metro dev server is running on the Mac and serves the latest code. It talks to the live API.
-- **Live state:** the newest `live-*` tag (`git tag -l 'live-*' | sort -V | tail -1`; `live-37`
-  at 05:55 WIB) is deployed, and main equals that tag. Gate green (91 unit and API tests, ruff,
+- **Live state:** the newest `live-*` tag (`git tag -l 'live-*' | sort -V | tail -1`) is
+  deployed, and main equals that tag. (`live-42` was deleted: it named a deploy that never
+  happened; see BUILD_LOG.) Gate green (91 unit and API tests, ruff,
   tsc, web export). Live smoke and all 6 Playwright specs, including the full §6 demo script,
   passed against the live site after every deploy. Tags `live-1` … `live-35` mark each verified
   deploy. `pre-iteration` is the state before tonight.
@@ -28,17 +29,8 @@
    always have the AI. I did not backfill production myself.
 2. **PT-0007 research consent:** open PT-0007 and set Research consent to **Yes**. Then the
    extended demo's outcome (Biopsy → Benign) makes the case validation-eligible on the AI page.
-3. **My mistake on your PT-0011:** the batch-25 seed reused the code PT-0011 and attached 4 demo
-   lesions (one capture each) to your own test patient (31 F, VI). Nothing of yours was changed or
-   deleted. The seed now uses PT-0091 and refuses codes held by a different patient. If you want
-   them removed:
-   - lesions b8b27005-f046-5d95-be70-a42f8dda3d00, 1a5ae85a-0f71-5384-aa7d-47d41a4c105b,
-     b7b42ec0-1206-5bdd-b132-5fddfe49328a, 08375ce7-c6fc-540d-8b52-a7e1b036c2f0;
-   - captures 9979d285-be2f-5d79-84d5-9f0a1fc113f0, 9101ba4e-76d2-50cb-8108-3e697358dcdb,
-     e18c0e31-be4a-563f-9669-08d373b5aaa3, 85996485-5f4f-546f-b13e-f14241a0a5e9.
-
-   This is a production delete, so I left it to you. PT-0010 and PT-0012 were not touched.
-
+3. **PT-0011:** the 4 demo lesions my seed attached to your patient were deleted at your request
+   (07:13 WIB, live-39), after a dry run on production. Your own lesions were untouched.
 4. **Security advisories (new tonight, 05:02 WIB), reported, not patched:** GitHub Dependabot
    lists two high-severity npm advisories in `mobile/package-lock.json`. Both come only from the
    Expo developer CLI (`expo` → `@expo/cli`), which runs on the Mac. They are not in the deployed
@@ -52,7 +44,30 @@
    you want it closed before submission, an npm `overrides` entry for zod is the option, followed
    by a full gate run. Your call.
 
-### What changed tonight (35 verified deploys)
+### Morning additions (06:00–07:20 WIB)
+
+- **Melanoma checklists, as AI-assisted diagnosis support:** the ABCD rule of dermoscopy (TDS, with
+  the published thresholds 4.75 and 5.45) and, on palms and soles, BRAAFF (≥ 1 suggests acral
+  melanoma).
+  - Scored automatically, on pigmented lesions only.
+  - Shown on results and on the reviewer page, in the AI strip, as a queue flag and in the
+    referral summary.
+  - Labelled "automated · decision support · not a diagnosis" and cited.
+  - Still no probability: that needs labelled data. Check the BRAAFF reference (Lallas et al., Br J
+    Dermatol 2015) before quoting weights on a slide.
+- **Motto:** "A second look shouldn't require a second visit."
+- **UX:**
+  - "Submit for review" pinned at the bottom of the results screen;
+  - the reviewer's form is on the first screen, with the AI cards beside the images;
+  - "Capture follow-up visit (due …)" on answered cases;
+  - "Next waiting case" for the dermatologist;
+  - technical details folded.
+- **Your Mac:** it was swapping (20 of 21.5 GB), which made the local test runs time out. 16
+  orphaned codegraph servers were stopped, you turned off Rancher Kubernetes, and the build cache
+  was pruned. Lowering Rancher's VM memory from 6 GB to 4 GB and quitting unused apps would help
+  further.
+
+### What changed overnight
 
 Before / after screenshots:
 - before: `docs/screenshots/20261025-0009-audit-before/`;
