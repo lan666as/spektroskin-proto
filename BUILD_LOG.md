@@ -683,3 +683,21 @@ The builder asked for an easier way in for judges, with security not a concern f
   changes their data. All records are synthetic; turn it off after judging.
 - Tests: pytest (enabled signs in as the seeded user; off by default gives 404); e2e
   `demo-login.spec.ts` (one tap to the clinician home, link to the review queue).
+
+## 2026-10-25 08:30 WIB — wider demo cohort in the seed
+
+The builder asked for more varied and complete demo data on the demo accounts. The seed gains 16
+patients (PT-0201 to PT-0216, an unused range checked on production first), owned by `clinician`:
+- Every Fitzpatrick type, I to VI, and 15 body sites, including palm, sole, fingernail and toenail.
+- All three patterns, plus the acral ridge phantom.
+- Growth series: catalogue Day 01/14/30 and per-lesion generated series.
+- Blurred and glare captures with their retakes.
+- A three-lesion patient.
+- Cases in every state: submitted, in review, answered (observe, biopsy, refer).
+- Outcomes: observed, biopsied, excised, referred, declined; one answered case has no outcome yet,
+  so it shows on the to-do list. Research consent is yes on some patients and no on others.
+- Generated lesions use the virtual module's per-lesion identity, so each looks different.
+- **Honesty boundary:** seeded reviews carry no pattern read and outcomes carry no histopathology
+  result other than "pending", so the AI page's agreement and validation-set numbers do not pick
+  up made-up labels.
+- The seed stays idempotent and skips codes held by other patients.
