@@ -615,3 +615,22 @@ Timestamped record of what was built during GENOHACK (Sat 24 – Sun 25 Oct 2026
   - the clinician spec declares a 120 s budget (it runs about 42 s against the 60 s default);
   - review-loop checks the audit row right after sending instead of at the end.
 - UX batch 2 re-landed with these test fixes.
+
+## 2026-10-25 07:15 WIB — Correction: the "live failures" were local; Mac memory
+
+- On re-reading the ship logs, all three failures (06:43, 06:48, 06:59) happened in the local gate,
+  before deploy (`e2e: playwright against http://localhost:8480`). Production stayed on live-41
+  throughout and was never broken.
+- The revert was therefore never deployed. The `live-42` tag I created (claiming f5c86fc was
+  deployed) was wrong and has been deleted locally and on GitHub. The "calm re-run" I took as
+  verification had tested live-41.
+- **Root cause:** the Mac was out of memory, so the browser and the local Docker stack were too
+  slow for the test timeouts.
+  - 16 GB RAM with 20 of 21.5 GB swap in use.
+  - The Rancher Desktop VM had 6 GB, with an unused Kubernetes cluster.
+  - 16 orphaned codegraph MCP servers were left from old sessions.
+- **With the builder's OK:** the orphaned codegraph servers were stopped (the builder approved it
+  in this session); the builder turned off Rancher Kubernetes; the Docker build cache was pruned
+  (417 MB).
+- The next ship passed the local gate and live verification in 1.6 min: live-43 = UX batch 2 plus
+  the test-budget fixes.
