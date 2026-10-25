@@ -62,7 +62,7 @@ export default function Home() {
       <DeviceCard />
       <Button label="New scan" onPress={() => router.push('/patients/new')} testID="new-scan" />
 
-      <Row style={{ flexWrap: 'nowrap' }}>
+      <Row style={{ flexWrap: 'wrap' }}>
         <Pressable style={styles.stat} onPress={() => setFilter('flagged')} testID="stat-flags">
           <Text style={[styles.statNumber, { color: colors.danger }]}>{secondLook.length}</Text>
           <Muted>Flags to check</Muted>
@@ -75,12 +75,11 @@ export default function Home() {
           <Text style={styles.statNumber}>{waiting.length}</Text>
           <Muted>Waiting for review</Muted>
         </Pressable>
+        <Pressable style={styles.stat} onPress={() => router.navigate('/cases')} testID="stat-answered">
+          <Text style={[styles.statNumber, { color: colors.success }]}>{answered.length}</Text>
+          <Muted>Recommendations</Muted>
+        </Pressable>
       </Row>
-      <Pressable onPress={() => router.navigate('/cases')} testID="stat-answered">
-        <Muted style={{ color: colors.success, fontWeight: '700' }}>
-          {answered.length} dermatologist recommendation{answered.length === 1 ? '' : 's'} received ›
-        </Muted>
-      </Pressable>
 
       {latestAnswer ? (
         <Card style={styles.latest}>
@@ -179,7 +178,8 @@ export default function Home() {
 const styles = StyleSheet.create({
   hello: { fontSize: 22, fontWeight: '700', color: colors.text },
   stat: {
-    flex: 1,
+    flexGrow: 1,
+    flexBasis: '45%',
     backgroundColor: colors.background,
     borderWidth: 1,
     borderColor: colors.border,

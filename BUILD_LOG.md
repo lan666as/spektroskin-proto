@@ -662,3 +662,10 @@ today; kept out of git via the local `.git/info/exclude`, the builder decides wh
   Video are marked "next" (they need the SK-2 hardware).
 - The "AI evidence" view tab is renamed Heatmap, matching the deck's view tabs.
 - Checked at 390 px with Playwright screenshots of home and the "Needs attention" filter.
+
+## 2026-10-25 07:55 WIB — restore the Recommendations tile
+
+The builder asked that aligning with the deck never downgrades an existing feature or journey.
+Batch 3 had turned the green Recommendations tile into a text link; it is a full tile again. Home
+now shows four tiles (2×2 at 390 px): flags to check, follow-ups due, waiting for review,
+recommendations. Batches 1–3 were checked for removals: no card, flow or test id was removed.
