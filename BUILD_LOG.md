@@ -766,3 +766,15 @@ every screen (390 px and 1280 px); the results screen was the weakest.
 - **Area-growth highlights** are red (the growth flag's colour) instead of amber, which is
   reserved for the Simulated badge.
 - Nothing removed.
+
+## 2026-10-25 08:58 WIB — home and case page structure, readability
+
+- **Home:** Latest recommendation, To do and Worth a second look now sit under uppercase section
+  labels with counts ("TO DO · 4"), with rows directly on the canvas instead of cards inside cards,
+  as in the Figma "RECENT RESULTS" list.
+- **Patient rows:** a shorter subtitle (age, sex, Fitzpatrick, lesion count, then the last visit
+  on its own line).
+- **Case page:** sections "YOUR REQUEST", "IMAGES SENT WITH THE CASE" and "THIS LESION OVER
+  TIME" below the recommendation and outcome.
+- **Readability:** secondary text gets an 18 px line height.
+- Checked with Playwright screenshots at 390 px; nothing removed.

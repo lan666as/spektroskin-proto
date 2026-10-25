@@ -4,7 +4,7 @@ import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 import { Stack, useLocalSearchParams, useRouter } from 'expo-router';
 
 import { api } from '@/api/client';
-import { Button, Card, ErrorBanner, Heading, Loading, Muted, Pill, Row, Screen } from '@/ui/components';
+import { Button, Card, ErrorBanner, Heading, Loading, Muted, Pill, Row, Screen, SectionLabel } from '@/ui/components';
 import { CaseTimeline, Footnote, HistoryStrip, Recommendation, SpectralViews, VisitCompare } from '@/ui/clinical';
 import { OutcomeCard } from '@/ui/outcome';
 import { formatDate, formatDateTime, patientLabel, siteLabel, STATUS_LABELS, statusTone } from '@/ui/labels';
@@ -76,6 +76,7 @@ export default function ClinicianCase() {
               </Row>
             </Card>
           )}
+          <SectionLabel>YOUR REQUEST</SectionLabel>
           <Card>
             <Muted>
               {patientLabel(c.patient)} · {siteLabel(c.lesion)}
@@ -85,7 +86,9 @@ export default function ClinicianCase() {
             <Muted>Submitted {formatDateTime(c.created_at)}</Muted>
           </Card>
           <CaseTimeline c={c} />
+          <SectionLabel>IMAGES SENT WITH THE CASE</SectionLabel>
           {latest ? <SpectralViews key={latest.id} capture={latest} /> : null}
+          <SectionLabel>THIS LESION OVER TIME</SectionLabel>
           <HistoryStrip captures={c.lesion_history} currentId={latest?.id} onSelect={(v) => setSelectedId(v.id)} />
           <VisitCompare captures={c.lesion_history} selectedId={reviewed?.id} />
           <Footnote />

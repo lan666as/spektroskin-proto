@@ -333,7 +333,7 @@ const styles = StyleSheet.create({
   },
   title: { ...type.title, color: colors.text },
   heading: { ...type.heading, color: colors.text },
-  muted: { ...type.small, color: colors.textMuted },
+  muted: { ...type.small, color: colors.textMuted, lineHeight: 18 },
   card: {
     backgroundColor: colors.background,
     borderColor: colors.border,

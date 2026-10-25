@@ -102,7 +102,7 @@ export default function Home() {
       </Row>
 
       {latestAnswer ? (
-        <Card style={styles.latest}>
+        <>
           <SectionLabel>LATEST RECOMMENDATION</SectionLabel>
           <ListItem
             title={`${latestAnswer.patient.code} · ${siteLabel(latestAnswer.lesion)}`}
@@ -111,12 +111,12 @@ export default function Home() {
             onPress={() => router.push({ pathname: '/cases/[caseId]', params: { caseId: latestAnswer.id } })}
             testID="latest-recommendation"
           />
-        </Card>
+        </>
       ) : null}
 
       {todo.length ? (
-        <Card testID="todo">
-          <Heading>To do</Heading>
+        <View style={styles.group} testID="todo">
+          <SectionLabel>TO DO · {todo.length}</SectionLabel>
           {todo.slice(0, TODO_SHOWN).map(({ c, step }) => (
             <ListItem
               key={c.id}
@@ -128,12 +128,12 @@ export default function Home() {
             />
           ))}
           {todo.length > TODO_SHOWN ? <Muted>and {todo.length - TODO_SHOWN} more in My cases</Muted> : null}
-        </Card>
+        </View>
       ) : null}
 
       {secondLook.length ? (
-        <Card testID="second-look">
-          <Heading>Worth a second look</Heading>
+        <View style={styles.group} testID="second-look">
+          <SectionLabel>WORTH A SECOND LOOK · {secondLook.length}</SectionLabel>
           {secondLook.slice(0, TODO_SHOWN).map(({ patient, flag }) => (
             <ListItem
               key={`${flag.lesion_id}-${flag.flag}`}
@@ -145,7 +145,7 @@ export default function Home() {
             />
           ))}
           <Muted>Automated flags from measurements and lesion comparison; consider asking a dermatologist.</Muted>
-        </Card>
+        </View>
       ) : null}
 
       <Row style={{ justifyContent: 'space-between' }}>
@@ -170,9 +170,9 @@ export default function Home() {
           key={p.id}
           title={p.code}
           left={<Avatar label={p.code.slice(-2)} tone={p.lesion_flags.length ? 'danger' : 'info'} />}
-          subtitle={`${demographics(p)} · ${p.lesion_count} lesion${p.lesion_count === 1 ? '' : 's'}${
-            p.last_visit_at ? ` · last visit ${formatDate(p.last_visit_at)}` : ''
-          }`}
+          subtitle={`${p.age} ${p.sex === 'female' ? 'F' : 'M'} · Fitz. ${p.fitzpatrick} · ${p.lesion_count} lesion${
+            p.lesion_count === 1 ? '' : 's'
+          }${p.last_visit_at ? `\nLast visit ${formatDate(p.last_visit_at)}` : ''}`}
           right={
             <View style={styles.right}>
               {p.lesion_flags[0] ? (
@@ -197,6 +197,7 @@ export default function Home() {
 }
 
 const styles = StyleSheet.create({
+  group: { gap: spacing.sm },
   sectionTitle: { fontSize: 26, fontWeight: '800', color: colors.text, letterSpacing: -0.4 },
   greeting: { flexDirection: 'row', alignItems: 'flex-start', gap: spacing.md, paddingTop: spacing.sm },
   date: { fontWeight: '600', fontSize: 14 },
