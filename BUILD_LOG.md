@@ -722,3 +722,26 @@ anything.
   - No element, flow or test id removed.
 - `npx expo lint` installed ESLint into package.json on its own; that was reverted (`git checkout`
   of package.json and the lockfile, `npm ci`). No dependency changed.
+
+## 2026-10-25 08:55 WIB — redesign to the Figma mocks and app icon
+
+The builder found the device card and other parts badly designed and pointed at `docs/figma`
+(mock screens and the app icon; that folder is git-ignored). The navy-header pass from 08:50 is
+replaced by the mocks' design language.
+- **App icon:** `docs/figma/App Icon.png` is now the app icon, splash image and favicon, and is
+  shown on the login screen.
+- **Device card:** a blue SK-2 panel:
+  - "● Connected" chip and the Simulated badge;
+  - "SpektroSkin SK-2 · Virtual module · virtual-001";
+  - spec chips (White · NIR 850 nm, Polarized, Pigment contrast, 50–100×);
+  - on Home, the white "New scan" button sits inside the panel.
+- **Home:** date and a large "Good morning, …" greeting with an initials avatar instead of a
+  header; four white stat tiles with coloured numbers; uppercase section labels.
+- **Patient list:** rows carry an initials-style avatar (red when the patient has a flag) and a
+  chevron.
+- **AI card:** a check-step list as in the mock "Analyzing" screen (green check, red "!" for items
+  needing attention, grey dot for the inactive risk estimate).
+- **Shell:** light headers on the canvas; floating pill bottom bar with the active tab
+  highlighted; pill buttons; borderless white cards with soft shadows; filled inputs.
+- **Checked:** Playwright screenshots at 390 px (login, home, capture, results, patient list).
+  No element, flow or test id was removed.

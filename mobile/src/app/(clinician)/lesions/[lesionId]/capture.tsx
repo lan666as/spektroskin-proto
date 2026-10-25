@@ -84,12 +84,7 @@ export default function CaptureScreen() {
           {patientLabel(lesion.data.patient)} · {siteLabel(lesion.data)}
         </Muted>
       ) : null}
-      <DeviceCard>
-        <Muted>
-          Each capture is a new synthetic frame set of this lesion (fresh noise and hand motion), not a
-          real optical module.
-        </Muted>
-      </DeviceCard>
+      <DeviceCard note="Each capture is a new synthetic frame set of this lesion (fresh noise and hand motion), not a real optical module." />
       <Chips
         label="Mode"
         options={CAPTURE_MODES}

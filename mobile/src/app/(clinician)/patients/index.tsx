@@ -1,14 +1,13 @@
 import { useQuery } from '@tanstack/react-query';
 import { Stack, useRouter } from 'expo-router';
 import { useState } from 'react';
-import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Image, Pressable, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 
 import { api } from '@/api/client';
 import { absoluteUrl } from '@/api/config';
 import { useSession } from '@/api/session';
-import { Button, Card, Chips, Empty, ErrorBanner, Field, Heading, ListItem, Loading, Muted, Pill, Row, Screen } from '@/ui/components';
+import { Avatar, Button, Card, Chips, Empty, ErrorBanner, Field, Heading, ListItem, Loading, Muted, Pill, Row, Screen, SectionLabel } from '@/ui/components';
 import { DeviceCard } from '@/ui/DeviceCard';
-import { Hero } from '@/ui/Hero';
 import { nextStep } from '@/ui/outcome';
 import { ACTION_LABELS, demographics, duration, FLAG_LABELS, formatDate, siteLabel } from '@/ui/labels';
 import { colors, radius, spacing } from '@/ui/theme';
@@ -16,6 +15,17 @@ import { colors, radius, spacing } from '@/ui/theme';
 const POLL_MS = 5_000;
 const TODO_SHOWN = 5;
 const RECENT_DAYS = 7;
+const TODAY = new Intl.DateTimeFormat('en-GB', { weekday: 'long', day: 'numeric', month: 'long' });
+
+function greeting(): string {
+  const hour = new Date().getHours();
+  return hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
+}
+
+function initials(name: string): string {
+  const words = name.replace(/^dr\.?\s+/i, '').split(/\s+/).filter(Boolean);
+  return words.slice(0, 2).map((w) => w[0]!.toUpperCase()).join('') || '·';
+}
 
 const FILTERS = [
   { value: 'all', label: 'All' },
@@ -30,6 +40,7 @@ export default function Home() {
   const { user } = useSession();
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState<Filter>('all');
+  const { width } = useWindowDimensions();
   const patients = useQuery({ queryKey: ['patients'], queryFn: api.patients });
   const cases = useQuery({ queryKey: ['cases', 'mine'], queryFn: () => api.cases(), refetchInterval: POLL_MS });
   const waiting = cases.data?.filter((c) => c.status !== 'answered') ?? [];
@@ -54,30 +65,37 @@ export default function Home() {
 
   return (
     <Screen testID="patients-screen" onRefresh={() => Promise.all([patients.refetch(), cases.refetch()])}>
-      <Stack.Screen options={{ title: 'Home' }} />
-      <Hero
-        eyebrow="SPEKTROSKIN"
-        title={`Hello, ${user?.display_name ?? ''}`}
-        subtitle="A second look shouldn't require a second visit. Capture a lesion, then ask a dermatologist."
-      />
+      {/* The greeting is the title on phones, as in the Figma home; wide screens keep the header for navigation. */}
+      <Stack.Screen options={{ title: 'Home', headerShown: width >= 700 }} />
+      <View style={styles.greeting}>
+        <View style={{ flex: 1 }}>
+          <Muted style={styles.date}>{TODAY.format(new Date())}</Muted>
+          <Text style={styles.hello}>
+            {greeting()},{'\n'}
+            {user?.display_name}
+          </Text>
+        </View>
+        <Avatar label={initials(user?.display_name ?? '')} />
+      </View>
 
-      <DeviceCard />
-      <Button label="New scan" onPress={() => router.push('/patients/new')} testID="new-scan" />
+      <DeviceCard>
+        <Button label="New scan" variant="onDark" onPress={() => router.push('/patients/new')} testID="new-scan" />
+      </DeviceCard>
 
       <Row style={{ flexWrap: 'wrap' }}>
-        <Pressable style={[styles.stat, { backgroundColor: colors.dangerSoft }]} onPress={() => setFilter('flagged')} testID="stat-flags">
+        <Pressable style={styles.stat} onPress={() => setFilter('flagged')} testID="stat-flags">
           <Text style={[styles.statNumber, { color: colors.danger }]}>{secondLook.length}</Text>
           <Muted>Flags to check</Muted>
         </Pressable>
-        <Pressable style={[styles.stat, { backgroundColor: colors.accentSoft }]} onPress={() => setFilter('follow-up')} testID="stat-follow-up">
+        <Pressable style={styles.stat} onPress={() => setFilter('follow-up')} testID="stat-follow-up">
           <Text style={[styles.statNumber, { color: colors.accent }]}>{todo.length}</Text>
           <Muted>Follow-ups due</Muted>
         </Pressable>
-        <Pressable style={[styles.stat, { backgroundColor: colors.tealSoft }]} onPress={() => router.navigate('/cases')} testID="stat-waiting">
+        <Pressable style={styles.stat} onPress={() => router.navigate('/cases')} testID="stat-waiting">
           <Text style={[styles.statNumber, { color: colors.teal }]}>{waiting.length}</Text>
           <Muted>Waiting for review</Muted>
         </Pressable>
-        <Pressable style={[styles.stat, { backgroundColor: colors.successSoft }]} onPress={() => router.navigate('/cases')} testID="stat-answered">
+        <Pressable style={styles.stat} onPress={() => router.navigate('/cases')} testID="stat-answered">
           <Text style={[styles.statNumber, { color: colors.success }]}>{answered.length}</Text>
           <Muted>Recommendations</Muted>
         </Pressable>
@@ -85,7 +103,7 @@ export default function Home() {
 
       {latestAnswer ? (
         <Card style={styles.latest}>
-          <Muted style={{ color: colors.accent, fontWeight: '700' }}>LATEST RECOMMENDATION</Muted>
+          <SectionLabel>LATEST RECOMMENDATION</SectionLabel>
           <ListItem
             title={`${latestAnswer.patient.code} · ${siteLabel(latestAnswer.lesion)}`}
             subtitle={`Answered in ${duration(latestAnswer.created_at, latestAnswer.answered_at)}`}
@@ -131,7 +149,7 @@ export default function Home() {
       ) : null}
 
       <Row style={{ justifyContent: 'space-between' }}>
-        <Heading>Patients</Heading>
+        <Text style={styles.sectionTitle}>Patients</Text>
         <Button label="New patient" onPress={() => router.push('/patients/new')} testID="new-patient" />
       </Row>
       <Field
@@ -151,6 +169,7 @@ export default function Home() {
         <ListItem
           key={p.id}
           title={p.code}
+          left={<Avatar label={p.code.slice(-2)} tone={p.lesion_flags.length ? 'danger' : 'info'} />}
           subtitle={`${demographics(p)} · ${p.lesion_count} lesion${p.lesion_count === 1 ? '' : 's'}${
             p.last_visit_at ? ` · last visit ${formatDate(p.last_visit_at)}` : ''
           }`}
@@ -178,9 +197,14 @@ export default function Home() {
 }
 
 const styles = StyleSheet.create({
+  sectionTitle: { fontSize: 26, fontWeight: '800', color: colors.text, letterSpacing: -0.4 },
+  greeting: { flexDirection: 'row', alignItems: 'flex-start', gap: spacing.md, paddingTop: spacing.sm },
+  date: { fontWeight: '600', fontSize: 14 },
+  hello: { fontSize: 30, fontWeight: '800', color: colors.text, letterSpacing: -0.6, lineHeight: 36 },
   stat: {
     flexGrow: 1,
     flexBasis: '45%',
+    backgroundColor: colors.background,
     borderRadius: radius.lg,
     padding: spacing.lg,
     gap: 2,

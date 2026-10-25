@@ -112,7 +112,7 @@ export function Button({
 }: {
   label: string;
   onPress: () => void;
-  variant?: 'primary' | 'secondary' | 'danger';
+  variant?: 'primary' | 'secondary' | 'danger' | 'onDark';
   disabled?: boolean;
   busy?: boolean;
   testID?: string;
@@ -130,14 +130,15 @@ export function Button({
         variant === 'primary' && styles.buttonPrimary,
         variant === 'secondary' && styles.buttonSecondary,
         variant === 'danger' && styles.buttonDanger,
+        variant === 'onDark' && styles.buttonOnDark,
         (pressed || inactive) && { opacity: inactive ? 0.5 : 0.85 },
       ]}
     >
       {busy ? (
-        <ActivityIndicator color={variant === 'secondary' ? colors.accent : colors.onAccent} />
+        <ActivityIndicator color={variant === 'secondary' || variant === 'onDark' ? colors.accent : colors.onAccent} />
       ) : (
         <Text
-          style={[styles.buttonText, variant === 'secondary' && { color: colors.accent }]}
+          style={[styles.buttonText, (variant === 'secondary' || variant === 'onDark') && { color: colors.accent }]}
         >
           {label}
         </Text>
@@ -256,12 +257,15 @@ export function ListItem({
   title,
   subtitle,
   right,
+  left,
   onPress,
   testID,
 }: {
   title: string;
   subtitle?: string;
   right?: ReactNode;
+  /** Shown before the title, e.g. an Avatar. */
+  left?: ReactNode;
   onPress: () => void;
   testID?: string;
 }) {
@@ -272,13 +276,35 @@ export function ListItem({
       testID={testID}
       style={({ pressed }) => [styles.listItem, pressed && { backgroundColor: colors.surface }]}
     >
+      {left}
       <View style={{ flex: 1, gap: 2 }}>
         <Text style={styles.listTitle}>{title}</Text>
         {subtitle ? <Muted>{subtitle}</Muted> : null}
       </View>
       {right}
+      <Text style={styles.chevron}>›</Text>
     </Pressable>
   );
+}
+
+/** Initials in a tinted circle, as in the Figma patient list. */
+export function Avatar({ label, tone = 'info' }: { label: string; tone?: 'info' | 'danger' | 'success' | 'neutral' }) {
+  const [bg, fg] = {
+    info: [colors.accentSoft, colors.accent],
+    danger: [colors.dangerSoft, colors.danger],
+    success: [colors.successSoft, colors.success],
+    neutral: [colors.surface, colors.textMuted],
+  }[tone];
+  return (
+    <View style={[styles.avatar, { backgroundColor: bg }]}>
+      <Text style={[styles.avatarText, { color: fg }]}>{label}</Text>
+    </View>
+  );
+}
+
+/** Small uppercase label above a group, as in the Figma mocks ("RECENT RESULTS"). */
+export function SectionLabel({ children }: { children: ReactNode }) {
+  return <Text style={styles.sectionLabel}>{children}</Text>;
 }
 
 const styles = StyleSheet.create({
@@ -303,7 +329,7 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: colors.background,
     borderColor: colors.border,
-    borderWidth: 1,
+    borderWidth: 0,
     borderRadius: radius.lg,
     padding: spacing.lg,
     gap: spacing.md,
@@ -311,7 +337,7 @@ const styles = StyleSheet.create({
   },
   button: {
     minHeight: touchTarget,
-    borderRadius: radius.md,
+    borderRadius: radius.pill,
     paddingHorizontal: spacing.xl,
     alignItems: 'center',
     justifyContent: 'center',
@@ -324,17 +350,18 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 4 },
     elevation: 3,
   },
-  buttonSecondary: { backgroundColor: colors.accentSoft, borderWidth: 1, borderColor: '#C9DCF3' },
+  buttonSecondary: { backgroundColor: colors.accentSoft },
+  buttonOnDark: { backgroundColor: colors.background },
   buttonDanger: { backgroundColor: colors.danger },
   buttonText: { color: colors.onAccent, fontSize: 16, fontWeight: '700', letterSpacing: 0.1 },
   field: { gap: spacing.xs },
   label: { ...type.small, color: colors.textMuted, fontWeight: '600' },
   input: {
     minHeight: touchTarget,
-    borderWidth: 1,
+    borderWidth: 0,
     borderColor: colors.border,
     borderRadius: radius.md,
-    backgroundColor: colors.surface,
+    backgroundColor: '#E8EDF4',
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
     fontSize: 16,
@@ -379,10 +406,13 @@ const styles = StyleSheet.create({
     gap: spacing.md,
     paddingVertical: spacing.md,
     paddingHorizontal: spacing.md,
-    borderWidth: 1,
-    borderColor: colors.border,
+    borderWidth: 0,
     backgroundColor: colors.background,
-    borderRadius: radius.md,
+    borderRadius: radius.lg,
   },
   listTitle: { fontSize: 16, fontWeight: '700', color: colors.text },
+  chevron: { fontSize: 22, color: '#A9B4C4', marginLeft: -4 },
+  avatar: { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center' },
+  avatarText: { fontSize: 15, fontWeight: '800' },
+  sectionLabel: { fontSize: 13, fontWeight: '700', color: colors.textMuted, letterSpacing: 1 },
 });

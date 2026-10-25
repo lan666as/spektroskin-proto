@@ -1,5 +1,5 @@
 import { useNetInfo } from '@react-native-community/netinfo';
-import { Redirect, Stack, useRouter } from 'expo-router';
+import { Redirect, Stack, usePathname, useRouter } from 'expo-router';
 import { Pressable, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -8,7 +8,7 @@ import { useSession } from '@/api/session';
 import { useSync } from '@/sync/SyncProvider';
 
 import { Loading } from './components';
-import { colors, spacing } from './theme';
+import { colors, radius, shadow, spacing } from './theme';
 
 type Link = { label: string; href: '/cases' | '/patients' | '/review' | '/ai' | '/audit'; testID: string };
 
@@ -20,6 +20,7 @@ const WIDE_LAYOUT = 700;
 export function RoleStack({ role, links }: { role: User['role']; links: Link[] }) {
   const { ready, user, signOut } = useSession();
   const router = useRouter();
+  const pathname = usePathname();
   const { width } = useWindowDimensions();
   const insets = useSafeAreaInsets();
   const net = useNetInfo();
@@ -30,11 +31,17 @@ export function RoleStack({ role, links }: { role: User['role']; links: Link[] }
   if (user.role !== role) return <Redirect href="/" />;
 
   const items = [
-    ...links.map((link) => ({ ...link, onPress: () => router.navigate(link.href), muted: false })),
+    ...links.map((link) => ({
+      ...link,
+      onPress: () => router.navigate(link.href),
+      muted: false,
+      active: pathname.startsWith(link.href),
+    })),
     {
       label: 'Sign out',
       testID: 'sign-out',
       muted: true,
+      active: false,
       onPress: async () => {
         await signOut();
         router.replace('/login');
@@ -65,8 +72,8 @@ export function RoleStack({ role, links }: { role: User['role']; links: Link[] }
       <Stack
         screenOptions={{
           headerRight: wide ? headerRight : undefined,
-          headerStyle: { backgroundColor: colors.navy },
-          headerTintColor: colors.onAccent,
+          headerStyle: { backgroundColor: colors.canvas },
+          headerTintColor: colors.text,
           headerTitleStyle: { fontWeight: '700' },
           headerShadowVisible: false,
           contentStyle: { backgroundColor: colors.canvas },
@@ -80,18 +87,23 @@ export function RoleStack({ role, links }: { role: User['role']; links: Link[] }
         </Pressable>
       ) : null}
       {wide ? null : (
-        <View style={[styles.bottomBar, { paddingBottom: insets.bottom }]}>
-          {items.map((item) => (
-            <Pressable
-              key={item.testID}
-              onPress={item.onPress}
-              style={styles.bottomItem}
-              accessibilityRole="button"
-              testID={item.testID}
-            >
-              <Text style={[styles.actionText, item.muted && styles.muted]}>{item.label}</Text>
-            </Pressable>
-          ))}
+        <View style={[styles.bottomWrap, { paddingBottom: insets.bottom + spacing.sm }]}>
+          <View style={styles.bottomBar}>
+            {items.map((item) => (
+              <Pressable
+                key={item.testID}
+                onPress={item.onPress}
+                style={[styles.bottomItem, item.active && styles.bottomItemActive]}
+                accessibilityRole="button"
+                accessibilityState={{ selected: item.active }}
+                testID={item.testID}
+              >
+                <Text style={[styles.bottomText, item.active && styles.bottomTextActive, item.muted && styles.muted]}>
+                  {item.label}
+                </Text>
+              </Pressable>
+            ))}
+          </View>
         </View>
       )}
     </View>
@@ -108,13 +120,22 @@ const styles = StyleSheet.create({
   headerAction: { minHeight: 44, paddingHorizontal: spacing.sm, justifyContent: 'center' },
   actionText: { color: colors.accent, fontWeight: '600', fontSize: 15 },
   muted: { color: colors.textMuted },
-  headerText: { color: colors.onAccent, fontWeight: '600', fontSize: 15 },
-  headerMuted: { color: colors.onNavyMuted },
+  headerText: { color: colors.accent, fontWeight: '600', fontSize: 15 },
+  headerMuted: { color: colors.textMuted },
+  bottomWrap: { backgroundColor: colors.canvas, paddingHorizontal: spacing.lg, paddingTop: spacing.xs },
   bottomBar: {
     flexDirection: 'row',
-    borderTopWidth: 1,
-    borderTopColor: colors.border,
     backgroundColor: colors.background,
+    borderRadius: radius.pill,
+    padding: 6,
+    gap: 4,
+    maxWidth: 520,
+    width: '100%',
+    alignSelf: 'center',
+    ...shadow,
   },
-  bottomItem: { flex: 1, minHeight: 52, alignItems: 'center', justifyContent: 'center' },
+  bottomItem: { flex: 1, minHeight: 48, alignItems: 'center', justifyContent: 'center', borderRadius: radius.pill },
+  bottomItemActive: { backgroundColor: colors.accentSoft },
+  bottomText: { color: colors.textMuted, fontWeight: '600', fontSize: 14 },
+  bottomTextActive: { color: colors.accent, fontWeight: '800' },
 });

@@ -4,8 +4,7 @@ import { Image, StyleSheet, Text, View } from 'react-native';
 
 import type { User } from '@/api/client';
 import { useSession } from '@/api/session';
-import { Button, Card, Chips, ErrorBanner, Field, Muted, Row, Screen } from '@/ui/components';
-import { Hero } from '@/ui/Hero';
+import { Button, Card, Chips, ErrorBanner, Field, Muted, Screen } from '@/ui/components';
 import { SimulatedBadge } from '@/ui/SimulatedBadge';
 import { colors, spacing } from '@/ui/theme';
 
@@ -44,16 +43,11 @@ export default function Login() {
   return (
     <Screen>
       <View style={styles.brand}>
-        <Hero
-          eyebrow="AFFORDABLE, AI-ASSISTED SKIN CANCER ASSESSMENT"
-          title="SpektroSkin"
-          subtitle="A second look shouldn't require a second visit."
-        >
-          <Row style={{ marginTop: spacing.sm }}>
-            <Image source={require('@/assets/images/icon.png')} style={styles.icon} />
-            <SimulatedBadge label="Research prototype · optical module simulated" />
-          </Row>
-        </Hero>
+        <Image source={require('@/assets/images/icon.png')} style={styles.icon} accessibilityLabel="SpektroSkin" />
+        <Text style={styles.eyebrow}>AFFORDABLE, AI-ASSISTED SKIN CANCER ASSESSMENT</Text>
+        <Text style={styles.name}>SpektroSkin</Text>
+        <Text style={styles.tagline}>A second look shouldn't require a second visit.</Text>
+        <SimulatedBadge label="Research prototype · optical module simulated" />
       </View>
       <Card testID="demo-login">
         <Text style={styles.demoTitle}>Try the demo in one tap</Text>
@@ -119,7 +113,10 @@ export default function Login() {
 }
 
 const styles = StyleSheet.create({
-  brand: { paddingTop: spacing.lg },
-  icon: { width: 40, height: 40, borderRadius: 10 },
+  brand: { alignItems: 'center', gap: spacing.sm, paddingTop: spacing.xxl, paddingBottom: spacing.sm },
+  icon: { width: 96, height: 96, borderRadius: 24, marginBottom: spacing.sm },
+  eyebrow: { color: colors.accent, fontSize: 12, fontWeight: '800', letterSpacing: 1.2, textAlign: 'center' },
+  name: { fontSize: 34, fontWeight: '800', color: colors.text, letterSpacing: -0.8 },
+  tagline: { fontSize: 16, color: colors.textMuted, textAlign: 'center', marginBottom: spacing.xs },
   demoTitle: { fontSize: 17, fontWeight: '700', color: colors.text },
 });

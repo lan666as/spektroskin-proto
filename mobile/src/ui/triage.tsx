@@ -8,7 +8,7 @@ import { Button, Card, ErrorBanner, Heading, Muted, Row } from './components';
 import { checklistSummary } from './checklists';
 import { formatArea, isAcral } from './labels';
 import { SimulatedBadge } from './SimulatedBadge';
-import { colors, radius, spacing } from './theme';
+import { colors, radius, shadow, spacing } from './theme';
 
 type Triage = NonNullable<Capture['triage_model']>;
 type Pattern = keyof typeof PATTERN_LABELS;
@@ -154,42 +154,85 @@ export function AcralPattern({ capture, site }: { capture: Capture; site: BodySi
 }
 
 /** One line of AI outputs right under the quality check: what the models suggest, at a glance. */
+function Step({
+  state,
+  title,
+  detail,
+  testID,
+}: {
+  state: 'done' | 'attention' | 'inactive';
+  title: string;
+  detail?: string;
+  testID?: string;
+}) {
+  const [bg, fg, mark] = {
+    done: [colors.successSoft, colors.success, '✓'],
+    attention: [colors.dangerSoft, colors.danger, '!'],
+    inactive: [colors.surface, '#A9B4C4', '•'],
+  }[state];
+  return (
+    <View style={styles.step} testID={testID}>
+      <View style={[styles.stepMark, { backgroundColor: bg }]}>
+        <Text style={[styles.stepMarkText, { color: fg }]}>{mark}</Text>
+      </View>
+      <View style={{ flex: 1 }}>
+        <Text style={[styles.stepTitle, state === 'inactive' && { color: colors.textMuted }]}>{title}</Text>
+        {detail ? <Text style={styles.stepDetail}>{detail}</Text> : null}
+      </View>
+    </View>
+  );
+}
+
 export function AiGlance({ capture, site }: { capture: Capture; site?: BodySite }) {
   const t = capture.triage_model;
   if (!t) return null;
   const acral = site && isAcral(site) ? capture.acral_model : null;
   const change = capture.change_since_first;
+  const checklists = checklistSummary(capture.checklists, site);
   return (
     <View style={styles.glance} testID="ai-glance">
       <Row style={{ justifyContent: 'space-between', flexWrap: 'wrap' }}>
-        <Text style={styles.glanceTitle}>AI analysis · research mode</Text>
+        <Text style={styles.glanceTitle}>AI ANALYSIS · RESEARCH MODE</Text>
         <SimulatedBadge label="Simulated training data" />
       </Row>
-      <Text style={styles.glanceStep}>✓ Image quality: passed</Text>
-      <Text style={styles.glanceStep}>✓ Lesion segmentation: {formatArea(capture.area_mm2)}</Text>
-      <Text style={styles.glanceLine} testID="ai-glance-pattern">
-        ✓ Vascular & pigment pattern: {patternSummary(t)}
-      </Text>
+      <Step state="done" title="Image quality" detail="Passed the quality gate" />
+      <Step state="done" title="Lesion segmentation" detail={`Border detected · ${formatArea(capture.area_mm2)}`} />
+      <Step
+        state="done"
+        title="Vascular & pigment patterns"
+        detail={patternSummary(t)}
+        testID="ai-glance-pattern"
+      />
       {acral ? (
-        <Text style={styles.glanceLine}>
-          Acral: pigment along the{' '}
-          {acral.pattern === 'ridge' ? 'ridges ⚠ prompt review' : acral.pattern === 'furrow' ? 'furrows' : '… (uncertain)'}
-        </Text>
+        <Step
+          state={acral.pattern === 'ridge' ? 'attention' : 'done'}
+          title="Acral pattern"
+          detail={`Pigment along the ${
+            acral.pattern === 'ridge' ? 'ridges · prompt review' : acral.pattern === 'furrow' ? 'furrows' : '… (uncertain)'
+          }`}
+        />
       ) : null}
-      {checklistSummary(capture.checklists, site) ? (
-        <Text style={styles.glanceLine} testID="ai-glance-checklists">
-          {checklistSummary(capture.checklists, site)}
-        </Text>
+      {checklists ? (
+        <Step
+          state={/suspicious|≥|threshold/i.test(checklists) ? 'attention' : 'done'}
+          title="Published checklists"
+          detail={checklists}
+          testID="ai-glance-checklists"
+        />
       ) : null}
       {change ? (
-        <Text style={styles.glanceLine}>
-          Since Day 01: {change.new_area_mm2.toFixed(1)} mm² new area
-        </Text>
+        <Step
+          state={change.new_area_mm2 >= 3 ? 'attention' : 'done'}
+          title="Change since Day 01"
+          detail={`${change.new_area_mm2.toFixed(1)} mm² new area`}
+        />
       ) : null}
-      <Text style={styles.glanceStep} testID="ai-glance-risk">
-        ○ Malignancy risk estimate: not active. It needs histopathology-confirmed captures from the pilot
-        hospitals; a number trained on simulated phantoms would be made up.
-      </Text>
+      <Step
+        state="inactive"
+        title="Malignancy risk estimate · not active"
+        detail="Needs histopathology-confirmed captures from the pilot hospitals; a number trained on simulated phantoms would be made up."
+        testID="ai-glance-risk"
+      />
       <Text style={styles.glanceNote}>
         Decision support, not a diagnosis. Observe · biopsy · refer stays your call, with the
         dermatologist's review. Details and reasons below.
@@ -240,14 +283,18 @@ const styles = StyleSheet.create({
   why: { fontSize: 14, fontWeight: '700', color: colors.text },
   badges: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.xs, width: '100%' },
   glance: {
-    backgroundColor: colors.accentSoft,
+    backgroundColor: colors.background,
     borderRadius: radius.lg,
-    padding: spacing.md,
-    gap: 4,
+    padding: spacing.lg,
+    gap: spacing.md,
+    ...shadow,
   },
+  step: { flexDirection: 'row', alignItems: 'flex-start', gap: spacing.md },
+  stepMark: { width: 28, height: 28, borderRadius: 14, alignItems: 'center', justifyContent: 'center' },
+  stepMarkText: { fontSize: 15, fontWeight: '800' },
+  stepTitle: { fontSize: 16, fontWeight: '700', color: colors.text },
+  stepDetail: { fontSize: 14, color: colors.textMuted, marginTop: 1 },
   glanceTitle: { fontSize: 13, fontWeight: '800', color: colors.accent, letterSpacing: 0.3 },
-  glanceLine: { fontSize: 16, fontWeight: '700', color: colors.text },
-  glanceStep: { fontSize: 14, color: colors.text },
   glanceNote: { fontSize: 12, color: colors.textMuted },
   acral: { fontSize: 18, fontWeight: '800', color: colors.text },
   agreement: { fontSize: 14, fontWeight: '700', color: colors.accent },
