@@ -24,7 +24,7 @@ def _settings(monkeypatch: pytest.MonkeyPatch, enabled: bool) -> None:
     monkeypatch.setattr(auth_api, "get_settings", lambda: settings)
 
 
-def test_demo_login_signs_in_as_the_seeded_user(db: Session, monkeypatch: pytest.MonkeyPatch) -> None:
+def test_demo_login_signs_in_as_seeded_user(db: Session, monkeypatch: pytest.MonkeyPatch) -> None:
     _settings(monkeypatch, True)
     derm = _demo_user(db, "dermatologist")
     token = auth_api.demo_login(auth_api.DemoLogin(role="dermatologist"), db)

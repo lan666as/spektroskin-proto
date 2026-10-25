@@ -36,7 +36,7 @@ class DemoLogin(BaseModel):
 
 @router.post("/demo", response_model=Token)
 def demo_login(body: DemoLogin, session: Annotated[Session, Depends(get_session)]) -> Token:
-    """Sign in as the seeded demo user of a role, without a password (only when DEMO_LOGIN is on)."""
+    """Sign in as the seeded demo user of a role without a password; only when DEMO_LOGIN is on."""
     if not get_settings().demo_login:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Not Found")
     user = session.scalar(select(User).where(User.username == body.role))
