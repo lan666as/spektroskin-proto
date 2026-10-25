@@ -10,7 +10,8 @@ hardware **simulated**:
 simulated optical module → clinician app → backend (quality checks, calibration, spectral maps,
 records) → dermatologist review portal → recommendation back to the clinician.
 
-**Live demo:** https://spektroskin.zidan.dev (demo accounts on request) ·
+**Live demo:** offline since 26 Oct 2026 (the event is over; the production snapshot is the
+`backup-2026-10-26` release, with restore steps) ·
 **Build log:** [BUILD_LOG.md](BUILD_LOG.md) ·
 **Evidence:** [docs/evidence/validation_report.md](docs/evidence/validation_report.md)
 

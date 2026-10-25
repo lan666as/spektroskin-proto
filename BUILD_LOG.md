@@ -778,3 +778,16 @@ every screen (390 px and 1280 px); the results screen was the weakest.
   TIME" below the recommendation and outcome.
 - **Readability:** secondary text gets an 18 px line height.
 - Checked with Playwright screenshots at 390 px; nothing removed.
+
+## 2026-10-26 — after the event: backup and shutdown
+
+GENOHACK is over; the builder asked to wrap up.
+- **Repository** made private on GitHub.
+- **Production backup:** `pg_dump -Fc` of the database plus a tar of the image storage volume,
+  taken from the VPS at `live-53`. Restored into a scratch database locally first; row counts
+  matched production (314 patients, 1031 captures, 277 cases, 260 reviews). Uploaded with
+  SHA-256 sums and restore steps as the GitHub release `backup-2026-10-26`.
+- **VPS:** `docker compose down` (containers and network removed; volumes, images, `.env` and
+  the checkout kept). `docker compose up -d` in the project directory brings it back.
+- **Local Mac:** Expo dev server stopped; `docker compose down -v --rmi local` removed the local
+  containers, volumes (dev and test databases) and the built API image. Code untouched.
