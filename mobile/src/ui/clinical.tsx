@@ -21,7 +21,7 @@ const VIEW_OPTIONS = [
   { value: 'standard', label: 'White light' },
   { value: 'pigment', label: 'Pigment' },
   { value: 'vascular', label: 'Vessels (NIR)' },
-  { value: 'evidence', label: 'AI evidence' },
+  { value: 'evidence', label: 'Heatmap' },
   { value: 'change', label: 'Change since Day 01' },
 ] as const;
 export type ViewName = (typeof VIEW_OPTIONS)[number]['value'];
@@ -31,7 +31,7 @@ const VIEW_HELP: Record<ViewName, string> = {
   pigment: 'Estimated melanin map (darker = more pigment).',
   vascular: 'Blood vessels under the skin: estimated hemoglobin map (darker red = more blood).',
   evidence:
-    'Where the pattern evidence sits: amber = extra pigment, red = extra blood, pink = brightest blood spots, compared with the surrounding skin. These are the maps the triage model reads.',
+    'AI heatmap: where the pattern evidence sits: amber = extra pigment, red = extra blood, pink = brightest blood spots, compared with the surrounding skin. These are the maps the triage model reads.',
   change:
     'Day 01 registered onto this visit by skin texture: blue line = Day 01 outline, teal line = now, amber = new area, blue fill = no longer covered.',
 };

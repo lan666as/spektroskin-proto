@@ -648,3 +648,17 @@ today; kept out of git via the local `.git/info/exclude`, the builder decides wh
   labelled "illustrative". The app shows no malignancy probability, because CLAUDE.md §2 forbids
   one and any number trained on simulated phantoms would be fabricated evidence. The slot is
   visible and says what it needs: histopathology-confirmed captures from the pilots.
+
+## 2026-10-25 07:40 WIB — UX batch 3: home and capture follow the deck's app screens
+
+- Home mirrors the deck's phone home and "Triage" screen:
+  - the SK-2 device card (Simulated) and a "New scan" button;
+  - tiles for flags to check, follow-ups due and cases waiting for review;
+  - patient filter chips All / Needs attention / Follow-up / Recent, with each patient's flag
+    badge.
+- The deck's risk-% badges are replaced by the automated flag badges (growing, looks different,
+  …), for the reason logged at 07:35.
+- Capture shares the device card and shows the deck's modes: Multispectral is active; Photo and
+  Video are marked "next" (they need the SK-2 hardware).
+- The "AI evidence" view tab is renamed Heatmap, matching the deck's view tabs.
+- Checked at 390 px with Playwright screenshots of home and the "Needs attention" filter.

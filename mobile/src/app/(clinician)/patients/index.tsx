@@ -6,18 +6,29 @@ import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import { api } from '@/api/client';
 import { absoluteUrl } from '@/api/config';
 import { useSession } from '@/api/session';
-import { Button, Card, Empty, ErrorBanner, Field, Heading, ListItem, Loading, Muted, Pill, Row, Screen } from '@/ui/components';
+import { Button, Card, Chips, Empty, ErrorBanner, Field, Heading, ListItem, Loading, Muted, Pill, Row, Screen } from '@/ui/components';
+import { DeviceCard } from '@/ui/DeviceCard';
 import { nextStep } from '@/ui/outcome';
 import { ACTION_LABELS, demographics, duration, FLAG_LABELS, formatDate, siteLabel } from '@/ui/labels';
 import { colors, radius, spacing } from '@/ui/theme';
 
 const POLL_MS = 5_000;
 const TODO_SHOWN = 5;
+const RECENT_DAYS = 7;
+
+const FILTERS = [
+  { value: 'all', label: 'All' },
+  { value: 'flagged', label: 'Needs attention' },
+  { value: 'follow-up', label: 'Follow-up' },
+  { value: 'recent', label: 'Recent' },
+] as const;
+type Filter = (typeof FILTERS)[number]['value'];
 
 export default function Home() {
   const router = useRouter();
   const { user } = useSession();
   const [search, setSearch] = useState('');
+  const [filter, setFilter] = useState<Filter>('all');
   const patients = useQuery({ queryKey: ['patients'], queryFn: api.patients });
   const cases = useQuery({ queryKey: ['cases', 'mine'], queryFn: () => api.cases(), refetchInterval: POLL_MS });
   const waiting = cases.data?.filter((c) => c.status !== 'answered') ?? [];
@@ -31,7 +42,14 @@ export default function Home() {
   );
   const latestAnswer = [...answered].sort((a, b) => (b.answered_at ?? '').localeCompare(a.answered_at ?? ''))[0];
   const query = search.trim().toUpperCase();
-  const shown = patients.data?.filter((p) => !query || p.code.includes(query)) ?? [];
+  const followUpCodes = new Set(todo.map(({ c }) => c.patient.code));
+  const recentSince = Date.now() - RECENT_DAYS * 86_400_000;
+  const matchesFilter = (p: NonNullable<typeof patients.data>[number]) =>
+    filter === 'all' ||
+    (filter === 'flagged' && p.lesion_flags.length > 0) ||
+    (filter === 'follow-up' && followUpCodes.has(p.code)) ||
+    (filter === 'recent' && !!p.last_visit_at && Date.parse(p.last_visit_at) >= recentSince);
+  const shown = patients.data?.filter((p) => (!query || p.code.includes(query)) && matchesFilter(p)) ?? [];
 
   return (
     <Screen testID="patients-screen" onRefresh={() => Promise.all([patients.refetch(), cases.refetch()])}>
@@ -41,16 +59,28 @@ export default function Home() {
         <Muted>Capture a lesion, then ask a dermatologist for a second look.</Muted>
       </View>
 
+      <DeviceCard />
+      <Button label="New scan" onPress={() => router.push('/patients/new')} testID="new-scan" />
+
       <Row style={{ flexWrap: 'nowrap' }}>
+        <Pressable style={styles.stat} onPress={() => setFilter('flagged')} testID="stat-flags">
+          <Text style={[styles.statNumber, { color: colors.danger }]}>{secondLook.length}</Text>
+          <Muted>Flags to check</Muted>
+        </Pressable>
+        <Pressable style={styles.stat} onPress={() => setFilter('follow-up')} testID="stat-follow-up">
+          <Text style={styles.statNumber}>{todo.length}</Text>
+          <Muted>Follow-ups due</Muted>
+        </Pressable>
         <Pressable style={styles.stat} onPress={() => router.navigate('/cases')} testID="stat-waiting">
           <Text style={styles.statNumber}>{waiting.length}</Text>
           <Muted>Waiting for review</Muted>
         </Pressable>
-        <Pressable style={styles.stat} onPress={() => router.navigate('/cases')} testID="stat-answered">
-          <Text style={[styles.statNumber, { color: colors.success }]}>{answered.length}</Text>
-          <Muted>Recommendations</Muted>
-        </Pressable>
       </Row>
+      <Pressable onPress={() => router.navigate('/cases')} testID="stat-answered">
+        <Muted style={{ color: colors.success, fontWeight: '700' }}>
+          {answered.length} dermatologist recommendation{answered.length === 1 ? '' : 's'} received ›
+        </Muted>
+      </Pressable>
 
       {latestAnswer ? (
         <Card style={styles.latest}>
@@ -111,10 +141,11 @@ export default function Home() {
         placeholder="e.g. PT-0007"
         testID="patient-search"
       />
+      <Chips options={FILTERS} value={filter} onChange={setFilter} testIDPrefix="filter" />
       <ErrorBanner error={patients.error ?? cases.error} />
       {patients.isPending ? <Loading /> : null}
       {patients.data?.length === 0 ? <Empty>No patients yet. Register the first one.</Empty> : null}
-      {patients.data?.length && shown.length === 0 ? <Empty>No patient matches “{search}”.</Empty> : null}
+      {patients.data?.length && shown.length === 0 ? <Empty>No patient matches this search and filter.</Empty> : null}
       {shown.map((p) => (
         <ListItem
           key={p.id}
@@ -123,11 +154,16 @@ export default function Home() {
             p.last_visit_at ? ` · last visit ${formatDate(p.last_visit_at)}` : ''
           }`}
           right={
-            p.latest_thumbnail_url ? (
-              <Image source={{ uri: absoluteUrl(p.latest_thumbnail_url) }} style={styles.thumb} />
-            ) : (
-              <View style={[styles.thumb, styles.thumbEmpty]} />
-            )
+            <View style={styles.right}>
+              {p.lesion_flags[0] ? (
+                <Pill label={FLAG_LABELS[p.lesion_flags[0].flag].label} tone={FLAG_LABELS[p.lesion_flags[0].flag].tone} />
+              ) : null}
+              {p.latest_thumbnail_url ? (
+                <Image source={{ uri: absoluteUrl(p.latest_thumbnail_url) }} style={styles.thumb} />
+              ) : (
+                <View style={[styles.thumb, styles.thumbEmpty]} />
+              )}
+            </View>
           }
           onPress={() => router.push({ pathname: '/patients/[patientId]', params: { patientId: p.id } })}
           testID={`patient-${p.code}`}
@@ -153,6 +189,7 @@ const styles = StyleSheet.create({
   },
   statNumber: { fontSize: 28, fontWeight: '800', color: colors.text },
   latest: { borderColor: colors.accent, paddingVertical: spacing.sm, gap: 0 },
+  right: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
   thumb: { width: 52, height: 52, borderRadius: radius.sm },
   thumbEmpty: { backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border },
 });

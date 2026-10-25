@@ -9,11 +9,17 @@ import type { FrameName } from '@/device/CaptureDevice';
 import { PHANTOMS } from '@/device/phantoms.generated';
 import { AUTO, captureDevice } from '@/device/VirtualCaptureDevice';
 import { useSync } from '@/sync/SyncProvider';
-import { Button, Card, Chips, ErrorBanner, Heading, Muted, Row, Screen } from '@/ui/components';
+import { Button, Card, Chips, ErrorBanner, Muted, Screen } from '@/ui/components';
 import { patientLabel, siteLabel } from '@/ui/labels';
 import { MultispectralCapture } from '@/ui/MultispectralCapture';
-import { SimulatedBadge } from '@/ui/SimulatedBadge';
+import { DeviceCard } from '@/ui/DeviceCard';
 import { colors, radius, spacing } from '@/ui/theme';
+
+const CAPTURE_MODES = [
+  { value: 'multispectral', label: 'Multispectral' },
+  { value: 'photo', label: 'Photo · next' },
+  { value: 'video', label: 'Video · next' },
+] as const;
 
 type Phase =
   | { kind: 'idle' }
@@ -30,7 +36,6 @@ export default function CaptureScreen() {
   const [error, setError] = useState<unknown>(null);
   const [devOpen, setDevOpen] = useState(false);
   const [phantom, setPhantom] = useState(captureDevice.selectedPhantom());
-  const status = captureDevice.status();
   const sync = useSync();
   const [frames, setFrames] = useState<Partial<Record<FrameName, ImageSourcePropType>>>({});
   const [firing, setFiring] = useState<FrameName | null>(null);
@@ -79,21 +84,20 @@ export default function CaptureScreen() {
           {patientLabel(lesion.data.patient)} · {siteLabel(lesion.data)}
         </Muted>
       ) : null}
-      <Card testID="device-card">
-        <Row style={{ justifyContent: 'space-between' }}>
-          <Row>
-            <View style={[styles.dot, { backgroundColor: status.connected ? colors.success : colors.danger }]} />
-            <Heading>
-              {status.label} {status.connected ? 'connected' : 'disconnected'}
-            </Heading>
-          </Row>
-          <SimulatedBadge />
-        </Row>
+      <DeviceCard>
         <Muted>
-          White light (polarized) · NIR 850 nm · pigment contrast. Device {status.deviceId}. Each capture is a new synthetic frame set of this lesion (fresh
-          noise and hand motion), not a real optical module.
+          Each capture is a new synthetic frame set of this lesion (fresh noise and hand motion), not a
+          real optical module.
         </Muted>
-      </Card>
+      </DeviceCard>
+      <Chips
+        label="Mode"
+        options={CAPTURE_MODES}
+        value="multispectral"
+        onChange={() => undefined}
+        testIDPrefix="mode"
+      />
+      <Muted>Photo and video modes come with the SK-2 hardware; this prototype captures multispectral only.</Muted>
 
       <Card>
         <MultispectralCapture frames={frames} firing={firing} processing={phase.kind === 'processing'} />
@@ -138,6 +142,5 @@ export default function CaptureScreen() {
 }
 
 const styles = StyleSheet.create({
-  dot: { width: 10, height: 10, borderRadius: 5 },
   devToggle: { alignSelf: 'center', padding: spacing.sm, borderRadius: radius.sm },
 });
