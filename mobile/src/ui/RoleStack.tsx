@@ -47,7 +47,7 @@ export function RoleStack({ role, links }: { role: User['role']; links: Link[] }
     <View style={styles.headerActions}>
       {items.map((item) => (
         <Pressable key={item.testID} onPress={item.onPress} style={styles.headerAction} testID={item.testID}>
-          <Text style={[styles.actionText, item.muted && styles.muted]}>{item.label}</Text>
+          <Text style={[styles.headerText, item.muted && styles.headerMuted]}>{item.label}</Text>
         </Pressable>
       ))}
     </View>
@@ -65,9 +65,10 @@ export function RoleStack({ role, links }: { role: User['role']; links: Link[] }
       <Stack
         screenOptions={{
           headerRight: wide ? headerRight : undefined,
-          headerStyle: { backgroundColor: colors.background },
-          headerTintColor: colors.text,
-          headerTitleStyle: { fontWeight: '600' },
+          headerStyle: { backgroundColor: colors.navy },
+          headerTintColor: colors.onAccent,
+          headerTitleStyle: { fontWeight: '700' },
+          headerShadowVisible: false,
           contentStyle: { backgroundColor: colors.canvas },
         }}
       />
@@ -107,6 +108,8 @@ const styles = StyleSheet.create({
   headerAction: { minHeight: 44, paddingHorizontal: spacing.sm, justifyContent: 'center' },
   actionText: { color: colors.accent, fontWeight: '600', fontSize: 15 },
   muted: { color: colors.textMuted },
+  headerText: { color: colors.onAccent, fontWeight: '600', fontSize: 15 },
+  headerMuted: { color: colors.onNavyMuted },
   bottomBar: {
     flexDirection: 'row',
     borderTopWidth: 1,

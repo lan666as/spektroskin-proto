@@ -8,6 +8,7 @@ import { absoluteUrl } from '@/api/config';
 import { useSession } from '@/api/session';
 import { Button, Card, Chips, Empty, ErrorBanner, Field, Heading, ListItem, Loading, Muted, Pill, Row, Screen } from '@/ui/components';
 import { DeviceCard } from '@/ui/DeviceCard';
+import { Hero } from '@/ui/Hero';
 import { nextStep } from '@/ui/outcome';
 import { ACTION_LABELS, demographics, duration, FLAG_LABELS, formatDate, siteLabel } from '@/ui/labels';
 import { colors, radius, spacing } from '@/ui/theme';
@@ -54,28 +55,29 @@ export default function Home() {
   return (
     <Screen testID="patients-screen" onRefresh={() => Promise.all([patients.refetch(), cases.refetch()])}>
       <Stack.Screen options={{ title: 'Home' }} />
-      <View>
-        <Text style={styles.hello}>Hello, {user?.display_name}</Text>
-        <Muted>Capture a lesion, then ask a dermatologist for a second look.</Muted>
-      </View>
+      <Hero
+        eyebrow="SPEKTROSKIN"
+        title={`Hello, ${user?.display_name ?? ''}`}
+        subtitle="A second look shouldn't require a second visit. Capture a lesion, then ask a dermatologist."
+      />
 
       <DeviceCard />
       <Button label="New scan" onPress={() => router.push('/patients/new')} testID="new-scan" />
 
       <Row style={{ flexWrap: 'wrap' }}>
-        <Pressable style={styles.stat} onPress={() => setFilter('flagged')} testID="stat-flags">
+        <Pressable style={[styles.stat, { backgroundColor: colors.dangerSoft }]} onPress={() => setFilter('flagged')} testID="stat-flags">
           <Text style={[styles.statNumber, { color: colors.danger }]}>{secondLook.length}</Text>
           <Muted>Flags to check</Muted>
         </Pressable>
-        <Pressable style={styles.stat} onPress={() => setFilter('follow-up')} testID="stat-follow-up">
-          <Text style={styles.statNumber}>{todo.length}</Text>
+        <Pressable style={[styles.stat, { backgroundColor: colors.accentSoft }]} onPress={() => setFilter('follow-up')} testID="stat-follow-up">
+          <Text style={[styles.statNumber, { color: colors.accent }]}>{todo.length}</Text>
           <Muted>Follow-ups due</Muted>
         </Pressable>
-        <Pressable style={styles.stat} onPress={() => router.navigate('/cases')} testID="stat-waiting">
-          <Text style={styles.statNumber}>{waiting.length}</Text>
+        <Pressable style={[styles.stat, { backgroundColor: colors.tealSoft }]} onPress={() => router.navigate('/cases')} testID="stat-waiting">
+          <Text style={[styles.statNumber, { color: colors.teal }]}>{waiting.length}</Text>
           <Muted>Waiting for review</Muted>
         </Pressable>
-        <Pressable style={styles.stat} onPress={() => router.navigate('/cases')} testID="stat-answered">
+        <Pressable style={[styles.stat, { backgroundColor: colors.successSoft }]} onPress={() => router.navigate('/cases')} testID="stat-answered">
           <Text style={[styles.statNumber, { color: colors.success }]}>{answered.length}</Text>
           <Muted>Recommendations</Muted>
         </Pressable>
@@ -176,18 +178,14 @@ export default function Home() {
 }
 
 const styles = StyleSheet.create({
-  hello: { fontSize: 22, fontWeight: '700', color: colors.text },
   stat: {
     flexGrow: 1,
     flexBasis: '45%',
-    backgroundColor: colors.background,
-    borderWidth: 1,
-    borderColor: colors.border,
     borderRadius: radius.lg,
-    padding: spacing.md,
+    padding: spacing.lg,
     gap: 2,
   },
-  statNumber: { fontSize: 28, fontWeight: '800', color: colors.text },
+  statNumber: { fontSize: 32, fontWeight: '800', color: colors.text, letterSpacing: -0.5 },
   latest: { borderColor: colors.accent, paddingVertical: spacing.sm, gap: 0 },
   right: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
   thumb: { width: 52, height: 52, borderRadius: radius.sm },

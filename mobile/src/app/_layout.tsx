@@ -28,9 +28,10 @@ export default function RootLayout() {
         <SyncProvider>
         <Stack
           screenOptions={{
-            headerStyle: { backgroundColor: colors.background },
-            headerTintColor: colors.text,
-            headerTitleStyle: { fontWeight: '600' },
+            headerStyle: { backgroundColor: colors.navy },
+            headerTintColor: colors.onAccent,
+            headerTitleStyle: { fontWeight: '700' },
+            headerShadowVisible: false,
             contentStyle: { backgroundColor: colors.canvas },
           }}
         >

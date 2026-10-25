@@ -1,30 +1,45 @@
+// Palette from the GENOHACK pitch deck: navy headings and panels, clinical blue accent, teal for
+// spectral highlights. Amber stays reserved for the Simulated badge.
 export const colors = {
   background: '#FFFFFF',
-  canvas: '#F1F5F9',
-  surface: '#F8FAFC',
-  border: '#E2E8F0',
-  text: '#0F172A',
-  textMuted: '#64748B',
-  accent: '#0F766E',
-  accentSoft: '#CCFBF1',
+  canvas: '#F3F6FB',
+  surface: '#F7F9FC',
+  border: '#E3E9F2',
+  text: '#0B2545',
+  textMuted: '#5B6B82',
+  navy: '#0B2545',
+  navySoft: '#1C3A63',
+  onNavyMuted: '#B9C7DD',
+  accent: '#1B5FAA',
+  accentSoft: '#E7F0FB',
+  teal: '#12A4A0',
+  tealSoft: '#E0F5F4',
   onAccent: '#FFFFFF',
   simulatedText: '#B45309',
   simulatedBg: '#FEF3C7',
-  danger: '#B91C1C',
-  dangerSoft: '#FEE2E2',
-  success: '#15803D',
-  successSoft: '#DCFCE7',
+  danger: '#C0262D',
+  dangerSoft: '#FDE8E8',
+  success: '#157F4A',
+  successSoft: '#DFF5E8',
 } as const;
 
 export const spacing = { xs: 4, sm: 8, md: 12, lg: 16, xl: 24, xxl: 32 } as const;
 
-export const radius = { sm: 6, md: 10, lg: 16 } as const;
+export const radius = { sm: 8, md: 14, lg: 20 } as const;
 
 export const type = {
-  title: { fontSize: 24, fontWeight: '700' },
-  heading: { fontSize: 18, fontWeight: '600' },
+  title: { fontSize: 26, fontWeight: '800', letterSpacing: -0.3 },
+  heading: { fontSize: 18, fontWeight: '700', letterSpacing: -0.1 },
   body: { fontSize: 16 },
   small: { fontSize: 13 },
+} as const;
+
+export const shadow = {
+  shadowColor: '#0B2545',
+  shadowOpacity: 0.07,
+  shadowRadius: 18,
+  shadowOffset: { width: 0, height: 6 },
+  elevation: 2,
 } as const;
 
 export const touchTarget = 48;

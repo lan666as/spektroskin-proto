@@ -701,3 +701,24 @@ patients (PT-0201 to PT-0216, an unused range checked on production first), owne
   result other than "pending", so the AI page's agreement and validation-set numbers do not pick
   up made-up labels.
 - The seed stays idempotent and skips codes held by other patients.
+
+## 2026-10-25 08:50 WIB — visual pass in the pitch deck's style
+
+The builder asked for a more elegant, lively look aligned with the deck, without removing
+anything.
+- **Palette** follows the deck: navy, clinical blue accent and teal. Amber stays reserved for the
+  Simulated badge.
+- **Components:**
+  - navy headers;
+  - softer, deeper card shadows; larger radii;
+  - pill-shaped filter chips (navy when selected);
+  - primary buttons with a tinted shadow; soft-blue secondary buttons;
+  - rounded list rows; filled input fields.
+- **New `Hero` panel** (navy with two soft rings) on login and home, carrying the motto.
+- **Home tiles** are tinted per meaning: flags red, follow-ups blue, waiting teal, recommendations
+  green.
+- **Checks:**
+  - Playwright screenshots at 390 px (login, home, patient) and 1280 px (review queue).
+  - No element, flow or test id removed.
+- `npx expo lint` installed ESLint into package.json on its own; that was reverted (`git checkout`
+  of package.json and the lockfile, `npm ci`). No dependency changed.

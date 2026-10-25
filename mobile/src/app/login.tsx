@@ -4,7 +4,8 @@ import { Image, StyleSheet, Text, View } from 'react-native';
 
 import type { User } from '@/api/client';
 import { useSession } from '@/api/session';
-import { Button, Card, Chips, ErrorBanner, Field, Muted, Screen, Title } from '@/ui/components';
+import { Button, Card, Chips, ErrorBanner, Field, Muted, Row, Screen } from '@/ui/components';
+import { Hero } from '@/ui/Hero';
 import { SimulatedBadge } from '@/ui/SimulatedBadge';
 import { colors, spacing } from '@/ui/theme';
 
@@ -43,10 +44,16 @@ export default function Login() {
   return (
     <Screen>
       <View style={styles.brand}>
-        <Image source={require('@/assets/images/icon.png')} style={{ width: 64, height: 64, borderRadius: 14 }} />
-        <Title>SpektroSkin</Title>
-        <Text style={styles.tagline}>A second look shouldn't require a second visit.</Text>
-        <SimulatedBadge label="Research prototype · optical module simulated" />
+        <Hero
+          eyebrow="AFFORDABLE, AI-ASSISTED SKIN CANCER ASSESSMENT"
+          title="SpektroSkin"
+          subtitle="A second look shouldn't require a second visit."
+        >
+          <Row style={{ marginTop: spacing.sm }}>
+            <Image source={require('@/assets/images/icon.png')} style={styles.icon} />
+            <SimulatedBadge label="Research prototype · optical module simulated" />
+          </Row>
+        </Hero>
       </View>
       <Card testID="demo-login">
         <Text style={styles.demoTitle}>Try the demo in one tap</Text>
@@ -112,7 +119,7 @@ export default function Login() {
 }
 
 const styles = StyleSheet.create({
-  brand: { gap: spacing.sm, paddingTop: spacing.xl },
-  tagline: { fontSize: 16, color: colors.textMuted },
+  brand: { paddingTop: spacing.lg },
+  icon: { width: 40, height: 40, borderRadius: 10 },
   demoTitle: { fontSize: 17, fontWeight: '700', color: colors.text },
 });
