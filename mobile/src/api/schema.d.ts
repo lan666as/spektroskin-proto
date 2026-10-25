@@ -38,6 +38,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/auth/demo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Demo Login
+         * @description Sign in as the seeded demo user of a role, without a password (only when DEMO_LOGIN is on).
+         */
+        post: operations["demo_login_api_auth_demo_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/auth/me": {
         parameters: {
             query?: never;
@@ -865,6 +885,14 @@ export interface components {
              * @description Consented, reviewed and histopathology-confirmed: usable to validate a model
              */
             validation_eligible: number;
+        };
+        /** DemoLogin */
+        DemoLogin: {
+            /**
+             * Role
+             * @enum {string}
+             */
+            role: "clinician" | "dermatologist";
         };
         /** HTTPValidationError */
         HTTPValidationError: {
@@ -1729,6 +1757,39 @@ export interface operations {
         requestBody: {
             content: {
                 "application/x-www-form-urlencoded": components["schemas"]["Body_login_api_auth_token_post"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Token"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    demo_login_api_auth_demo_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DemoLogin"];
             };
         };
         responses: {

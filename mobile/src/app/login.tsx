@@ -1,7 +1,8 @@
-import { Redirect, useRouter } from 'expo-router';
-import { useState } from 'react';
+import { Redirect, useLocalSearchParams, useRouter } from 'expo-router';
+import { useEffect, useState } from 'react';
 import { Image, StyleSheet, Text, View } from 'react-native';
 
+import type { User } from '@/api/client';
 import { useSession } from '@/api/session';
 import { Button, Card, Chips, ErrorBanner, Field, Muted, Screen, Title } from '@/ui/components';
 import { SimulatedBadge } from '@/ui/SimulatedBadge';
@@ -9,19 +10,27 @@ import { colors, spacing } from '@/ui/theme';
 
 export default function Login() {
   const router = useRouter();
-  const { ready, user, signIn } = useSession();
+  const { ready, user, signIn, signInDemo } = useSession();
+  // ?as=clinician or ?as=dermatologist: a shareable link that signs straight in (demo only).
+  const { as } = useLocalSearchParams<{ as?: string }>();
+  const linkRole = as === 'clinician' || as === 'dermatologist' ? as : null;
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<unknown>(null);
 
-  if (ready && user) return <Redirect href="/" />;
+  useEffect(() => {
+    if (ready && !user && linkRole) void enter(() => signInDemo(linkRole));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ready, linkRole]);
 
-  async function submit() {
+  if (ready && user) return <Redirect href={user.role === 'dermatologist' ? '/review' : '/patients'} />;
+
+  async function enter(attempt: () => Promise<User>) {
     setBusy(true);
     setError(null);
     try {
-      const signedIn = await signIn(username.trim(), password);
+      const signedIn = await attempt();
       router.replace(signedIn.role === 'dermatologist' ? '/review' : '/patients');
     } catch (e) {
       setError(e);
@@ -29,6 +38,7 @@ export default function Login() {
       setBusy(false);
     }
   }
+  const submit = () => enter(() => signIn(username.trim(), password));
 
   return (
     <Screen>
@@ -38,9 +48,26 @@ export default function Login() {
         <Text style={styles.tagline}>A second look shouldn't require a second visit.</Text>
         <SimulatedBadge label="Research prototype · optical module simulated" />
       </View>
+      <Card testID="demo-login">
+        <Text style={styles.demoTitle}>Try the demo in one tap</Text>
+        <Muted>No password needed. Both roles share the same synthetic demo data.</Muted>
+        <Button
+          label="Open as clinician (phone app)"
+          onPress={() => enter(() => signInDemo('clinician'))}
+          busy={busy}
+          testID="demo-clinician"
+        />
+        <Button
+          label="Open as dermatologist (review portal)"
+          variant="secondary"
+          onPress={() => enter(() => signInDemo('dermatologist'))}
+          busy={busy}
+          testID="demo-dermatologist"
+        />
+      </Card>
       <Card>
         <Chips
-          label="Sign in as"
+          label="Or sign in with a password as"
           options={[
             { value: 'clinician', label: 'Clinician' },
             { value: 'dermatologist', label: 'Dermatologist' },
@@ -87,4 +114,5 @@ export default function Login() {
 const styles = StyleSheet.create({
   brand: { gap: spacing.sm, paddingTop: spacing.xl },
   tagline: { fontSize: 16, color: colors.textMuted },
+  demoTitle: { fontSize: 17, fontWeight: '700', color: colors.text },
 });

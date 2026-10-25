@@ -669,3 +669,17 @@ The builder asked that aligning with the deck never downgrades an existing featu
 Batch 3 had turned the green Recommendations tile into a text link; it is a full tile again. Home
 now shows four tiles (2×2 at 390 px): flags to check, follow-ups due, waiting for review,
 recommendations. Batches 1–3 were checked for removals: no card, flow or test id was removed.
+
+## 2026-10-25 08:10 WIB — one-tap demo sign-in for judges
+
+The builder asked for an easier way in for judges, with security not a concern for the demo.
+- `POST /api/auth/demo {role}` signs in as the seeded `clinician` or `dermatologist` demo user
+  with no password. It is off unless `DEMO_LOGIN` is true; docker-compose turns it on by default
+  (`DEMO_LOGIN=false` in `.env` turns it off). No password is in the app bundle.
+- The login screen gains "Try the demo in one tap": Open as clinician / Open as dermatologist.
+  Password sign-in is unchanged below it.
+- Shareable links sign straight in: `/login?as=clinician` and `/login?as=dermatologist`.
+- **Trade-off, accepted by the builder:** anyone with the URL acts as the demo users and sees and
+  changes their data. All records are synthetic; turn it off after judging.
+- Tests: pytest (enabled signs in as the seeded user; off by default gives 404); e2e
+  `demo-login.spec.ts` (one tap to the clinician home, link to the review queue).

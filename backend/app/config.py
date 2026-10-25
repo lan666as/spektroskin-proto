@@ -12,6 +12,8 @@ class Settings(BaseSettings):
     jwt_expiry_hours: int = 24
     storage_dir: Path = Path("/data/storage")
     simulator_dir: Path = Path(__file__).resolve().parent.parent / "simulator" / "out"
+    # One-tap sign-in as the seeded demo users, so judges can open the prototype without a password.
+    demo_login: bool = False
     cors_origins: list[str] = ["http://localhost:8081", "http://localhost:8480"]
 
 

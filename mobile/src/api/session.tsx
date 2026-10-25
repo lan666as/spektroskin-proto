@@ -1,7 +1,7 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { createContext, type ReactNode, useCallback, useContext, useEffect, useState } from 'react';
 
-import { api, setAccessToken, setUnauthorizedHandler, type User } from './client';
+import { api, type Schemas, setAccessToken, setUnauthorizedHandler, type User } from './client';
 import { clearSession, loadSession, saveSession } from './tokenStore';
 
 type Session = { token: string; user: User };
@@ -9,6 +9,7 @@ type SessionState = {
   ready: boolean;
   user: User | null;
   signIn: (username: string, password: string) => Promise<User>;
+  signInDemo: (role: User['role']) => Promise<User>;
   signOut: () => Promise<void>;
 };
 
@@ -40,16 +41,20 @@ export function SessionProvider({ children }: { children: ReactNode }) {
     return () => setUnauthorizedHandler(null);
   }, [signOut]);
 
-  const signIn = useCallback(async (username: string, password: string) => {
-    const token = await api.login(username, password);
+  const start = useCallback(async (token: Schemas['Token']) => {
     setAccessToken(token.access_token);
     await saveSession(JSON.stringify({ token: token.access_token, user: token.user }));
     setUser(token.user);
     return token.user;
   }, []);
+  const signIn = useCallback(
+    async (username: string, password: string) => start(await api.login(username, password)),
+    [start],
+  );
+  const signInDemo = useCallback(async (role: User['role']) => start(await api.demoLogin(role)), [start]);
 
   return (
-    <SessionContext.Provider value={{ ready, user, signIn, signOut }}>
+    <SessionContext.Provider value={{ ready, user, signIn, signInDemo, signOut }}>
       {children}
     </SessionContext.Provider>
   );

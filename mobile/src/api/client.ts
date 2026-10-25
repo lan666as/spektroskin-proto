@@ -115,6 +115,7 @@ export const api = {
       },
     );
   },
+  demoLogin: (role: User['role']) => post<Schemas['Token']>('/auth/demo', { role }),
   me: () => get<User>('/auth/me'),
   patients: () => get<PatientListItem[]>('/patients'),
   patient: (id: string) => get<PatientDetail>(`/patients/${id}`),
