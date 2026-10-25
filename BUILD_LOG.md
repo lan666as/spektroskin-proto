@@ -635,7 +635,7 @@ Timestamped record of what was built during GENOHACK (Sat 24 – Sun 25 Oct 2026
 - The next ship passed the local gate and live verification in 1.6 min: live-43 = UX batch 2 plus
   the test-budget fixes.
 
-## 2026-10-25 07:35 WIB — align the app to the final pitch deck
+## 2026-10-25 07:27 WIB — align the app to the final pitch deck
 
 The builder asked to align the app with `docs/SPEKTROSKIN_FINAL DECK.pdf` (the deck presented
 today; kept out of git via the local `.git/info/exclude`, the builder decides whether to commit it).
@@ -649,7 +649,7 @@ today; kept out of git via the local `.git/info/exclude`, the builder decides wh
   one and any number trained on simulated phantoms would be fabricated evidence. The slot is
   visible and says what it needs: histopathology-confirmed captures from the pilots.
 
-## 2026-10-25 07:40 WIB — UX batch 3: home and capture follow the deck's app screens
+## 2026-10-25 07:33 WIB — UX batch 3: home and capture follow the deck's app screens
 
 - Home mirrors the deck's phone home and "Triage" screen:
   - the SK-2 device card (Simulated) and a "New scan" button;
@@ -657,20 +657,20 @@ today; kept out of git via the local `.git/info/exclude`, the builder decides wh
   - patient filter chips All / Needs attention / Follow-up / Recent, with each patient's flag
     badge.
 - The deck's risk-% badges are replaced by the automated flag badges (growing, looks different,
-  …), for the reason logged at 07:35.
+  …), for the reason logged at 07:27.
 - Capture shares the device card and shows the deck's modes: Multispectral is active; Photo and
   Video are marked "next" (they need the SK-2 hardware).
 - The "AI evidence" view tab is renamed Heatmap, matching the deck's view tabs.
 - Checked at 390 px with Playwright screenshots of home and the "Needs attention" filter.
 
-## 2026-10-25 07:55 WIB — restore the Recommendations tile
+## 2026-10-25 07:39 WIB — restore the Recommendations tile
 
 The builder asked that aligning with the deck never downgrades an existing feature or journey.
 Batch 3 had turned the green Recommendations tile into a text link; it is a full tile again. Home
 now shows four tiles (2×2 at 390 px): flags to check, follow-ups due, waiting for review,
 recommendations. Batches 1–3 were checked for removals: no card, flow or test id was removed.
 
-## 2026-10-25 08:10 WIB — one-tap demo sign-in for judges
+## 2026-10-25 07:47 WIB — one-tap demo sign-in for judges
 
 The builder asked for an easier way in for judges, with security not a concern for the demo.
 - `POST /api/auth/demo {role}` signs in as the seeded `clinician` or `dermatologist` demo user
@@ -684,7 +684,7 @@ The builder asked for an easier way in for judges, with security not a concern f
 - Tests: pytest (enabled signs in as the seeded user; off by default gives 404); e2e
   `demo-login.spec.ts` (one tap to the clinician home, link to the review queue).
 
-## 2026-10-25 08:30 WIB — wider demo cohort in the seed
+## 2026-10-25 07:57 WIB — wider demo cohort in the seed
 
 The builder asked for more varied and complete demo data on the demo accounts. The seed gains 16
 patients (PT-0201 to PT-0216, an unused range checked on production first), owned by `clinician`:
@@ -702,7 +702,7 @@ patients (PT-0201 to PT-0216, an unused range checked on production first), owne
   up made-up labels.
 - The seed stays idempotent and skips codes held by other patients.
 
-## 2026-10-25 08:50 WIB — visual pass in the pitch deck's style
+## 2026-10-25 08:13 WIB — visual pass in the pitch deck's style
 
 The builder asked for a more elegant, lively look aligned with the deck, without removing
 anything.
@@ -723,10 +723,10 @@ anything.
 - `npx expo lint` installed ESLint into package.json on its own; that was reverted (`git checkout`
   of package.json and the lockfile, `npm ci`). No dependency changed.
 
-## 2026-10-25 08:55 WIB — redesign to the Figma mocks and app icon
+## 2026-10-25 08:28 WIB — redesign to the Figma mocks and app icon
 
 The builder found the device card and other parts badly designed and pointed at `docs/figma`
-(mock screens and the app icon; that folder is git-ignored). The navy-header pass from 08:50 is
+(mock screens and the app icon; that folder is git-ignored). The navy-header pass from 08:13 is
 replaced by the mocks' design language.
 - **App icon:** `docs/figma/App Icon.png` is now the app icon, splash image and favicon, and is
   shown on the login screen.
@@ -745,3 +745,5 @@ replaced by the mocks' design language.
   highlighted; pill buttons; borderless white cards with soft shadows; filled inputs.
 - **Checked:** Playwright screenshots at 390 px (login, home, capture, results, patient list).
   No element, flow or test id was removed.
+- Correction: the times in the headers of today's entries from 07:27 onward were estimates and ran
+  up to 27 minutes ahead; they are now set to the commit times from git.
