@@ -64,6 +64,7 @@ export function SpectralViews({
   return (
     <View style={{ gap: spacing.md }} testID="spectral-views">
       <Chips
+        scroll
         options={allowAll ? [...available, { value: 'all' as const, label: 'All side by side' }] : available}
         value={all ? 'all' : current}
         onChange={(v) => {
@@ -137,6 +138,7 @@ export function VisitCompare({ captures, selectedId }: { captures: Capture[]; se
         <SimulatedBadge />
       </Row>
       <Chips
+        scroll
         options={VIEW_OPTIONS.filter((o) => first.views[o.value] && second.views[o.value])}
         value={view}
         onChange={setView}
@@ -390,7 +392,7 @@ const styles = StyleSheet.create({
   compareCell: { flex: 1, gap: 2 },
   compareImage: { width: '100%', aspectRatio: 1, borderRadius: radius.md, backgroundColor: colors.surface },
   changePill: { borderRadius: radius.md, padding: spacing.sm },
-  changeUp: { backgroundColor: '#FEF3C7' },
+  changeUp: { backgroundColor: colors.dangerSoft },
   changeFlat: { backgroundColor: colors.surface },
   changeText: { fontSize: 16, fontWeight: '700', color: colors.text },
   guidance: { fontSize: 15, color: colors.text },

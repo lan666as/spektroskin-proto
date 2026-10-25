@@ -160,7 +160,7 @@ export default function Home() {
         placeholder="e.g. PT-0007"
         testID="patient-search"
       />
-      <Chips options={FILTERS} value={filter} onChange={setFilter} testIDPrefix="filter" />
+      <Chips scroll options={FILTERS} value={filter} onChange={setFilter} testIDPrefix="filter" />
       <ErrorBanner error={patients.error ?? cases.error} />
       {patients.isPending ? <Loading /> : null}
       {patients.data?.length === 0 ? <Empty>No patients yet. Register the first one.</Empty> : null}

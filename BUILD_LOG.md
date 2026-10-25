@@ -747,3 +747,22 @@ replaced by the mocks' design language.
   No element, flow or test id was removed.
 - Correction: the times in the headers of today's entries from 07:27 onward were estimates and ran
   up to 27 minutes ahead; they are now set to the commit times from git.
+
+## 2026-10-25 08:45 WIB — information flow of the results screen
+
+The builder asked for deeper work on formatting and information flow. I took a screenshot tour of
+every screen (390 px and 1280 px); the results screen was the weakest.
+- **Results order** now follows the Figma "Result" screen:
+  1. the images and view tabs;
+  2. size and change;
+  3. the AI analysis check list;
+  4. "WHY · THE EVIDENCE BEHIND EACH STEP": quality check, triage support, acral pattern,
+     checklists, measurements, automated analysis;
+  5. "THIS LESION OVER TIME": history and visit compare;
+  6. technical details.
+
+  A failed quality check still comes first, with its retake guidance.
+- **View tabs and filters** are one swipeable row instead of wrapping to two lines.
+- **Area-growth highlights** are red (the growth flag's colour) instead of amber, which is
+  reserved for the Simulated badge.
+- Nothing removed.

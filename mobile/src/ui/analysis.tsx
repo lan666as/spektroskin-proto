@@ -197,7 +197,7 @@ const styles = StyleSheet.create({
   big: { fontSize: 30, fontWeight: '800', color: colors.text },
   medium: { fontSize: 20, fontWeight: '700', color: colors.text },
   change: { borderRadius: radius.md, padding: spacing.sm },
-  changeUp: { backgroundColor: '#FEF3C7' },
+  changeUp: { backgroundColor: colors.dangerSoft },
   changeFlat: { backgroundColor: colors.surface },
   changeText: { fontSize: 15, fontWeight: '700', color: colors.text },
   assist: { backgroundColor: colors.accentSoft, borderRadius: radius.sm, paddingHorizontal: spacing.sm, paddingVertical: 2 },

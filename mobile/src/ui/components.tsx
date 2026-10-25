@@ -166,18 +166,17 @@ export function Chips<T extends string>({
   value,
   onChange,
   testIDPrefix,
+  scroll = false,
 }: {
   label?: string;
   options: readonly { value: T; label: string }[];
   value: T | null;
   onChange: (value: T) => void;
   testIDPrefix?: string;
+  /** One swipeable row instead of wrapping (view tabs, filters). */
+  scroll?: boolean;
 }) {
-  return (
-    <View style={styles.field}>
-      {label ? <Text style={styles.label}>{label}</Text> : null}
-      <View style={styles.chips}>
-        {options.map((option) => {
+  const chips = options.map((option) => {
           const selected = option.value === value;
           return (
             <Pressable
@@ -193,8 +192,17 @@ export function Chips<T extends string>({
               </Text>
             </Pressable>
           );
-        })}
-      </View>
+  });
+  return (
+    <View style={styles.field}>
+      {label ? <Text style={styles.label}>{label}</Text> : null}
+      {scroll ? (
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chipsRow}>
+          {chips}
+        </ScrollView>
+      ) : (
+        <View style={styles.chips}>{chips}</View>
+      )}
     </View>
   );
 }
@@ -368,6 +376,7 @@ const styles = StyleSheet.create({
     color: colors.text,
   },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
+  chipsRow: { flexDirection: 'row', gap: spacing.sm, paddingRight: spacing.lg },
   chip: {
     minHeight: 40,
     maxWidth: '100%',
