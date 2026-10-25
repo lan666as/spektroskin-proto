@@ -18,18 +18,18 @@ export const SIMULATION_FOOTNOTE =
   'No diagnosis, cancer probability or risk score. AI suggestions are research-mode outputs of small models trained on simulated data only.';
 
 const VIEW_OPTIONS = [
-  { value: 'standard', label: 'Standard' },
+  { value: 'standard', label: 'White light' },
   { value: 'pigment', label: 'Pigment' },
-  { value: 'vascular', label: 'Vascular' },
+  { value: 'vascular', label: 'Vessels (NIR)' },
   { value: 'evidence', label: 'AI evidence' },
   { value: 'change', label: 'Change since Day 01' },
 ] as const;
 export type ViewName = (typeof VIEW_OPTIONS)[number]['value'];
 
 const VIEW_HELP: Record<ViewName, string> = {
-  standard: 'Pseudo-colour image from the blue, green and red bands.',
+  standard: 'White-light view: pseudo-colour image from the blue, green and red bands.',
   pigment: 'Estimated melanin map (darker = more pigment).',
-  vascular: 'Estimated hemoglobin map (darker red = more blood).',
+  vascular: 'Blood vessels under the skin: estimated hemoglobin map (darker red = more blood).',
   evidence:
     'Where the pattern evidence sits: amber = extra pigment, red = extra blood, pink = brightest blood spots, compared with the surrounding skin. These are the maps the triage model reads.',
   change:

@@ -90,7 +90,7 @@ export default function CaptureScreen() {
           <SimulatedBadge />
         </Row>
         <Muted>
-          Device {status.deviceId}. Each capture is a new synthetic frame set of this lesion (fresh
+          White light (polarized) · NIR 850 nm · pigment contrast. Device {status.deviceId}. Each capture is a new synthetic frame set of this lesion (fresh
           noise and hand motion), not a real optical module.
         </Muted>
       </Card>

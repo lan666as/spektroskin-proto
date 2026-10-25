@@ -634,3 +634,17 @@ Timestamped record of what was built during GENOHACK (Sat 24 – Sun 25 Oct 2026
   (417 MB).
 - The next ship passed the local gate and live verification in 1.6 min: live-43 = UX batch 2 plus
   the test-budget fixes.
+
+## 2026-10-25 07:35 WIB — align the app to the final pitch deck
+
+The builder asked to align the app with `docs/SPEKTROSKIN_FINAL DECK.pdf` (the deck presented
+today; kept out of git via the local `.git/info/exclude`, the builder decides whether to commit it).
+- Device card names the deck's device: "SpektroSkin SK-2 (virtual)" with white light (polarized),
+  NIR 850 nm and pigment contrast; it stays badged Simulated.
+- View tabs use the deck's three views: White light, Pigment, Vessels (NIR).
+- The AI card follows the deck's "Analyze" checklist: image quality, lesion segmentation, vascular
+  & pigment pattern, and the malignancy risk estimate shown as **not active**.
+- **Deviation from the deck, on purpose:** the deck's "78 % melanoma" screen is a design mock
+  labelled "illustrative". The app shows no malignancy probability, because CLAUDE.md §2 forbids
+  one and any number trained on simulated phantoms would be fabricated evidence. The slot is
+  visible and says what it needs: histopathology-confirmed captures from the pilots.

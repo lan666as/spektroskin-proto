@@ -6,7 +6,7 @@ import { api, type BodySite, type Capture } from '@/api/client';
 
 import { Button, Card, ErrorBanner, Heading, Muted, Row } from './components';
 import { checklistSummary } from './checklists';
-import { isAcral } from './labels';
+import { formatArea, isAcral } from './labels';
 import { SimulatedBadge } from './SimulatedBadge';
 import { colors, radius, spacing } from './theme';
 
@@ -162,11 +162,13 @@ export function AiGlance({ capture, site }: { capture: Capture; site?: BodySite 
   return (
     <View style={styles.glance} testID="ai-glance">
       <Row style={{ justifyContent: 'space-between', flexWrap: 'wrap' }}>
-        <Text style={styles.glanceTitle}>AI assist · research mode</Text>
+        <Text style={styles.glanceTitle}>AI analysis · research mode</Text>
         <SimulatedBadge label="Simulated training data" />
       </Row>
+      <Text style={styles.glanceStep}>✓ Image quality: passed</Text>
+      <Text style={styles.glanceStep}>✓ Lesion segmentation: {formatArea(capture.area_mm2)}</Text>
       <Text style={styles.glanceLine} testID="ai-glance-pattern">
-        Pattern: {patternSummary(t)}
+        ✓ Vascular & pigment pattern: {patternSummary(t)}
       </Text>
       {acral ? (
         <Text style={styles.glanceLine}>
@@ -184,7 +186,14 @@ export function AiGlance({ capture, site }: { capture: Capture; site?: BodySite 
           Since Day 01: {change.new_area_mm2.toFixed(1)} mm² new area
         </Text>
       ) : null}
-      <Text style={styles.glanceNote}>Suggestions, not a diagnosis. Details and reasons below.</Text>
+      <Text style={styles.glanceStep} testID="ai-glance-risk">
+        ○ Malignancy risk estimate: not active. It needs histopathology-confirmed captures from the pilot
+        hospitals; a number trained on simulated phantoms would be made up.
+      </Text>
+      <Text style={styles.glanceNote}>
+        Decision support, not a diagnosis. Observe · biopsy · refer stays your call, with the
+        dermatologist's review. Details and reasons below.
+      </Text>
     </View>
   );
 }
@@ -238,6 +247,7 @@ const styles = StyleSheet.create({
   },
   glanceTitle: { fontSize: 13, fontWeight: '800', color: colors.accent, letterSpacing: 0.3 },
   glanceLine: { fontSize: 16, fontWeight: '700', color: colors.text },
+  glanceStep: { fontSize: 14, color: colors.text },
   glanceNote: { fontSize: 12, color: colors.textMuted },
   acral: { fontSize: 18, fontWeight: '800', color: colors.text },
   agreement: { fontSize: 14, fontWeight: '700', color: colors.accent },

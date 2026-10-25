@@ -26,7 +26,7 @@ const SHOW_MS = 250;
 const STATUS: DeviceStatus = {
   connected: true,
   deviceId: 'virtual-001',
-  label: 'Virtual module',
+  label: 'SpektroSkin SK-2 (virtual)',
   simulated: true,
 };
 
